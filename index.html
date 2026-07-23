@@ -628,7 +628,7 @@
                             <button class="btn btn-sm btn-outline" onclick="openRecipeFormModal()">+ 添加菜谱</button>
                         </div>
                         <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
-                        <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 随机生成菜谱</button>
+                        <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 今天吃啥？</button>
                         <div id="recipeList" style="margin-top:12px;"></div>
                     </div>
                 </div>
@@ -1625,13 +1625,17 @@
         const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
         const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
 
-        return `
-        <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
+    return `
+    <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
+            <div style="display:flex;gap:6px;align-items:center;">
                 <span style="font-size:12px;color:var(--primary);font-weight:600;">${matchRate > 0 ? '匹配' + matchRate + '%' : ''}</span>
+                <button class="btn btn-sm" style="background:#e3f2fd;color:#1976d2;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();openRecipeEditModal('${recipe.name}')">编辑</button>
+                <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
             </div>
-            <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
+        </div>
+        <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
             <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
                 ${mainIngs.map(ing => {
                     const have = invMap[ing.name] || 0;
@@ -1715,14 +1719,25 @@
         const invMap = {};
         for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
 
-        document.getElementById('consumptionPreview').innerHTML = selectedRecipe.ingredients.map(ing => {
-            const before = invMap[ing.name] || 0;
-            const after = before - ing.grams;
+    const condimentCats = ['调料', '香料'];
+    document.getElementById('consumptionPreview').innerHTML = selectedRecipe.ingredients.map(ing => {
+        const isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
+        const before = invMap[ing.name] || 0;
+        
+        // 如果是调料，只展示，不计算扣减
+        if (isCondiment) {
             return `<div class="preview-item">
-                <span>${ing.name}</span>
-                <span>${before}g → <span class="deduct">${Math.max(0, after)}g</span>${after <= 0 ? '<span class="exhausted"> (耗尽)</span>' : ''}</span>
+            <span>${ing.name} <span style="color:var(--gray-400);font-size:11px;">(调料)</span></span>
+            <span style="color:var(--gray-400);">需 ${ing.grams}g (不扣库存)</span>
             </div>`;
-        }).join('');
+        }
+
+        const after = before - ing.grams;
+        return `<div class="preview-item">
+        <span>${ing.name}</span>
+        <span>${before}g → <span class="deduct">${Math.max(0, after)}g</span>${after <= 0 ? '<span class="exhausted"> (耗尽)</span>' : ''}</span>
+        </div>`;
+    }).join('');
     }
 
     function confirmMeal() {
@@ -1732,20 +1747,32 @@
         for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
 
         // 再次检查库存是否充足
-        for (const ing of selectedRecipe.ingredients) {
-            if (!invMap[ing.name] || invMap[ing.name] < ing.grams) {
-                showToast(`食材不足：${ing.name} 需要 ${ing.grams}g，库存只有 ${invMap[ing.name] || 0}g`);
-                return;
-            }
+            const condimentCats = ['调料', '香料']; // 定义不扣库存的分类
+    
+    // 再次检查库存是否充足 (跳过调料)
+    for (const ing of selectedRecipe.ingredients) {
+        // 如果是调料或香料，直接跳过，不检查库存
+        if (condimentCats.includes(guessIngredientCategory(ing.name))) {
+            continue; 
         }
-
-        // 扣减库存
-        const consumed = [];
-        for (const ing of selectedRecipe.ingredients) {
-            const useGrams = recipeConfirmGrams[ing.name] !== undefined ? recipeConfirmGrams[ing.name] : ing.grams;
+        if (!invMap[ing.name] || invMap[ing.name] < ing.grams) {
+            showToast(`食材不足：${ing.name} 需要 ${ing.grams}g，库存只有 ${invMap[ing.name] || 0}g`);
+            return;
+        }
+    }
+    
+    // 扣减库存 (跳过调料)
+    const consumed = [];
+    for (const ing of selectedRecipe.ingredients) {
+        const isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
+        const useGrams = recipeConfirmGrams[ing.name] !== undefined ? recipeConfirmGrams[ing.name] : ing.grams;
+        
+        // 只有非调料才扣减库存
+        if (!isCondiment && appData.inventory[ing.name]) {
             appData.inventory[ing.name].grams -= useGrams;
-            consumed.push({ name: ing.name, grams: useGrams });
         }
+        consumed.push({ name: ing.name, grams: useGrams, isCondiment: isCondiment });
+    }
 
         // 记录到日历
         if (!appData.mealLog[confirmDate]) {
