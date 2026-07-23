@@ -13,7 +13,7 @@
     <link rel="manifest" id="manifestLink" href="/menu-generator/manifest.json">
     <link rel="apple-touch-icon" id="appleTouchIcon" href="/menu-generator/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/menu-generator/icon-192.png">
-    <title>随机菜单生成器</title>
+    <title>今天吃什么？</title>
     <style>
         :root {
             --primary: #ff6b6b;
@@ -590,7 +590,7 @@
     <div class="app">
         <!-- Header -->
         <div class="header">
-            <h1>🍳 随机菜单生成器</h1>
+            <h1>🍳 今天吃什么？</h1>
             <div class="subtitle">管理食材 · 智能推荐 · 饮食记录</div>
         </div>
 
@@ -615,11 +615,7 @@
                         <span class="cat-chip" onclick="filterCategory('酱菜')">🫙 酱菜</span>
                     </div>
                     <div id="invList"></div>
-                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-200);display:flex;gap:10px;">
-                        <button class="btn btn-secondary btn-sm" onclick="exportData()" style="flex:1;">📤 导出</button>
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()" style="flex:1;">📥 导入</button>
-                        <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
-                    </div>
+
                 </div>
             </div>
 
@@ -670,7 +666,7 @@
                     <div id="catManageList" style="margin-top:8px;"></div>
                 </div>
                 <div class="card">
-                    <div class="card-title">🎨 食材图标</div>
+                    <div class="card-title">🎨 食材管理</div>
                     <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">为食材单独设置图标（覆盖分类默认图标）</div>
                     <div class="form-row">
                         <input type="text" id="iconIngName" placeholder="食材名称" autocomplete="off">
@@ -690,6 +686,15 @@
                             <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">建议 512×512 PNG 正方形</div>
                             <button class="btn btn-sm btn-secondary" onclick="resetAppIcon()" style="margin-top:4px;">恢复默认</button>
                         </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">💾 数据管理</div>
+                    <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px;">导出或导入食材、菜谱和饮食记录</div>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn btn-secondary btn-sm" onclick="exportData()" style="flex:1;">📤 导出数据</button>
+                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()" style="flex:1;">📥 导入数据</button>
+                        <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
                     </div>
                 </div>
             </div>
@@ -822,7 +827,9 @@
                     <span class="date-text" id="confirmDateText"></span>
                     <button onclick="shiftConfirmDate(1)">▶</button>
                 </div>
-                <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;">食材消耗预览</div>
+                <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;">食材用量调整 <span style="color:var(--primary);font-weight:600;" id="confirmCalDisplay"></span></div>
+                <div id="confirmGramsAdjust"></div>
+                <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;margin-top:12px;">食材消耗预览</div>
                 <div id="consumptionPreview"></div>
                 <div style="display:flex;gap:10px;margin-top:16px;">
                     <button class="btn btn-secondary" onclick="closeConfirmModal()" style="flex:1;">取消</button>
@@ -2070,6 +2077,19 @@
         renderCategoryManage();
         if (currentTab === 'inventory') renderInventory();
         showToast('分类已更新 ✅', 'success');
+    }
+
+    function editCategoryCal(name) {
+        var cats = appData.customCategories || {};
+        var current = cats[name + '_cal'] || CATEGORY_DEFAULT_CALORIES[name] || 100;
+        var val = prompt('设置「' + name + '」每100g热量（kcal）：', current);
+        if (val === null || val.trim() === '') return;
+        var cal = parseInt(val);
+        if (isNaN(cal) || cal < 0) { showToast('请输入有效数字'); return; }
+        if (!appData.customCategories) appData.customCategories = {};
+        appData.customCategories[name + '_cal'] = cal;
+        persist(); renderCategoryManage();
+        showToast('热量已更新 ✅', 'success');
     }
 
     function categoryDragStart(e, name) {
