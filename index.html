@@ -841,6 +841,28 @@
         '香料':'🌿','干货':'🍄','水产':'🐟','乳制品':'🥛','水果':'🍎','酱菜':'🫙'
     };
 
+    const CALORIE_TABLE = {
+        '猪肉':395,'猪瘦肉':143,'五花肉':518,'排骨':264,'猪肝':129,'猪蹄':260,'牛肉':125,'牛腩':163,'牛腱':113,'牛排':188,'羊肉':203,'羊排':236,'鸡肉':167,'鸡胸肉':133,'鸡腿':181,'鸡翅':194,'鸡爪':254,'鸭肉':240,'鸭腿':217,'猪肉末':395,'肉末':395,'培根':541,'火腿':330,'香肠':508,'鱼':105,'草鱼':113,'鲫鱼':108,'鲈鱼':105,'三文鱼':208,'带鱼':127,'虾':93,'虾仁':48,'基围虾':99,'小龙虾':93,'螃蟹':95,'蟹':95,'蟹黄':237,'贝类':80,'蛤蜊':56,'花甲':56,'蛏子':40,'生蚝':73,'鱿鱼':75,'墨鱼':83,'章鱼':135,'鸡蛋':144,'鸭蛋':180,'鹌鹑蛋':160,'咸鸭蛋':190,'皮蛋':171,'番茄':18,'西红柿':18,'黄瓜':16,'冬瓜':12,'南瓜':23,'苦瓜':19,'丝瓜':20,'白菜':13,'大白菜':13,'娃娃菜':13,'小白菜':15,'油菜':15,'菠菜':28,'生菜':13,'油麦菜':15,'芹菜':14,'韭菜':26,'香菜':31,'葱':30,'姜':41,'蒜':126,'蒜苗':40,'蒜薹':61,'青椒':22,'辣椒':38,'甜椒':19,'彩椒':19,'土豆':81,'马铃薯':81,'山药':57,'芋头':79,'红薯':86,'紫薯':82,'胡萝卜':37,'白萝卜':16,'萝卜':16,'莲藕':73,'藕':73,'茄子':23,'豆角':34,'四季豆':31,'豇豆':32,'豌豆':111,'毛豆':131,'西兰花':36,'花菜':24,'菜花':24,'卷心菜':22,'包菜':22,'甘蓝':22,'洋葱':39,'玉米':112,'玉米粒':112,'竹笋':23,'笋':23,'芦笋':22,'菌菇':25,'蘑菇':24,'香菇':26,'金针菇':32,'杏鲍菇':38,'木耳':27,'豆腐':82,'嫩豆腐':62,'老豆腐':82,'内酯豆腐':50,'豆腐干':140,'豆干':140,'香干':147,'豆皮':409,'千张':260,'腐竹':459,'豆腐皮':409,'油豆腐':245,'豆腐泡':245,'黄豆':359,'绿豆':316,'红豆':309,'米饭':116,'大米':346,'白米饭':116,'熟米饭':116,'面条':286,'挂面':346,'湿面':280,'方便面':472,'馒头':223,'包子':227,'饺子':240,'馄饨':218,'面包':312,'吐司':278,'全麦面包':246,'面粉':344,'小麦粉':344,'玉米面':341,'小米':358,'糯米':348,'燕麦':377,'食用油':899,'花生油':899,'菜籽油':899,'橄榄油':899,'香油':898,'盐':0,'食盐':0,'酱油':63,'生抽':53,'老抽':88,'蚝油':117,'醋':30,'陈醋':114,'白醋':6,'香醋':68,'糖':396,'白糖':396,'冰糖':397,'红糖':389,'料酒':70,'黄酒':66,'豆瓣酱':178,'辣椒酱':88,'番茄酱':83,'甜面酱':136,'芝麻酱':618,'鸡精':262,'味精':268,'花椒':258,'八角':281,'桂皮':259,'胡椒粉':296,'五香粉':348,'辣椒粉':314,'孜然粉':375,'淀粉':346,'玉米淀粉':345,'土豆淀粉':337,'生粉':346,'牛奶':54,'全脂牛奶':61,'脱脂牛奶':33,'酸奶':72,'奶酪':328,'黄油':717,'奶油':340,'苹果':53,'香蕉':93,'橙子':48,'橘子':44,'葡萄':45,'西瓜':31,'草莓':32,'猕猴桃':61,'芒果':35,'菠萝':44,'桃子':48,'梨':51,'柠檬':37,'蓝莓':57,'红枣':276,'枸杞':349,'桂圆':273,'莲子':344,'百合':342,'银耳':200,'紫菜':207,'海带':77,'海带丝':77,'虾皮':153,'干贝':264,'海米':198,'榨菜':29,'酸菜':16,'泡菜':24,'雪里红':25,'酱黄瓜':39,'萝卜干':59,'粉条':337,'粉丝':335,'宽粉':338,'年糕':154,'汤圆':231,'粽子':195,'花生':563,'核桃':627,'腰果':553,'杏仁':578,'瓜子':597,'蜂蜜':321,'巧克力':546,'冰淇淋':127,'蛋白':60,'蛋黄':328
+    };
+    const CATEGORY_DEFAULT_CALORIES = {
+        '肉类':200,'水产':100,'蛋类':144,'蔬菜':25,'豆制品':100,'主食':150,'调料':0,'香料':0,'干货':250,'乳制品':60,'水果':50,'酱菜':30,'其他':100
+    };
+    function getIngredientCalories(name) {
+        if (CALORIE_TABLE[name]) return CALORIE_TABLE[name];
+        var invItem = appData.inventory[name];
+        if (!invItem) return 100;
+        var customCats = appData.customCategories || {};
+        if (customCats[invItem.category + '_cal']) return customCats[invItem.category + '_cal'];
+        return CATEGORY_DEFAULT_CALORIES[invItem.category] || 100;
+    }
+    function calcRecipeCalories(recipe) {
+        var total = 0;
+        recipe.ingredients.forEach(function(ing) {
+            total += Math.round(getIngredientCalories(ing.name) * ing.grams / 100);
+        });
+        return total;
+    }
+
     const DEFAULT_PANTRY = {};
 
     // ==================== 菜谱数据库（带克数） ====================
@@ -1221,38 +1243,42 @@
         if (body) body.classList.toggle('open', openedCategories[cat]);
     }
 
+    var catFilterExpanded = false;
     function renderCategoryFilter() {
-        const builtIn = { ...CATEGORY_EMOJI };
-        const customCats = appData.customCategories || {};
-        const allCats = { ...builtIn, ...customCats };
-        const catKeys = Object.keys(allCats);
-        const chips = ['全部', ...catKeys.slice(0, 3)];
-        const dropdownCats = catKeys.slice(3);
-        const container = document.getElementById('catFilter');
-        let html = '';
-        chips.forEach(cat => {
-            const emoji = cat === '全部' ? '' : (allCats[cat] || '📦');
-            const label = cat === '全部' ? '全部' : emoji + ' ' + cat;
-            const active = invFilter === cat ? ' active' : '';
+        var builtIn = { ...CATEGORY_EMOJI };
+        var customCats = appData.customCategories || {};
+        var allCats = { ...builtIn, ...customCats };
+        var catKeys = Object.keys(allCats);
+        var container = document.getElementById('catFilter');
+        var html = '';
+
+        // 始终显示的: 全部 + 前3个
+        var visibleCats = ['全部', ...catKeys.slice(0, 3)];
+        var hiddenCats = catKeys.slice(3);
+
+        visibleCats.forEach(function(cat) {
+            var emoji = cat === '全部' ? '' : (allCats[cat] || '📦');
+            var label = cat === '全部' ? '全部' : emoji + ' ' + cat;
+            var active = invFilter === cat ? ' active' : '';
             html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + label + '</span>';
         });
-        if (dropdownCats.length > 0) {
-            html += '<select id="catFilterDropdown" onchange="filterCategory(this.value)" style="padding:5px 8px;border-radius:14px;font-size:12px;border:1px solid var(--gray-200);background:white;color:var(--gray-600);cursor:pointer;min-width:80px;">';
-            html += '<option value="" disabled ' + (dropdownCats.includes(invFilter) ? '' : 'selected') + '>更多 ▼</option>';
-            dropdownCats.forEach(cat => {
-                const emoji = allCats[cat] || '📦';
-                const selected = invFilter === cat ? ' selected' : '';
-                html += '<option value="' + cat + '"' + selected + '>' + emoji + ' ' + cat + '</option>';
-            });
-            html += '</select>';
+
+        if (hiddenCats.length > 0) {
+            var isExpanded = catFilterExpanded;
+            html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
+            if (isExpanded) {
+                hiddenCats.forEach(function(cat) {
+                    var emoji = allCats[cat] || '📦';
+                    var active = invFilter === cat ? ' active' : '';
+                    html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
+                });
+            }
         }
         container.innerHTML = html;
-        var dd = document.getElementById('catFilterDropdown');
-        if (dd && dropdownCats.includes(invFilter)) {
-            dd.style.background = 'var(--primary-light)';
-            dd.style.borderColor = 'var(--primary)';
-            dd.style.color = 'var(--primary)';
-        }
+    }
+    function toggleCatFilterExpand() {
+        catFilterExpanded = !catFilterExpanded;
+        renderCategoryFilter();
     }
 
     function renderInventory() {
@@ -1356,6 +1382,37 @@
             <input type="number" placeholder="克数" class="ing-grams" style="width:70px;" min="1" value="100">
             <button class="ing-del" onclick="this.parentElement.remove()">×</button>`;
         container.appendChild(row);
+    }
+
+    function openRecipeEditModal(recipeName) {
+        var recipe = getAllRecipes().find(function(r) { return r.name === recipeName; });
+        if (!recipe) return;
+        editingRecipeName = recipeName;
+        document.getElementById('newRecipeName').value = recipe.name;
+        document.getElementById('newRecipeCat').value = recipe.category;
+        document.getElementById('newRecipeDiff').value = recipe.difficulty;
+        document.getElementById('newRecipeTime').value = recipe.time;
+        document.getElementById('newRecipeSteps').value = recipe.steps.join('\n');
+        var ingContainer = document.getElementById('newRecipeIngredients');
+        ingContainer.innerHTML = recipe.ingredients.map(function(ing) {
+            return '<div class="ingredient-form-row"><input type="text" placeholder="食材名" class="ing-name" value="' + ing.name + '"><input type="number" placeholder="克数" class="ing-grams" style="width:70px;" min="1" value="' + ing.grams + '"><button class="ing-del" onclick="this.parentElement.remove()">×</button></div>';
+        }).join('');
+        document.querySelector('#recipeFormModal h3').textContent = '✏️ 编辑菜谱';
+        document.getElementById('recipeFormModal').classList.add('show');
+    }
+
+    function deleteRecipe(recipeName) {
+        if (!confirm('确定删除菜谱「' + recipeName + '」吗？此操作不可撤销。')) return;
+        var customIdx = (appData.customRecipes || []).findIndex(function(r) { return r.name === recipeName; });
+        if (customIdx >= 0) {
+            appData.customRecipes.splice(customIdx, 1);
+            persist();
+            showToast('菜谱「' + recipeName + '」已删除 ✅', 'success');
+            if (recipeViewMode === 'browse') renderRecipeBrowse();
+            else if (recipeViewMode === 'generate') generateRecipe();
+            return;
+        }
+        showToast('内置菜谱不可删除');
     }
 
     function saveNewRecipe() {
@@ -1914,21 +1971,38 @@
     }
 
     function renderCategoryManage() {
-        const cats = getCustomCategories();
-        const builtIn = {
+        var cats = getCustomCategories();
+        var builtIn = {
             '肉类':'🥩','蔬菜':'🥬','蛋类':'🥚','水产':'🐟','豆制品':'🫘',
             '主食':'🍚','调料':'🧂','香料':'🌿','干货':'🍄','乳制品':'🥛',
             '水果':'🍎','酱菜':'🫙','其他':'📦'
         };
-        const all = { ...builtIn, ...cats };
+        var html = '';
 
-        document.getElementById('catManageList').innerHTML = Object.entries(all).map(([name, emoji]) => `
-            <div class="inv-item" style="padding:8px 12px;">
-                <span style="font-size:20px;">${emoji}</span>
-                <div class="inv-info"><div class="inv-name" style="font-size:13px;">${name}</div></div>
-                ${cats[name] ? `<button class="inv-del" onclick="deleteCategory('${name}')">×</button>` : '<span style="font-size:10px;color:var(--gray-400);">内置</span>'}
-            </div>
-        `).join('');
+        var customCatNames = Object.keys(cats);
+        if (customCatNames.length > 0) {
+            var isOpen = categoryAccordionState['custom'] !== false;
+            html += '<div class="accordion-item"><div class="accordion-header ' + (isOpen ? 'open' : '') + '" onclick="toggleCategoryAccordion(\'custom\')">✨ 自定义分类 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + customCatNames.length + '个)</span><span class="arrow">▼</span></div><div class="accordion-body ' + (isOpen ? 'open' : '') + '">';
+            customCatNames.forEach(function(name, idx) {
+                html += '<div class="sub-item" draggable="true" ondragstart="categoryDragStart(event,\'' + name + '\')" ondragover="categoryDragOver(event)" ondrop="categoryDrop(event,\'' + name + '\')" ondragend="categoryDragEnd(event)"><span style="font-size:18px;">' + cats[name] + '</span><span>' + name + '</span><div class="accordion-actions">' + (idx > 0 ? '<button onclick="event.stopPropagation();moveCategoryUp(\'' + name + '\')">▲</button>' : '<button disabled style="opacity:0.3;">▲</button>') + (idx < customCatNames.length - 1 ? '<button onclick="event.stopPropagation();moveCategoryDown(\'' + name + '\')">▼</button>' : '<button disabled style="opacity:0.3;">▼</button>') + '<button onclick="event.stopPropagation();editCategory(\'' + name + '\')" style="color:var(--primary);">✏️</button><button onclick="event.stopPropagation();deleteCategory(\'' + name + '\')" class="danger">×</button></div></div>';
+            });
+            html += '</div></div>';
+        }
+
+        var builtInNames = Object.keys(builtIn);
+        var isOpenBI = categoryAccordionState['builtin'] !== false;
+        html += '<div class="accordion-item"><div class="accordion-header ' + (isOpenBI ? 'open' : '') + '" onclick="toggleCategoryAccordion(\'builtin\')">📦 内置分类 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + builtInNames.length + '个)</span><span class="arrow">▼</span></div><div class="accordion-body ' + (isOpenBI ? 'open' : '') + '">';
+        builtInNames.forEach(function(name) {
+            var cal = (cats[name + '_cal']) || CATEGORY_DEFAULT_CALORIES[name] || 100;
+            html += '<div class="sub-item"><span style="font-size:18px;">' + builtIn[name] + '</span><span>' + name + '</span><span style="font-size:11px;color:var(--gray-400);">~' + cal + ' kcal/100g</span><span style="font-size:10px;color:var(--gray-400);margin-left:auto;">内置</span></div>';
+        });
+        html += '</div></div>';
+        document.getElementById('catManageList').innerHTML = html;
+    }
+
+    function toggleCategoryAccordion(section) {
+        categoryAccordionState[section] = !categoryAccordionState[section];
+        renderCategoryManage();
     }
 
     function addCategory() {
@@ -1955,6 +2029,70 @@
         persist();
         renderCategoryManage();
         showToast(`已删除分类「${name}」`);
+    }
+
+    function moveCategoryUp(name) {
+        var keys = Object.keys(appData.customCategories);
+        var idx = keys.indexOf(name);
+        if (idx <= 0) return;
+        var entries = Object.entries(appData.customCategories);
+        var temp = entries[idx];
+        entries[idx] = entries[idx - 1];
+        entries[idx - 1] = temp;
+        appData.customCategories = Object.fromEntries(entries);
+        persist();
+        renderCategoryManage();
+        if (currentTab === 'inventory') renderInventory();
+    }
+
+    function moveCategoryDown(name) {
+        var keys = Object.keys(appData.customCategories);
+        var idx = keys.indexOf(name);
+        if (idx < 0 || idx >= keys.length - 1) return;
+        var entries = Object.entries(appData.customCategories);
+        var temp = entries[idx];
+        entries[idx] = entries[idx + 1];
+        entries[idx + 1] = temp;
+        appData.customCategories = Object.fromEntries(entries);
+        persist();
+        renderCategoryManage();
+        if (currentTab === 'inventory') renderInventory();
+    }
+
+    function editCategory(name) {
+        var emoji = appData.customCategories[name] || '📦';
+        var newName = prompt('修改分类名称：', name);
+        if (!newName || newName.trim() === '') return;
+        var newEmoji = prompt('修改图标（1-2个字符）：', emoji);
+        if (newName.trim() !== name) delete appData.customCategories[name];
+        appData.customCategories[newName.trim()] = (newEmoji && newEmoji.trim()) || emoji;
+        persist();
+        renderCategoryManage();
+        if (currentTab === 'inventory') renderInventory();
+        showToast('分类已更新 ✅', 'success');
+    }
+
+    function categoryDragStart(e, name) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', name);
+        e.target.style.opacity = '0.5';
+    }
+    function categoryDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+    function categoryDragEnd(e) { e.target.style.opacity = '1'; }
+    function categoryDrop(e, targetName) {
+        e.preventDefault();
+        var srcName = e.dataTransfer.getData('text/plain');
+        if (!srcName || srcName === targetName) return;
+        var keys = Object.keys(appData.customCategories);
+        var srcIdx = keys.indexOf(srcName);
+        var tgtIdx = keys.indexOf(targetName);
+        if (srcIdx < 0 || tgtIdx < 0) return;
+        var entries = Object.entries(appData.customCategories);
+        var moved = entries.splice(srcIdx, 1)[0];
+        entries.splice(tgtIdx, 0, moved);
+        appData.customCategories = Object.fromEntries(entries);
+        persist();
+        renderCategoryManage();
     }
 
     function getCustomIcons() {
