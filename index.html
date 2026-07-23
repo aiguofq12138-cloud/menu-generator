@@ -517,6 +517,70 @@
         .preview-item .deduct { color: var(--primary); font-weight: 600; }
         .preview-item .exhausted { color: #f44336; font-size: 11px; }
 
+        /* 手风琴 */
+        .accordion-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            user-select: none;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            min-height: 44px;
+            transition: background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .accordion-header:active { background: var(--gray-100); }
+        .accordion-header .arrow {
+            transition: transform 0.3s;
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-left: auto;
+        }
+        .accordion-header.open .arrow { transform: rotate(180deg); }
+        .accordion-body { display: none; padding: 0 12px 10px; }
+        .accordion-body.open { display: block; }
+        .accordion-body .sub-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 8px;
+            font-size: 13px;
+            border-radius: 8px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .accordion-body .sub-item:active { background: var(--gray-50); }
+        .accordion-actions {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+        .accordion-actions button {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--gray-200);
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            padding: 0;
+        }
+        .accordion-actions button:active { background: var(--gray-100); }
+        .accordion-actions button.danger { color: #c62828; border-color: #ffcdd2; }
+        .btn-danger { background: #c62828; color: white; border: none; }
+        .btn-danger:active { background: #b71c1c; }
+
         @media (min-width: 481px) {
             .app { border-left: 1px solid var(--gray-200); border-right: 1px solid var(--gray-200); }
         }
@@ -1054,7 +1118,11 @@
     let confirmMealType = 'breakfast';
     let confirmDate = '';
     let openedCategories = {};
-    let recipeViewMode = 'browse'; // 'browse' | 'generate'
+    let recipeViewMode = 'browse';
+    let editingRecipeName = null;
+    let recipeConfirmGrams = {};
+    let categoryAccordionState = {};
+    let iconAccordionState = {};
 
     // ==================== 数据管理 ====================
     function loadData() {
@@ -1153,7 +1221,42 @@
         if (body) body.classList.toggle('open', openedCategories[cat]);
     }
 
+    function renderCategoryFilter() {
+        const builtIn = { ...CATEGORY_EMOJI };
+        const customCats = appData.customCategories || {};
+        const allCats = { ...builtIn, ...customCats };
+        const catKeys = Object.keys(allCats);
+        const chips = ['全部', ...catKeys.slice(0, 3)];
+        const dropdownCats = catKeys.slice(3);
+        const container = document.getElementById('catFilter');
+        let html = '';
+        chips.forEach(cat => {
+            const emoji = cat === '全部' ? '' : (allCats[cat] || '📦');
+            const label = cat === '全部' ? '全部' : emoji + ' ' + cat;
+            const active = invFilter === cat ? ' active' : '';
+            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + label + '</span>';
+        });
+        if (dropdownCats.length > 0) {
+            html += '<select id="catFilterDropdown" onchange="filterCategory(this.value)" style="padding:5px 8px;border-radius:14px;font-size:12px;border:1px solid var(--gray-200);background:white;color:var(--gray-600);cursor:pointer;min-width:80px;">';
+            html += '<option value="" disabled ' + (dropdownCats.includes(invFilter) ? '' : 'selected') + '>更多 ▼</option>';
+            dropdownCats.forEach(cat => {
+                const emoji = allCats[cat] || '📦';
+                const selected = invFilter === cat ? ' selected' : '';
+                html += '<option value="' + cat + '"' + selected + '>' + emoji + ' ' + cat + '</option>';
+            });
+            html += '</select>';
+        }
+        container.innerHTML = html;
+        var dd = document.getElementById('catFilterDropdown');
+        if (dd && dropdownCats.includes(invFilter)) {
+            dd.style.background = 'var(--primary-light)';
+            dd.style.borderColor = 'var(--primary)';
+            dd.style.color = 'var(--primary)';
+        }
+    }
+
     function renderInventory() {
+        renderCategoryFilter();
         const allItems = Object.values(appData.inventory).filter(i => i.grams > 0);
 
         document.getElementById('invCount').textContent = `${allItems.length} 种食材`;
@@ -1239,6 +1342,8 @@
     }
 
     function closeRecipeFormModal() {
+        editingRecipeName = null;
+        document.querySelector('#recipeFormModal h3').textContent = '📝 添加新菜谱';
         document.getElementById('recipeFormModal').classList.remove('show');
     }
 
@@ -1511,6 +1616,10 @@
         selectedRecipe = recipe;
         confirmMealType = 'breakfast';
         confirmDate = todayStr();
+        recipeConfirmGrams = {};
+        recipe.ingredients.forEach(function(ing) {
+            recipeConfirmGrams[ing.name] = ing.grams;
+        });
 
         document.querySelectorAll('#mealTypeGroup .meal-type-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('#mealTypeGroup .meal-type-btn[data-meal="breakfast"]').classList.add('active');
@@ -1569,8 +1678,9 @@
         // 扣减库存
         const consumed = [];
         for (const ing of selectedRecipe.ingredients) {
-            appData.inventory[ing.name].grams -= ing.grams;
-            consumed.push({ name: ing.name, grams: ing.grams });
+            const useGrams = recipeConfirmGrams[ing.name] !== undefined ? recipeConfirmGrams[ing.name] : ing.grams;
+            appData.inventory[ing.name].grams -= useGrams;
+            consumed.push({ name: ing.name, grams: useGrams });
         }
 
         // 记录到日历
@@ -1842,18 +1952,64 @@
     }
 
     function renderIconManage() {
-        const icons = getCustomIcons();
+        var icons = getCustomIcons();
         if (Object.keys(icons).length === 0) {
             document.getElementById('iconManageList').innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无自定义图标</div>';
             return;
         }
-        document.getElementById('iconManageList').innerHTML = Object.entries(icons).map(([name, emoji]) => `
-            <div class="inv-item" style="padding:8px 12px;">
-                <span style="font-size:20px;">${emoji}</span>
-                <div class="inv-info"><div class="inv-name" style="font-size:13px;">${name}</div></div>
-                <button class="inv-del" onclick="deleteIngredientIcon('${name}')">×</button>
-            </div>
-        `).join('');
+        // 按分类分组
+        var groups = {};
+        for (var name in icons) {
+            if (!icons.hasOwnProperty(name)) continue;
+            var invItem = appData.inventory[name];
+            var cat = invItem ? invItem.category : '其他';
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push({ name: name, emoji: icons[name] });
+        }
+        var catOrder = ['肉类','蔬菜','蛋类','水产','豆制品','主食','酱菜','水果','乳制品','干货','调料','香料','其他'];
+        var sortedCats = Object.keys(groups).sort(function(a, b) {
+            var ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
+            if (ai === -1 && bi === -1) return a.localeCompare(b);
+            if (ai === -1) return 1; if (bi === -1) return -1; return ai - bi;
+        });
+
+        var html = '';
+        sortedCats.forEach(function(cat) {
+            var items = groups[cat];
+            var customCats = getCustomCategories();
+            var catEmoji = customCats[cat] || CATEGORY_EMOJI[cat] || '📦';
+            var isOpen = iconAccordionState[cat] !== false;
+            html += '<div class="accordion-item">' +
+                '<div class="accordion-header ' + (isOpen ? 'open' : '') + '" onclick="toggleIconAccordion(\'' + cat + '\')">' +
+                catEmoji + ' ' + cat + ' <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + items.length + '个)</span>' +
+                '<span class="arrow">▼</span></div>' +
+                '<div class="accordion-body ' + (isOpen ? 'open' : '') + '">';
+            items.forEach(function(item) {
+                html += '<div class="sub-item"><span style="font-size:18px;">' + item.emoji + '</span><span>' + item.name + '</span>' +
+                    '<div class="accordion-actions" style="margin-left:auto;">' +
+                    '<button onclick="event.stopPropagation();editIngredientIcon(\'' + item.name + '\')" style="color:var(--primary);">✏️</button>' +
+                    '<button onclick="event.stopPropagation();deleteIngredientIcon(\'' + item.name + '\')" class="danger">×</button>' +
+                    '</div></div>';
+            });
+            html += '</div></div>';
+        });
+        document.getElementById('iconManageList').innerHTML = html;
+    }
+
+    function toggleIconAccordion(cat) {
+        iconAccordionState[cat] = !iconAccordionState[cat];
+        renderIconManage();
+    }
+
+    function editIngredientIcon(name) {
+        var currentEmoji = appData.customIcons[name] || '🍽';
+        var newEmoji = prompt('修改「' + name + '」的图标（1-2个字符）：', currentEmoji);
+        if (!newEmoji || !newEmoji.trim()) return;
+        appData.customIcons[name] = newEmoji.trim();
+        persist();
+        renderIconManage();
+        if (currentTab === 'inventory') renderInventory();
+        showToast('图标已更新 ✅', 'success');
     }
 
     function setIngredientIcon() {
@@ -2018,6 +2174,8 @@
             inventory: appData.inventory,
             mealLog: appData.mealLog,
             customRecipes: appData.customRecipes || [],
+            customCategories: appData.customCategories || {},
+            customIcons: appData.customIcons || {},
             exportedAt: new Date().toISOString()
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2063,8 +2221,54 @@
     }
 
     // ==================== 初始化 ====================
+    function setupInventoryNameSuggestions() {
+        var input = document.getElementById('invName');
+        if (!input || input._suggestionsSetup) return;
+        input._suggestionsSetup = true;
+        input.addEventListener('input', function() {
+            var val = this.value.trim().toLowerCase();
+            removeSuggestions();
+            if (!val) return;
+            var allNames = Object.keys(appData.inventory);
+            var matches = allNames.filter(function(n) { return n.toLowerCase().indexOf(val) !== -1; }).slice(0, 5);
+            if (matches.length === 0) return;
+            var dropdown = document.createElement('div');
+            dropdown.id = 'invNameSuggestions';
+            dropdown.style.cssText = 'position:absolute;background:white;border:1px solid var(--gray-200);border-radius:10px;max-height:150px;overflow-y:auto;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.12);';
+            matches.forEach(function(name) {
+                var item = document.createElement('div');
+                item.textContent = name;
+                item.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:14px;';
+                item.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    input.value = name;
+                    removeSuggestions();
+                    document.getElementById('invGrams').focus();
+                });
+                dropdown.appendChild(item);
+            });
+            var modal = document.querySelector('#inventoryModal .modal-sheet');
+            var rect = input.getBoundingClientRect();
+            var modalRect = modal.getBoundingClientRect();
+            dropdown.style.position = 'absolute';
+            dropdown.style.left = (rect.left - modalRect.left) + 'px';
+            dropdown.style.top = (rect.bottom - modalRect.top + 4) + 'px';
+            dropdown.style.width = (rect.width) + 'px';
+            modal.style.position = 'relative';
+            modal.appendChild(dropdown);
+        });
+        input.addEventListener('blur', function() {
+            setTimeout(function() { removeSuggestions(); }, 200);
+        });
+    }
+    function removeSuggestions() {
+        var existing = document.getElementById('invNameSuggestions');
+        if (existing) existing.remove();
+    }
+
     function init() {
         appData = loadData();
+        setupInventoryNameSuggestions();
         renderInventory();
 
         // 回车添加食材
