@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="菜单生成器">
+    <!-- Android PWA -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ff6b6b">
+    <link rel="manifest" id="manifestLink" href="/manifest.json">
+    <link rel="apple-touch-icon" id="appleTouchIcon" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <title>随机菜单生成器</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --primary-dark: #ee5a24;
+            --primary-light: #fff3f0;
+            --green: #2e7d32;
+            --green-bg: #e8f5e9;
+            --orange: #e65100;
+            --orange-bg: #fff3e0;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e8e8e8;
+            --gray-400: #999;
+            --gray-600: #666;
+            --gray-800: #333;
+            --radius: 12px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f2f2f7;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            max-width: 480px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #f2f2f7;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ff9a56, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 12px 16px;
+            padding-top: max(12px, env(safe-area-inset-top));
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .header h1 { font-size: 18px; font-weight: 700; }
+        .header .subtitle { font-size: 11px; opacity: 0.85; }
+
+        /* Main View */
+        .view-container { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .view { display: none; padding: 12px 16px; padding-bottom: 80px; }
+        .view.active { display: block; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            display: flex;
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding-bottom: var(--safe-bottom);
+            flex-shrink: 0;
+        }
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 4px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--gray-400);
+            font-size: 10px;
+            transition: color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-btn .nav-icon { font-size: 22px; margin-bottom: 2px; }
+        .nav-btn.active { color: var(--primary); font-weight: 600; }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title .count { font-size: 12px; color: var(--gray-400); font-weight: 400; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--primary); color: white; width: 100%; padding: 14px; font-size: 16px; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-600); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+        .btn-danger { background: #ffebee; color: #c62828; }
+        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
+
+        /* Form */
+        .form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .form-row input, .form-row select {
+            padding: 10px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-row input:focus, .form-row select:focus { border-color: var(--primary); }
+        .form-row input { flex: 1; }
+        .form-row select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px; }
+
+        /* Category group in inventory */
+        .cat-group { margin-bottom: 16px; }
+        .cat-group-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+            padding: 12px 14px;
+            min-height: 44px;
+            background: var(--gray-100);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cat-group-header .cat-count { color: var(--gray-400); font-weight: 400; margin-left: auto; }
+        .cat-group-body { display: none; }
+        .cat-group-body.open { display: block; }
+        .cat-group-header .arrow { transition: transform 0.3s; font-size: 12px; }
+        .cat-group-header.open .arrow { transform: rotate(180deg); }
+
+        /* Recipe form */
+        .recipe-form-group { margin-bottom: 12px; }
+        .recipe-form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
+        .recipe-form-group input, .recipe-form-group select, .recipe-form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .recipe-form-group input:focus, .recipe-form-group select:focus, .recipe-form-group textarea:focus { border-color: var(--primary); }
+        .recipe-form-group textarea { resize: vertical; min-height: 60px; }
+        .ingredient-form-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+        .ingredient-form-row input { flex: 1; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; outline: none; }
+        .ingredient-form-row input:focus { border-color: var(--primary); }
+        .ingredient-form-row .ing-del {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #ffebee; color: #c62828; font-size: 14px; cursor: pointer; flex-shrink: 0;
+        }
+        .add-more-btn { font-size: 12px; color: var(--primary); cursor: pointer; padding: 4px 0; display: inline-block; }
+
+        /* Inventory Item */
+        .inv-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            position: relative;
+            transition: background 0.2s;
+        }
+        .inv-item:active { background: var(--gray-100); }
+        .inv-emoji { font-size: 28px; flex-shrink: 0; width: 36px; text-align: center; }
+        .inv-info { flex: 1; min-width: 0; }
+        .inv-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+        .inv-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+        .inv-bar {
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 6px;
+            background: var(--gray-200);
+            overflow: hidden;
+        }
+        .inv-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .inv-bar-fill.high { background: #4caf50; }
+        .inv-bar-fill.mid { background: #ff9800; }
+        .inv-bar-fill.low { background: #f44336; }
+        .inv-grams { font-size: 13px; font-weight: 600; color: var(--gray-600); flex-shrink: 0; }
+        .inv-del {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #ffebee;
+            color: #c62828;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Collapsible */
+        .collapse-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        .collapse-header .arrow { transition: transform 0.3s; font-size: 12px; }
+        .collapse-header.open .arrow { transform: rotate(180deg); }
+        .collapse-body { display: none; }
+        .collapse-body.open { display: block; }
+
+        /* Category filter */
+        .cat-filter {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .cat-filter::-webkit-scrollbar { display: none; }
+        .cat-chip {
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-600);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .cat-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+        /* Recipe Card */
+        .recipe-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .recipe-card:active { border-color: var(--primary); }
+        .recipe-card.selected { border-color: var(--primary); background: #fff5f5; }
+        .recipe-name { font-size: 18px; font-weight: 700; color: var(--gray-800); text-align: center; margin-bottom: 8px; }
+        .recipe-meta-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 14px; }
+        .recipe-meta-tag { font-size: 11px; background: var(--gray-100); padding: 4px 10px; border-radius: 10px; color: var(--gray-600); }
+        .section-title { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+        .ingredient-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        .ingredient-row.sufficient { background: var(--green-bg); color: var(--green); }
+        .ingredient-row.insufficient { background: var(--orange-bg); color: var(--orange); }
+        .steps-list { padding-left: 18px; }
+        .steps-list li { margin-bottom: 6px; font-size: 13px; line-height: 1.5; color: var(--gray-600); }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .action-bar .btn { flex: 1; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            top: max(20px, env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: var(--gray-800);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 999;
+            transition: transform 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #2e7d32; }
+
+        /* Modal overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-sheet {
+            background: white;
+            width: 100%;
+            max-width: 340px;
+            border-radius: 16px;
+            padding: 20px 16px;
+            margin: 20px;
+            padding-bottom: calc(20px + var(--safe-bottom));
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-sheet.bottom {
+            max-width: 480px;
+            margin: 0;
+            border-radius: 16px 16px 0 0;
+            align-self: flex-end;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .modal-sheet h3 { text-align: center; margin-bottom: 16px; font-size: 16px; }
+        .meal-type-group { display: flex; gap: 8px; margin-bottom: 16px; }
+        .meal-type-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--gray-200);
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .meal-type-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+
+        .date-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
+        .date-nav .date-text { font-size: 15px; font-weight: 600; }
+        .date-nav button {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 1px solid var(--gray-200);
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Calendar */
+        .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .month-nav .month-title { font-size: 16px; font-weight: 700; }
+        .month-nav button {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 1px solid var(--gray-200);
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; color: var(--gray-400); margin-bottom: 6px; }
+        .weekdays .weekend { color: var(--primary); }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.15s;
+        }
+        .day-cell:active { background: var(--gray-100); }
+        .day-cell.today { background: var(--primary); color: white; font-weight: 700; }
+        .day-cell.selected:not(.today) { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .day-cell.other-month { color: #ccc; }
+        .day-dots { display: flex; gap: 2px; margin-top: 2px; }
+        .day-dot { width: 4px; height: 4px; border-radius: 50%; }
+        .day-dot.has { background: #4caf50; }
+        .day-dot.empty { background: var(--gray-200); }
+
+        /* Meal slots */
+        .meal-slot {
+            background: var(--gray-50);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .meal-slot.has-meal {
+            background: var(--green-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .meal-label { font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
+        .meal-empty {
+            color: var(--gray-400);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border: 1px dashed var(--gray-200);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .meal-empty:active { border-color: var(--primary); color: var(--primary); }
+        .meal-recipe-name { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+        .meal-recipe-meta { font-size: 11px; color: var(--gray-600); }
+        .meal-delete {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-400);
+        }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 13px; }
+
+        /* Tips */
+        .tips {
+            background: #fffbe6;
+            border-left: 3px solid #ffc107;
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12px;
+            color: #8d6e00;
+            margin-top: 12px;
+        }
+
+        /* Preview list in confirm modal */
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .preview-item .deduct { color: var(--primary); font-weight: 600; }
+        .preview-item .exhausted { color: #f44336; font-size: 11px; }
+
+        @media (min-width: 481px) {
+            .app { border-left: 1px solid var(--gray-200); border-right: 1px solid var(--gray-200); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <h1>🍳 随机菜单生成器</h1>
+            <div class="subtitle">管理食材 · 智能推荐 · 饮食记录</div>
+        </div>
+
+        <!-- Views -->
+        <div class="view-container">
+            <!-- Inventory View -->
+            <div class="view active" id="view-inventory">
+                <div class="card">
+                    <div class="card-title">
+                        🥬 食材库存
+                        <span class="count" id="invCount">0 种食材</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="openInventoryModal()" style="margin-bottom:12px;">+ 添加食材</button>
+                    <div class="cat-filter" id="catFilter" style="flex-wrap:wrap;">
+                        <span class="cat-chip active" onclick="filterCategory('全部')">全部</span>
+                        <span class="cat-chip" onclick="filterCategory('肉类')">🥩 肉类</span>
+                        <span class="cat-chip" onclick="filterCategory('蔬菜')">🥬 蔬菜</span>
+                        <span class="cat-chip" onclick="filterCategory('蛋类')">🥚 蛋类</span>
+                        <span class="cat-chip" onclick="filterCategory('水产')">🐟 水产</span>
+                        <span class="cat-chip" onclick="filterCategory('豆制品')">🫘 豆制品</span>
+                        <span class="cat-chip" onclick="filterCategory('主食')">🍚 主食</span>
+                        <span class="cat-chip" onclick="filterCategory('酱菜')">🫙 酱菜</span>
+                    </div>
+                    <div id="invList"></div>
+                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-200);display:flex;gap:10px;">
+                        <button class="btn btn-secondary btn-sm" onclick="exportData()" style="flex:1;">📤 导出</button>
+                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()" style="flex:1;">📥 导入</button>
+                        <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe View -->
+            <div class="view" id="view-recipes">
+                <div id="recipeContent">
+                    <div class="card" id="recipeBrowseCard">
+                        <div class="card-title">
+                            📋 我的菜谱
+                            <button class="btn btn-sm btn-outline" onclick="openRecipeFormModal()">+ 添加菜谱</button>
+                        </div>
+                        <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
+                        <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 随机生成菜谱</button>
+                        <div id="recipeList" style="margin-top:12px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div class="view" id="view-calendar">
+                <div class="card">
+                    <div class="month-nav">
+                        <button onclick="prevMonth()">◀</button>
+                        <span class="month-title" id="monthTitle"></span>
+                        <button onclick="nextMonth()">▶</button>
+                    </div>
+                    <div class="weekdays">
+                        <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span class="weekend">六</span><span class="weekend">日</span>
+                    </div>
+                    <div class="days-grid" id="daysGrid"></div>
+                </div>
+                <div class="card" id="dayDetail">
+                    <div class="card-title" id="dayDetailTitle">选择日期查看详情</div>
+                    <div id="mealSlots"></div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div class="view" id="view-settings">
+                <div class="card">
+                    <div class="card-title">🏷️ 分类标签管理</div>
+                    <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">增删分类标签，用于食材分类和筛选</div>
+                    <div class="form-row">
+                        <input type="text" id="newCatName" placeholder="分类名，如：零食" autocomplete="off">
+                        <input type="text" id="newCatEmoji" placeholder="ICON" style="width:60px;flex-shrink:0;" maxlength="2" value="📦">
+                        <button class="btn btn-primary btn-sm" onclick="addCategory()" style="width:auto;">添加</button>
+                    </div>
+                    <div id="catManageList" style="margin-top:8px;"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🎨 食材图标</div>
+                    <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">为食材单独设置图标（覆盖分类默认图标）</div>
+                    <div class="form-row">
+                        <input type="text" id="iconIngName" placeholder="食材名称" autocomplete="off">
+                        <input type="text" id="iconIngEmoji" placeholder="ICON" style="width:60px;flex-shrink:0;" maxlength="2" value="🍽">
+                        <button class="btn btn-primary btn-sm" onclick="setIngredientIcon()" style="width:auto;">设置</button>
+                    </div>
+                    <div id="iconManageList" style="margin-top:8px;max-height:200px;overflow-y:auto;"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🖼️ 桌面图标</div>
+                    <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">上传自定义图标，添加到桌面时显示</div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div id="iconPreview" style="width:64px;height:64px;border-radius:16px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;flex-shrink:0;">🍳</div>
+                        <div>
+                            <button class="btn btn-sm btn-outline" onclick="document.getElementById('iconUpload').click()">📷 选择图片</button>
+                            <input type="file" id="iconUpload" accept="image/*" onchange="uploadAppIcon(event)" style="display:none;">
+                            <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">建议 512×512 PNG 正方形</div>
+                            <button class="btn btn-sm btn-secondary" onclick="resetAppIcon()" style="margin-top:4px;">恢复默认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+            <button class="nav-btn active" id="nav-inventory" onclick="switchTab('inventory')">
+                <span class="nav-icon">🥬</span>食材
+            </button>
+            <button class="nav-btn" id="nav-recipes" onclick="switchTab('recipes')">
+                <span class="nav-icon">📋</span>菜谱
+            </button>
+            <button class="nav-btn" id="nav-calendar" onclick="switchTab('calendar')">
+                <span class="nav-icon">📅</span>日历
+            </button>
+            <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')">
+                <span class="nav-icon">⚙️</span>我的
+            </button>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+
+        <!-- Inventory Add Modal -->
+        <div class="modal-overlay" id="inventoryModal">
+            <div class="modal-sheet">
+                <h3>🥬 添加食材</h3>
+                <div class="recipe-form-group">
+                    <label>食材名称</label>
+                    <input type="text" id="invName" placeholder="如：鸡蛋、番茄" autocomplete="off">
+                </div>
+                <div class="form-row">
+                    <div class="recipe-form-group" style="flex:1;">
+                        <label>克数</label>
+                        <input type="number" id="invGrams" placeholder="克数" min="1" value="200">
+                    </div>
+                    <div class="recipe-form-group" style="flex:1;">
+                        <label>分类</label>
+                        <select id="invCategory">
+                            <option value="蔬菜">🥬 蔬菜</option>
+                            <option value="肉类">🥩 肉类</option>
+                            <option value="蛋类">🥚 蛋类</option>
+                            <option value="水产">🐟 水产</option>
+                            <option value="豆制品">🫘 豆制品</option>
+                            <option value="主食">🍚 主食</option>
+                            <option value="调料">🧂 调料</option>
+                            <option value="香料">🌿 香料</option>
+                            <option value="干货">🍄 干货</option>
+                            <option value="乳制品">🥛 乳制品</option>
+                            <option value="水果">🍎 水果</option>
+                            <option value="酱菜">🫙 酱菜</option>
+                            <option value="其他">📦 其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn btn-secondary" onclick="closeInventoryModal()" style="flex:1;">取消</button>
+                    <button class="btn btn-primary" onclick="addInventory()" style="flex:1;">确认添加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Recipe Modal -->
+        <div class="modal-overlay" id="recipeFormModal">
+            <div class="modal-sheet">
+                <h3>📝 添加新菜谱</h3>
+                <div class="recipe-form-group">
+                    <label>菜谱名称</label>
+                    <input type="text" id="newRecipeName" placeholder="如：清炒时蔬">
+                </div>
+                <div class="form-row">
+                    <div class="recipe-form-group" style="flex:1;">
+                        <label>分类</label>
+                        <select id="newRecipeCat">
+                            <option value="家常菜">家常菜</option>
+                            <option value="快手菜">快手菜</option>
+                            <option value="汤类">汤类</option>
+                            <option value="下饭菜">下饭菜</option>
+                            <option value="凉拌菜">凉拌菜</option>
+                        </select>
+                    </div>
+                    <div class="recipe-form-group" style="flex:1;">
+                        <label>难度</label>
+                        <select id="newRecipeDiff">
+                            <option value="简单">简单</option>
+                            <option value="中等">中等</option>
+                            <option value="困难">困难</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="recipe-form-group">
+                    <label>烹饪时间</label>
+                    <input type="text" id="newRecipeTime" placeholder="如：20分钟">
+                </div>
+                <div class="recipe-form-group">
+                    <label>所需食材及用量</label>
+                    <div id="newRecipeIngredients">
+                        <div class="ingredient-form-row">
+                            <input type="text" placeholder="食材名" class="ing-name">
+                            <input type="number" placeholder="克数" class="ing-grams" style="width:70px;" min="1" value="100">
+                        </div>
+                    </div>
+                    <span class="add-more-btn" onclick="addIngredientRow()">+ 添加更多食材</span>
+                </div>
+                <div class="recipe-form-group">
+                    <label>做法步骤（每行一步）</label>
+                    <textarea id="newRecipeSteps" placeholder="1. 第一步&#10;2. 第二步&#10;3. 第三步"></textarea>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn btn-secondary" onclick="closeRecipeFormModal()" style="flex:1;">取消</button>
+                    <button class="btn btn-primary" onclick="saveNewRecipe()" style="flex:1;">保存菜谱</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div class="modal-overlay" id="confirmModal">
+            <div class="modal-sheet bottom">
+                <h3>✅ 确认记录此餐</h3>
+                <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;">选择时段</div>
+                <div class="meal-type-group" id="mealTypeGroup">
+                    <div class="meal-type-btn active" data-meal="breakfast" onclick="selectMealType('breakfast')">🌅 早餐</div>
+                    <div class="meal-type-btn" data-meal="lunch" onclick="selectMealType('lunch')">☀️ 午餐</div>
+                    <div class="meal-type-btn" data-meal="dinner" onclick="selectMealType('dinner')">🌙 晚餐</div>
+                </div>
+                <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;">选择日期</div>
+                <div class="date-nav">
+                    <button onclick="shiftConfirmDate(-1)">◀</button>
+                    <span class="date-text" id="confirmDateText"></span>
+                    <button onclick="shiftConfirmDate(1)">▶</button>
+                </div>
+                <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;">食材消耗预览</div>
+                <div id="consumptionPreview"></div>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn btn-secondary" onclick="closeConfirmModal()" style="flex:1;">取消</button>
+                    <button class="btn btn-primary" onclick="confirmMeal()" style="flex:1;">确认记录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ==================== 常量 ====================
+    const STORAGE_KEY = 'menu_generator_data';
+
+    const CATEGORY_EMOJI = {
+        '肉类':'🥩','蔬菜':'🥬','蛋类':'🥚','豆制品':'🫘','主食':'🍚','调料':'🧂',
+        '香料':'🌿','干货':'🍄','水产':'🐟','乳制品':'🥛','水果':'🍎','酱菜':'🫙'
+    };
+
+    const DEFAULT_PANTRY = {};
+
+    // ==================== 菜谱数据库（带克数） ====================
+    const RECIPES = [
+        { name:'番茄炒蛋',category:'家常菜',difficulty:'简单',time:'15分钟',
+          ingredients:[
+            {name:'鸡蛋',grams:150},{name:'番茄',grams:200},{name:'葱',grams:10},
+            {name:'盐',grams:5},{name:'糖',grams:5},{name:'食用油',grams:20}
+          ],
+          steps:['鸡蛋打散加少许盐搅匀，番茄切块','热锅凉油，倒入蛋液炒至凝固盛出','锅中再加油，放入番茄翻炒出汁','加入少许糖提鲜，倒回鸡蛋翻炒均匀','撒上葱花出锅'] },
+
+        { name:'青椒肉丝',category:'家常菜',difficulty:'中等',time:'20分钟',
+          ingredients:[
+            {name:'猪里脊肉',grams:200},{name:'青椒',grams:150},{name:'姜',grams:10},
+            {name:'蒜',grams:10},{name:'生抽',grams:15},{name:'料酒',grams:10},
+            {name:'淀粉',grams:10},{name:'食用油',grams:25},{name:'盐',grams:5}
+          ],
+          steps:['猪肉切丝，加料酒、生抽、淀粉腌制10分钟','青椒切丝，姜蒜切末','热锅凉油，下肉丝滑炒至变色盛出','锅中留底油，爆香姜蒜，下青椒翻炒','倒回肉丝，加盐调味，翻炒均匀出锅'] },
+
+        { name:'酸辣土豆丝',category:'家常菜',difficulty:'简单',time:'15分钟',
+          ingredients:[
+            {name:'土豆',grams:250},{name:'干辣椒',grams:10},{name:'醋',grams:20},
+            {name:'花椒',grams:5},{name:'盐',grams:5},{name:'食用油',grams:25},
+            {name:'葱',grams:10},{name:'蒜',grams:10}
+          ],
+          steps:['土豆去皮切细丝，泡水去淀粉','热锅凉油，下花椒和干辣椒爆香','捞出花椒，下土豆丝大火翻炒','加醋、盐调味，快速翻炒至断生','出锅前撒上葱花'] },
+
+        { name:'红烧肉',category:'家常菜',difficulty:'中等',time:'60分钟',
+          ingredients:[
+            {name:'五花肉',grams:400},{name:'冰糖',grams:20},{name:'生抽',grams:30},
+            {name:'老抽',grams:15},{name:'料酒',grams:20},{name:'八角',grams:5},
+            {name:'桂皮',grams:5},{name:'姜',grams:15},{name:'葱',grams:10},{name:'食用油',grams:15}
+          ],
+          steps:['五花肉切块焯水去血沫','锅中放少许油，加入冰糖小火炒至焦糖色','下五花肉翻炒上色','加入生抽、老抽、料酒、八角、桂皮、姜葱','加入开水没过肉，大火烧开转小火炖40分钟','收汁至浓稠即可出锅'] },
+
+        { name:'宫保鸡丁',category:'家常菜',difficulty:'中等',time:'25分钟',
+          ingredients:[
+            {name:'鸡胸肉',grams:200},{name:'花生米',grams:50},{name:'黄瓜',grams:100},
+            {name:'胡萝卜',grams:100},{name:'干辣椒',grams:10},{name:'花椒',grams:5},
+            {name:'蒜',grams:10},{name:'姜',grams:10},{name:'生抽',grams:15},
+            {name:'醋',grams:15},{name:'糖',grams:10},{name:'淀粉',grams:10},
+            {name:'料酒',grams:10},{name:'食用油',grams:30}
+          ],
+          steps:['鸡胸肉切丁，加料酒、生抽、淀粉腌制','黄瓜、胡萝卜切丁，花生米炸熟','调碗汁：生抽、醋、糖、淀粉、水混合','热锅凉油，下鸡丁滑炒至变色盛出','爆香花椒、干辣椒、姜蒜，下胡萝卜翻炒','加入鸡丁、黄瓜、花生米，倒入碗汁翻炒均匀'] },
+
+        { name:'麻婆豆腐',category:'家常菜',difficulty:'中等',time:'20分钟',
+          ingredients:[
+            {name:'豆腐',grams:300},{name:'猪肉末',grams:100},{name:'豆瓣酱',grams:20},
+            {name:'花椒粉',grams:5},{name:'蒜',grams:10},{name:'姜',grams:10},
+            {name:'葱',grams:10},{name:'生抽',grams:15},{name:'淀粉',grams:10},{name:'食用油',grams:25}
+          ],
+          steps:['豆腐切小块，焯水备用','热锅凉油，下猪肉末炒至变色','加入豆瓣酱炒出红油，下姜蒜爆香','加入适量水烧开，放入豆腐轻轻推动','加生抽调味，水淀粉勾芡','出锅撒上花椒粉和葱花'] },
+
+        { name:'鱼香肉丝',category:'家常菜',difficulty:'中等',time:'25分钟',
+          ingredients:[
+            {name:'猪里脊肉',grams:200},{name:'木耳',grams:30},{name:'胡萝卜',grams:100},
+            {name:'青椒',grams:100},{name:'豆瓣酱',grams:15},{name:'蒜',grams:10},
+            {name:'姜',grams:10},{name:'葱',grams:10},{name:'生抽',grams:15},
+            {name:'醋',grams:15},{name:'糖',grams:10},{name:'淀粉',grams:10},
+            {name:'料酒',grams:10},{name:'食用油',grams:25}
+          ],
+          steps:['猪肉切丝，加料酒、淀粉腌制','木耳泡发切丝，胡萝卜、青椒切丝','调鱼香汁：生抽、醋、糖、淀粉、水混合','热锅凉油，下肉丝滑炒盛出','爆香豆瓣酱、姜蒜，下蔬菜翻炒','倒回肉丝，加入鱼香汁翻炒均匀，撒葱花'] },
+
+        { name:'可乐鸡翅',category:'家常菜',difficulty:'简单',time:'30分钟',
+          ingredients:[
+            {name:'鸡翅',grams:400},{name:'可乐',grams:300},{name:'生抽',grams:20},
+            {name:'老抽',grams:10},{name:'姜',grams:15},{name:'料酒',grams:15},
+            {name:'盐',grams:5},{name:'食用油',grams:20}
+          ],
+          steps:['鸡翅洗净划刀，加料酒、姜片腌制15分钟','热锅凉油，鸡翅两面煎至金黄','倒入可乐没过鸡翅','加入生抽、老抽上色调味','大火烧开转中小火收汁至浓稠','加盐调味出锅'] },
+
+        { name:'蒜蓉西兰花',category:'家常菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'西兰花',grams:300},{name:'蒜',grams:20},{name:'盐',grams:5},
+            {name:'食用油',grams:20},{name:'蚝油',grams:15}
+          ],
+          steps:['西兰花掰小朵，焯水1分钟捞出','蒜切末，热锅凉油爆香蒜末','下西兰花翻炒','加入蚝油和盐调味','翻炒均匀即可出锅'] },
+
+        { name:'糖醋排骨',category:'家常菜',difficulty:'中等',time:'40分钟',
+          ingredients:[
+            {name:'排骨',grams:400},{name:'醋',grams:30},{name:'糖',grams:25},
+            {name:'生抽',grams:20},{name:'老抽',grams:10},{name:'料酒',grams:15},
+            {name:'姜',grams:15},{name:'葱',grams:10},{name:'食用油',grams:20}
+          ],
+          steps:['排骨焯水去血沫','热锅凉油，下排骨煎至两面微黄','加入料酒、生抽、老抽、糖、醋、姜葱','加入开水没过排骨，大火烧开转小火炖30分钟','收汁至浓稠，撒上葱花和芝麻'] },
+
+        { name:'地三鲜',category:'家常菜',difficulty:'中等',time:'25分钟',
+          ingredients:[
+            {name:'土豆',grams:200},{name:'茄子',grams:200},{name:'青椒',grams:100},
+            {name:'蒜',grams:15},{name:'生抽',grams:15},{name:'糖',grams:5},
+            {name:'盐',grams:5},{name:'淀粉',grams:10},{name:'食用油',grams:40}
+          ],
+          steps:['土豆、茄子、青椒分别切块','土豆和茄子分别过油至表面微焦','锅中留底油，爆香蒜末','下青椒翻炒，加入土豆和茄子','加生抽、糖、盐调味，水淀粉勾薄芡出锅'] },
+
+        { name:'回锅肉',category:'家常菜',difficulty:'中等',time:'25分钟',
+          ingredients:[
+            {name:'五花肉',grams:300},{name:'青椒',grams:150},{name:'蒜苗',grams:80},
+            {name:'豆瓣酱',grams:20},{name:'姜',grams:10},{name:'蒜',grams:10},
+            {name:'生抽',grams:15},{name:'料酒',grams:10},{name:'糖',grams:5},{name:'食用油',grams:20}
+          ],
+          steps:['五花肉整块煮至八成熟，捞出切薄片','青椒切块，蒜苗切段','热锅凉油，下肉片煸炒至卷曲出油','加入豆瓣酱炒出红油','下姜蒜、青椒、蒜苗翻炒','加生抽、糖调味出锅'] },
+
+        { name:'蛋炒饭',category:'快手菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'米饭',grams:300},{name:'鸡蛋',grams:100},{name:'葱',grams:10},
+            {name:'盐',grams:5},{name:'食用油',grams:20},{name:'火腿肠',grams:50}
+          ],
+          steps:['鸡蛋打散，火腿肠切丁，葱切花','热锅凉油，倒入蛋液炒碎盛出','锅中加油，下米饭炒散','加入鸡蛋、火腿丁翻炒均匀','加盐调味，撒葱花出锅'] },
+
+        { name:'番茄鸡蛋面',category:'快手菜',difficulty:'简单',time:'15分钟',
+          ingredients:[
+            {name:'面条',grams:200},{name:'鸡蛋',grams:100},{name:'番茄',grams:200},
+            {name:'葱',grams:10},{name:'盐',grams:5},{name:'生抽',grams:10},{name:'食用油',grams:15}
+          ],
+          steps:['番茄切块，鸡蛋打散','热锅凉油，炒熟鸡蛋盛出','锅中加油，下番茄炒出汁','加入足量水烧开，下面条煮至断生','倒回鸡蛋，加盐和生抽调味，撒葱花'] },
+
+        { name:'煎蛋',category:'快手菜',difficulty:'简单',time:'5分钟',
+          ingredients:[
+            {name:'鸡蛋',grams:100},{name:'盐',grams:3},{name:'食用油',grams:10}
+          ],
+          steps:['平底锅加热倒油','打入鸡蛋，小火慢煎','蛋白凝固后撒少许盐','喜欢溏心的翻面略煎即可'] },
+
+        { name:'泡面升级版',category:'快手菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'方便面',grams:100},{name:'鸡蛋',grams:50},{name:'火腿肠',grams:50},
+            {name:'青菜',grams:100},{name:'葱',grams:10}
+          ],
+          steps:['锅中烧水，水开后放入面饼','打入一个鸡蛋，不要搅动','放入切好的火腿肠和青菜','加入调料包，煮2-3分钟','出锅撒葱花'] },
+
+        { name:'葱油拌面',category:'快手菜',difficulty:'简单',time:'15分钟',
+          ingredients:[
+            {name:'面条',grams:200},{name:'葱',grams:50},{name:'生抽',grams:20},
+            {name:'老抽',grams:10},{name:'糖',grams:10},{name:'食用油',grams:30}
+          ],
+          steps:['葱切段，锅中倒油小火炸葱段至焦黄','捞出葱段，油中加入生抽、老抽、糖搅匀','另起锅煮面条至熟，捞出过凉','面条拌入葱油汁，放上炸葱段'] },
+
+        { name:'番茄蛋花汤',category:'汤类',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'番茄',grams:150},{name:'鸡蛋',grams:50},{name:'葱',grams:10},
+            {name:'盐',grams:5},{name:'香油',grams:5},{name:'淀粉',grams:10}
+          ],
+          steps:['番茄切小块，鸡蛋打散','锅中加水烧开，放入番茄煮2分钟','水淀粉勾薄芡','转小火，倒入蛋液搅成蛋花','加盐和香油调味，撒葱花'] },
+
+        { name:'紫菜蛋花汤',category:'汤类',difficulty:'简单',time:'5分钟',
+          ingredients:[
+            {name:'紫菜',grams:10},{name:'鸡蛋',grams:50},{name:'虾皮',grams:10},
+            {name:'葱',grams:10},{name:'盐',grams:5},{name:'香油',grams:5}
+          ],
+          steps:['紫菜撕碎放入碗中，加虾皮','锅中水烧开，转小火倒入蛋液搅成蛋花','将蛋花汤冲入紫菜碗中','加盐、香油调味，撒葱花'] },
+
+        { name:'排骨玉米汤',category:'汤类',difficulty:'中等',time:'90分钟',
+          ingredients:[
+            {name:'排骨',grams:300},{name:'玉米',grams:200},{name:'胡萝卜',grams:150},
+            {name:'姜',grams:15},{name:'盐',grams:5},{name:'料酒',grams:15}
+          ],
+          steps:['排骨焯水去血沫','玉米切段，胡萝卜切块','锅中加水放入排骨、姜片、料酒','大火烧开转小火炖60分钟','加入玉米和胡萝卜继续炖20分钟','加盐调味出锅'] },
+
+        { name:'肉末茄子',category:'下饭菜',difficulty:'中等',time:'20分钟',
+          ingredients:[
+            {name:'茄子',grams:300},{name:'猪肉末',grams:100},{name:'蒜',grams:15},
+            {name:'姜',grams:10},{name:'豆瓣酱',grams:15},{name:'生抽',grams:15},
+            {name:'糖',grams:5},{name:'淀粉',grams:10},{name:'食用油',grams:30},{name:'葱',grams:10}
+          ],
+          steps:['茄子切条，撒盐腌制10分钟挤干水分','热锅多油，下茄子煸炒至软盛出','锅中留底油，下猪肉末炒散','加入豆瓣酱、姜蒜炒香','倒回茄子，加生抽、糖调味','水淀粉勾芡，撒葱花出锅'] },
+
+        { name:'黄焖鸡',category:'下饭菜',difficulty:'中等',time:'35分钟',
+          ingredients:[
+            {name:'鸡腿肉',grams:300},{name:'土豆',grams:200},{name:'青椒',grams:100},
+            {name:'香菇',grams:50},{name:'姜',grams:15},{name:'蒜',grams:10},
+            {name:'生抽',grams:20},{name:'老抽',grams:10},{name:'料酒',grams:15},
+            {name:'糖',grams:10},{name:'食用油',grams:25}
+          ],
+          steps:['鸡腿肉切块焯水，土豆切块，香菇切片','热锅凉油，下姜蒜爆香，加入鸡块翻炒','加料酒、生抽、老抽、糖上色','加入土豆、香菇和适量水，大火烧开转小火炖20分钟','加入青椒，收汁出锅'] },
+
+        { name:'凉拌黄瓜',category:'凉拌菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'黄瓜',grams:300},{name:'蒜',grams:10},{name:'醋',grams:15},
+            {name:'生抽',grams:10},{name:'盐',grams:3},{name:'糖',grams:5},
+            {name:'香油',grams:5},{name:'辣椒油',grams:10}
+          ],
+          steps:['黄瓜拍碎切段','蒜切末，与醋、生抽、盐、糖、香油、辣椒油混合成料汁','料汁浇在黄瓜上拌匀','腌制5分钟入味即可'] },
+
+        { name:'皮蛋豆腐',category:'凉拌菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'皮蛋',grams:100},{name:'豆腐',grams:300},{name:'葱',grams:10},
+            {name:'蒜',grams:10},{name:'生抽',grams:15},{name:'醋',grams:10},
+            {name:'香油',grams:5},{name:'盐',grams:3}
+          ],
+          steps:['豆腐整块放入盘中，皮蛋切丁铺在豆腐上','蒜切末，加生抽、醋、香油、盐调成料汁','料汁浇在皮蛋豆腐上','撒上葱花即可'] },
+
+        { name:'干煸四季豆',category:'家常菜',difficulty:'中等',time:'20分钟',
+          ingredients:[
+            {name:'四季豆',grams:300},{name:'猪肉末',grams:80},{name:'干辣椒',grams:10},
+            {name:'花椒',grams:5},{name:'蒜',grams:10},{name:'姜',grams:10},
+            {name:'生抽',grams:15},{name:'盐',grams:5},{name:'食用油',grams:35}
+          ],
+          steps:['四季豆去筋掰段，沥干水分','锅中多油，下四季豆煸至表面起皱盛出','锅中留底油，下肉末炒散','加入干辣椒、花椒、姜蒜爆香','倒回四季豆，加生抽、盐翻炒均匀出锅'] },
+
+        { name:'蚝油生菜',category:'家常菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'生菜',grams:300},{name:'蚝油',grams:20},{name:'蒜',grams:15},
+            {name:'生抽',grams:10},{name:'糖',grams:5},{name:'淀粉',grams:5},{name:'食用油',grams:15}
+          ],
+          steps:['生菜洗净焯水10秒捞出摆盘','蒜切末，热锅凉油爆香','加入蚝油、生抽、糖和少量水','水淀粉勾芡，浇在生菜上'] },
+
+        { name:'韭黄炒蛋',category:'家常菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'韭黄',grams:200},{name:'鸡蛋',grams:150},{name:'盐',grams:5},{name:'食用油',grams:20}
+          ],
+          steps:['韭黄洗净切段，鸡蛋打散加盐','热锅凉油，倒入蛋液炒至凝固盛出','锅中加油，下韭黄大火翻炒1分钟','倒回鸡蛋翻炒均匀出锅'] },
+
+        { name:'土豆炖牛肉',category:'家常菜',difficulty:'中等',time:'90分钟',
+          ingredients:[
+            {name:'牛肉',grams:350},{name:'土豆',grams:200},{name:'胡萝卜',grams:150},
+            {name:'洋葱',grams:100},{name:'姜',grams:15},{name:'八角',grams:5},
+            {name:'生抽',grams:20},{name:'老抽',grams:10},{name:'料酒',grams:20},
+            {name:'盐',grams:5},{name:'食用油',grams:25}
+          ],
+          steps:['牛肉切块焯水，土豆、胡萝卜切块','热锅凉油，下洋葱、姜、八角爆香','加入牛肉翻炒，加料酒、生抽、老抽上色','加入足量热水，大火烧开转小火炖60分钟','加入土豆、胡萝卜继续炖20分钟','加盐调味，收汁出锅'] },
+
+        { name:'蒜蓉粉丝蒸虾',category:'家常菜',difficulty:'中等',time:'25分钟',
+          ingredients:[
+            {name:'虾',grams:300},{name:'粉丝',grams:50},{name:'蒜',grams:30},
+            {name:'葱',grams:10},{name:'生抽',grams:15},{name:'蚝油',grams:15},
+            {name:'食用油',grams:20},{name:'盐',grams:3}
+          ],
+          steps:['粉丝泡软铺在盘底','虾开背去虾线，铺在粉丝上','蒜切末，一半用油炸至金黄，与生蒜混合','蒜蓉加生抽、蚝油、盐调匀，铺在虾上','上锅蒸8-10分钟','出锅撒葱花，淋热油'] },
+
+        { name:'红烧鸡块',category:'家常菜',difficulty:'中等',time:'35分钟',
+          ingredients:[
+            {name:'鸡块',grams:400},{name:'土豆',grams:200},{name:'青椒',grams:100},
+            {name:'姜',grams:15},{name:'蒜',grams:10},{name:'八角',grams:5},
+            {name:'生抽',grams:20},{name:'老抽',grams:10},{name:'料酒',grams:15},
+            {name:'糖',grams:10},{name:'食用油',grams:25}
+          ],
+          steps:['鸡块焯水去血沫','热锅凉油，下姜蒜八角爆香','加入鸡块翻炒至表面微黄','加料酒、生抽、老抽、糖上色','加入土豆和适量水炖20分钟','加入青椒，收汁出锅'] },
+
+        { name:'辣椒炒肉',category:'下饭菜',difficulty:'简单',time:'15分钟',
+          ingredients:[
+            {name:'猪肉',grams:200},{name:'青椒',grams:200},{name:'蒜',grams:10},
+            {name:'生抽',grams:15},{name:'老抽',grams:8},{name:'料酒',grams:10},
+            {name:'盐',grams:5},{name:'食用油',grams:25},{name:'豆豉',grams:10}
+          ],
+          steps:['猪肉切薄片，青椒切块，蒜切片','热锅不放油，下青椒干煸至表面微焦盛出','锅中加油，下肉片煸炒出油','加入豆豉、蒜片炒香','加料酒、生抽、老抽调味','倒回青椒翻炒均匀出锅'] },
+
+        { name:'丝瓜炒蛋',category:'家常菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'丝瓜',grams:300},{name:'鸡蛋',grams:150},{name:'盐',grams:5},
+            {name:'食用油',grams:20},{name:'蒜',grams:10}
+          ],
+          steps:['丝瓜去皮切滚刀块，鸡蛋打散','热锅凉油，倒入蛋液炒熟盛出','锅中加油，下蒜末爆香','下丝瓜翻炒至变软出水','倒回鸡蛋，加盐调味出锅'] },
+
+        { name:'洋葱炒肉',category:'家常菜',difficulty:'简单',time:'15分钟',
+          ingredients:[
+            {name:'洋葱',grams:200},{name:'猪肉',grams:150},{name:'生抽',grams:15},
+            {name:'料酒',grams:10},{name:'盐',grams:5},{name:'淀粉',grams:8},{name:'食用油',grams:20}
+          ],
+          steps:['猪肉切片加料酒、生抽、淀粉腌制','洋葱切丝','热锅凉油，下肉片滑炒至变色盛出','锅中留底油，下洋葱炒至透明','倒回肉片，加盐翻炒均匀'] },
+
+        { name:'手撕包菜',category:'家常菜',difficulty:'简单',time:'10分钟',
+          ingredients:[
+            {name:'包菜',grams:300},{name:'干辣椒',grams:10},{name:'蒜',grams:10},
+            {name:'醋',grams:15},{name:'生抽',grams:15},{name:'盐',grams:5},
+            {name:'食用油',grams:25},{name:'花椒',grams:5}
+          ],
+          steps:['包菜手撕成块，蒜切片','热锅凉油，下花椒、干辣椒、蒜片爆香','下包菜大火翻炒至变软','沿锅边淋入醋','加生抽、盐调味，翻炒均匀出锅'] },
+    ];
+
+    // ==================== 状态 ====================
+    let appData = null;
+    let currentTab = 'inventory';
+    let invFilter = '全部';
+    let selectedRecipe = null;
+    let calendarYear, calendarMonth, selectedDate;
+    let confirmMealType = 'breakfast';
+    let confirmDate = '';
+    let openedCategories = {};
+    let recipeViewMode = 'browse'; // 'browse' | 'generate'
+
+    // ==================== 数据管理 ====================
+    function loadData() {
+        let raw = localStorage.getItem(STORAGE_KEY);
+        let data = raw ? JSON.parse(raw) : null;
+        if (!data || data.version < 2) {
+            data = {
+                version: 2,
+                inventory: { ...DEFAULT_PANTRY },
+                mealLog: {},
+                customRecipes: []
+            };
+            saveData(data);
+        }
+        // 确保所有默认调料存在
+        for (const [k, v] of Object.entries(DEFAULT_PANTRY)) {
+            if (!data.inventory[k]) data.inventory[k] = { ...v };
+        }
+        if (!data.customRecipes) data.customRecipes = [];
+        if (!data.customCategories) data.customCategories = {};
+        if (!data.customIcons) data.customIcons = {};
+        // 恢复自定义图标
+        if (data.appIcon) {
+            setTimeout(function() {
+                restoreIconsToSW();
+            }, 300);
+        }
+        return data;
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function persist() { saveData(appData); }
+
+    // ==================== 食材库存 ====================
+    function openInventoryModal() {
+        document.getElementById('invName').value = '';
+        document.getElementById('invGrams').value = '200';
+        document.getElementById('invCategory').value = '蔬菜';
+        document.getElementById('inventoryModal').classList.add('show');
+        setTimeout(() => document.getElementById('invName').focus(), 300);
+    }
+
+    function closeInventoryModal() {
+        document.getElementById('inventoryModal').classList.remove('show');
+    }
+
+    function addInventory() {
+        const nameEl = document.getElementById('invName');
+        const gramsEl = document.getElementById('invGrams');
+        const catEl = document.getElementById('invCategory');
+        const name = nameEl.value.trim();
+        const grams = parseInt(gramsEl.value) || 0;
+        const cat = catEl.value;
+        if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
+        if (grams <= 0) { showToast('请输入有效的克数'); gramsEl.focus(); return; }
+
+        if (appData.inventory[name]) {
+            appData.inventory[name].grams += grams;
+            appData.inventory[name].category = cat;
+            appData.inventory[name].addedAt = appData.inventory[name].addedAt || todayStr();
+        } else {
+            appData.inventory[name] = { name, grams, category: cat, addedAt: todayStr() };
+        }
+        persist();
+        closeInventoryModal();
+        renderInventory();
+        showToast(`已添加 ${name} ${grams}g ✅`, 'success');
+    }
+
+    function deleteInventory(name) {
+        if (!confirm(`确定删除「${name}」吗？`)) return;
+        delete appData.inventory[name];
+        persist();
+        renderInventory();
+        showToast(`已删除 ${name}`);
+    }
+
+    function filterCategory(cat) {
+        invFilter = cat;
+        document.querySelectorAll('#catFilter .cat-chip').forEach(c => c.classList.remove('active'));
+        const chips = document.querySelectorAll('#catFilter .cat-chip');
+        chips.forEach(c => { if (c.textContent.includes(cat) || (cat==='全部' && c.textContent==='全部')) c.classList.add('active'); });
+        // 选中筛选时默认展开该分类
+        if (cat !== '全部') openedCategories[cat] = true;
+        renderInventory();
+    }
+
+    function toggleCategory(cat) {
+        openedCategories[cat] = !openedCategories[cat];
+        const header = document.querySelector(`.cat-group-header[onclick="toggleCategory('${cat}')"]`);
+        const body = document.getElementById(`cat-body-${cat}`);
+        if (header) header.classList.toggle('open', openedCategories[cat]);
+        if (body) body.classList.toggle('open', openedCategories[cat]);
+    }
+
+    function renderInventory() {
+        const allItems = Object.values(appData.inventory).filter(i => i.grams > 0);
+
+        document.getElementById('invCount').textContent = `${allItems.length} 种食材`;
+
+        const catOrder = ['肉类', '蔬菜', '蛋类', '水产', '豆制品', '主食', '酱菜', '水果', '乳制品', '干货', '调料', '香料', '其他'];
+
+        let displayItems = allItems;
+        if (invFilter !== '全部') {
+            displayItems = allItems.filter(i => i.category === invFilter);
+        }
+
+        const groups = {};
+        for (const item of displayItems) {
+            const cat = item.category || '其他';
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push(item);
+        }
+
+        const sortedCats = Object.keys(groups).sort((a, b) => {
+            const ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
+            if (ai === -1 && bi === -1) return a.localeCompare(b);
+            if (ai === -1) return 1;
+            if (bi === -1) return -1;
+            return ai - bi;
+        });
+
+        const listEl = document.getElementById('invList');
+        if (sortedCats.length === 0) {
+            listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🥬</div><p>还没有食材，快添加吧~</p></div>';
+        } else {
+            listEl.innerHTML = sortedCats.map(cat => {
+                const items = groups[cat].sort((a, b) => b.grams - a.grams);
+                const emoji = CATEGORY_EMOJI[cat] || '📦';
+                const totalGrams = items.reduce((s, i) => s + i.grams, 0);
+                const isOpen = invFilter !== '全部' || openedCategories[cat];
+                return `
+                <div class="cat-group">
+                    <div class="cat-group-header ${isOpen ? 'open' : ''}" onclick="toggleCategory('${cat}')">
+                        ${emoji} ${cat}
+                        <span class="cat-count">${items.length}种 · ${totalGrams}g</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="cat-group-body ${isOpen ? 'open' : ''}" id="cat-body-${cat}">
+                        ${items.map(i => {
+                            const maxGrams = (cat === '调料' || cat === '香料') ? 500 : 1000;
+                            const pct = Math.min(100, Math.round(i.grams / maxGrams * 100));
+                            const barClass = pct > 50 ? 'high' : pct > 20 ? 'mid' : 'low';
+                            return `
+                            <div class="inv-item">
+                                <div class="inv-emoji">${getIngredientDisplayIcon(i.name)}</div>
+                                <div class="inv-info">
+                                    <div class="inv-name">${i.name}</div>
+                                    <div class="inv-meta">${i.addedAt || '未知日期'}</div>
+                                    <div class="inv-bar"><div class="inv-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+                                </div>
+                                <div class="inv-grams">${i.grams}g</div>
+                                <button class="inv-del" onclick="event.stopPropagation();deleteInventory('${i.name}')">×</button>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // ==================== 菜谱推荐 ====================
+    function getAllRecipes() {
+        const custom = (appData.customRecipes || []);
+        return [...RECIPES, ...custom];
+    }
+
+    function openRecipeFormModal() {
+        document.getElementById('newRecipeName').value = '';
+        document.getElementById('newRecipeTime').value = '';
+        document.getElementById('newRecipeSteps').value = '';
+        document.getElementById('newRecipeIngredients').innerHTML = `
+            <div class="ingredient-form-row">
+                <input type="text" placeholder="食材名" class="ing-name">
+                <input type="number" placeholder="克数" class="ing-grams" style="width:70px;" min="1" value="100">
+            </div>`;
+        document.getElementById('recipeFormModal').classList.add('show');
+        setTimeout(() => document.getElementById('newRecipeName').focus(), 300);
+    }
+
+    function closeRecipeFormModal() {
+        document.getElementById('recipeFormModal').classList.remove('show');
+    }
+
+    function addIngredientRow() {
+        const container = document.getElementById('newRecipeIngredients');
+        const row = document.createElement('div');
+        row.className = 'ingredient-form-row';
+        row.innerHTML = `
+            <input type="text" placeholder="食材名" class="ing-name">
+            <input type="number" placeholder="克数" class="ing-grams" style="width:70px;" min="1" value="100">
+            <button class="ing-del" onclick="this.parentElement.remove()">×</button>`;
+        container.appendChild(row);
+    }
+
+    function saveNewRecipe() {
+        const name = document.getElementById('newRecipeName').value.trim();
+        const category = document.getElementById('newRecipeCat').value;
+        const difficulty = document.getElementById('newRecipeDiff').value;
+        const time = document.getElementById('newRecipeTime').value.trim();
+        const stepsRaw = document.getElementById('newRecipeSteps').value.trim();
+
+        if (!name) { showToast('请输入菜谱名称'); return; }
+        if (!time) { showToast('请输入烹饪时间'); return; }
+        if (!stepsRaw) { showToast('请输入做法步骤'); return; }
+
+        const ingRows = document.querySelectorAll('#newRecipeIngredients .ingredient-form-row');
+        const ingredients = [];
+        for (const row of ingRows) {
+            const ingName = row.querySelector('.ing-name').value.trim();
+            const ingGrams = parseInt(row.querySelector('.ing-grams').value) || 0;
+            if (ingName && ingGrams > 0) {
+                ingredients.push({ name: ingName, grams: ingGrams });
+            }
+        }
+        if (ingredients.length === 0) { showToast('请至少添加一种食材'); return; }
+
+        const steps = stepsRaw.split('\n').map(s => s.replace(/^\d+[\.\、\s]+/, '').trim()).filter(s => s);
+        if (steps.length === 0) { showToast('请至少添加一个步骤'); return; }
+
+        const all = getAllRecipes();
+        if (all.some(r => r.name === name)) { showToast('菜谱名称已存在'); return; }
+
+        const newRecipe = { name, category, difficulty, time, ingredients, steps };
+        if (!appData.customRecipes) appData.customRecipes = [];
+        appData.customRecipes.push(newRecipe);
+        persist();
+
+        closeRecipeFormModal();
+        showToast(`菜谱「${name}」已添加 ✅`, 'success');
+        if (recipeViewMode === 'browse') renderRecipeBrowse();
+    }
+
+    function getAvailableIngredients() {
+        return Object.entries(appData.inventory)
+            .filter(([,v]) => v.grams > 0)
+            .map(([k,v]) => ({ name: k, grams: v.grams }));
+    }
+
+    function findRecipesByInventory() {
+        const condimentCats = ['调料', '香料'];
+        const invSet = new Set(Object.entries(appData.inventory)
+            .filter(([,v]) => v.grams > 0 && !condimentCats.includes(v.category))
+            .map(([k]) => k));
+
+        return getAllRecipes()
+            .map(r => {
+                const mainIngs = r.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
+                const matchedIngs = mainIngs.filter(ing => invSet.has(ing.name));
+                const matchRate = mainIngs.length > 0 ? Math.round(matchedIngs.length / mainIngs.length * 100) : 0;
+                return { ...r, matchedIngs, matchRate, hasMatch: matchedIngs.length > 0 };
+            })
+            .filter(r => r.hasMatch)
+            .sort((a, b) => b.matchRate - a.matchRate);
+    }
+
+    function guessIngredientCategory(name) {
+        const n = name.toLowerCase();
+        if (/食用油|盐|生抽|老抽|料酒|醋|蚝油|香油|淀粉|糖|豆瓣酱|花椒粉|辣椒油/.test(n)) return '调料';
+        if (/葱|姜|蒜|干辣椒|花椒|八角|桂皮/.test(n)) return '香料';
+        return '';
+    }
+
+    function renderRecipeBrowse() {
+        recipeViewMode = 'browse';
+        document.getElementById('recipeContent').innerHTML = `
+            <div class="card" id="recipeBrowseCard">
+                <div class="card-title">
+                    📋 我的菜谱
+                    <button class="btn btn-sm btn-outline" onclick="openRecipeFormModal()">+ 添加菜谱</button>
+                </div>
+                <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
+                <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 随机生成菜谱</button>
+                <div id="recipeList" style="margin-top:12px;"></div>
+            </div>`;
+
+        const all = getAllRecipes();
+        const avail = getAvailableIngredients();
+        document.getElementById('availSummary').textContent =
+            `共 ${all.length} 道菜 · 可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+
+        if (all.length === 0) {
+            document.getElementById('recipeList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p>还没有菜谱，点击右上角添加吧~</p>
+                </div>`;
+            return;
+        }
+
+        document.getElementById('recipeList').innerHTML = all.map((r, idx) => renderMiniRecipe(r, idx, false)).join('');
+    }
+
+    function enterGenerateMode() {
+        const avail = getAvailableIngredients();
+        if (avail.length === 0) {
+            showToast('请先添加食材！');
+            switchTab('inventory');
+            return;
+        }
+
+        recipeViewMode = 'generate';
+        document.getElementById('recipeContent').innerHTML = `
+            <div class="card" id="recipeGenerateCard">
+                <div class="card-title">
+                    <button class="btn btn-sm btn-secondary" onclick="renderRecipeBrowse()">← 返回菜谱</button>
+                    <span style="font-size:15px;">🎲 智能推荐</span>
+                    <span style="width:60px;"></span>
+                </div>
+                <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
+                <button class="btn btn-primary" onclick="generateRecipe()">🔄 换一换</button>
+                <div id="recipeList" style="margin-top:12px;"></div>
+            </div>`;
+
+        generateRecipe();
+    }
+
+    function generateRecipe() {
+        const avail = getAvailableIngredients();
+        if (avail.length === 0) {
+            showToast('请先添加食材！');
+            switchTab('inventory');
+            return;
+        }
+
+        const matches = findRecipesByInventory();
+
+        if (matches.length === 0) {
+            document.getElementById('recipeList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🥬</div>
+                    <p>没有匹配的菜谱，先去添加些食材吧~</p>
+                </div>`;
+            document.getElementById('availSummary').textContent =
+                `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+            return;
+        }
+
+        const shuffled = [...matches].sort(() => Math.random() - 0.5);
+        const picked = shuffled[0];
+        const others = shuffled.slice(1, 5);
+
+        selectedRecipe = picked;
+        document.getElementById('recipeList').innerHTML = renderRecipeDetail(picked, true) +
+            (others.length > 0 ? `<div style="margin-top:12px;font-size:13px;color:var(--gray-600);font-weight:600;">📋 更多推荐</div>` + others.map((r, idx) => renderMiniRecipe(r, idx, false)).join('') : '');
+
+        document.getElementById('availSummary').textContent =
+            `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+    }
+
+    function renderRecipeDetail(recipe, showActions) {
+        const invMap = {};
+        for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
+        const condimentCats = ['调料', '香料'];
+
+        const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
+        const condimentIngs = recipe.ingredients.filter(ing => condimentCats.includes(guessIngredientCategory(ing.name)));
+
+        return `
+        <div class="recipe-card selected" id="recipeDetail">
+            <div class="recipe-name">${recipe.name}</div>
+            <div class="recipe-meta-row">
+                <span class="recipe-meta-tag">📂 ${recipe.category}</span>
+                <span class="recipe-meta-tag">⏱ ${recipe.time}</span>
+                <span class="recipe-meta-tag">📊 ${recipe.difficulty}</span>
+            </div>
+            <div class="section-title">📋 主食材</div>
+            ${mainIngs.map(ing => {
+                const have = invMap[ing.name] || 0;
+                const sufficient = have >= ing.grams;
+                return `<div class="ingredient-row ${sufficient ? 'sufficient' : 'insufficient'}">
+                    <span>${sufficient ? '✅' : '⚠️'} ${ing.name}</span>
+                    <span>需 ${ing.grams}g (库存 ${have}g${!sufficient ? ' 不足!' : ''})</span>
+                </div>`;
+            }).join('')}
+            ${condimentIngs.length > 0 ? `
+            <div class="section-title" style="margin-top:12px;">🧂 调料</div>
+            ${condimentIngs.map(ing => `<div class="ingredient-row" style="background:var(--gray-50);color:var(--gray-600);">
+                <span>${ing.name}</span><span>${ing.grams}g</span>
+            </div>`).join('')}
+            ` : ''}
+            <div class="section-title" style="margin-top:12px;">👨‍🍳 做法步骤</div>
+            <ol class="steps-list">${recipe.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+            ${showActions ? `
+            <div class="action-bar">
+                <button class="btn btn-outline" onclick="generateRecipe()">🔄 再换一个</button>
+                <button class="btn btn-primary" onclick="openConfirmModal('${recipe.name}')">✅ 确认采用</button>
+            </div>` : ''}
+        </div>`;
+    }
+
+    function renderMiniRecipe(recipe, idx, fullMatch) {
+        const invMap = {};
+        for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
+        const condimentCats = ['调料', '香料'];
+        const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
+        const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
+
+        return `
+        <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
+                <span style="font-size:12px;color:var(--primary);font-weight:600;">${matchRate > 0 ? '匹配' + matchRate + '%' : ''}</span>
+            </div>
+            <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                ${mainIngs.map(ing => {
+                    const have = invMap[ing.name] || 0;
+                    const sufficient = have >= ing.grams;
+                    return `<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:${sufficient ? 'var(--green-bg)' : 'var(--orange-bg)'};color:${sufficient ? 'var(--green)' : 'var(--orange)'};">${ing.name} ${ing.grams}g</span>`;
+                }).join('')}
+            </div>
+        </div>`;
+    }
+
+    function selectMiniRecipe(name, idx) {
+        const recipe = getAllRecipes().find(r => r.name === name);
+        if (!recipe) return;
+
+        const miniEl = document.getElementById('mini-' + idx);
+        const detailEl = document.getElementById('recipeDetail');
+        const isAlreadySelected = miniEl && miniEl.classList.contains('selected');
+
+        // 收起已展开的详情
+        if (detailEl) {
+            detailEl.remove();
+        }
+        document.querySelectorAll('.recipe-card').forEach(el => el.classList.remove('selected'));
+
+        if (isAlreadySelected) {
+            selectedRecipe = null;
+            return;
+        }
+
+        selectedRecipe = recipe;
+        if (miniEl) miniEl.classList.add('selected');
+
+        // 在当前卡片后面插入详情
+        if (miniEl) {
+            miniEl.insertAdjacentHTML('afterend', renderRecipeDetail(recipe, true));
+        } else {
+            document.getElementById('recipeList').insertAdjacentHTML('afterbegin', renderRecipeDetail(recipe, true));
+        }
+        document.getElementById('recipeDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ==================== 确认弹窗 ====================
+    function openConfirmModal(recipeName) {
+        const recipe = getAllRecipes().find(r => r.name === recipeName);
+        if (!recipe) return;
+        selectedRecipe = recipe;
+        confirmMealType = 'breakfast';
+        confirmDate = todayStr();
+
+        document.querySelectorAll('#mealTypeGroup .meal-type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('#mealTypeGroup .meal-type-btn[data-meal="breakfast"]').classList.add('active');
+
+        updateConfirmUI();
+        document.getElementById('confirmModal').classList.add('show');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('show');
+    }
+
+    function selectMealType(type) {
+        confirmMealType = type;
+        document.querySelectorAll('#mealTypeGroup .meal-type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`#mealTypeGroup .meal-type-btn[data-meal="${type}"]`).classList.add('active');
+    }
+
+    function shiftConfirmDate(delta) {
+        const d = new Date(confirmDate);
+        d.setDate(d.getDate() + delta);
+        confirmDate = d.toISOString().slice(0, 10);
+        updateConfirmUI();
+    }
+
+    function updateConfirmUI() {
+        document.getElementById('confirmDateText').textContent = formatDate(confirmDate);
+        if (!selectedRecipe) return;
+        const invMap = {};
+        for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
+
+        document.getElementById('consumptionPreview').innerHTML = selectedRecipe.ingredients.map(ing => {
+            const before = invMap[ing.name] || 0;
+            const after = before - ing.grams;
+            return `<div class="preview-item">
+                <span>${ing.name}</span>
+                <span>${before}g → <span class="deduct">${Math.max(0, after)}g</span>${after <= 0 ? '<span class="exhausted"> (耗尽)</span>' : ''}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function confirmMeal() {
+        if (!selectedRecipe) return;
+
+        const invMap = {};
+        for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
+
+        // 再次检查库存是否充足
+        for (const ing of selectedRecipe.ingredients) {
+            if (!invMap[ing.name] || invMap[ing.name] < ing.grams) {
+                showToast(`食材不足：${ing.name} 需要 ${ing.grams}g，库存只有 ${invMap[ing.name] || 0}g`);
+                return;
+            }
+        }
+
+        // 扣减库存
+        const consumed = [];
+        for (const ing of selectedRecipe.ingredients) {
+            appData.inventory[ing.name].grams -= ing.grams;
+            consumed.push({ name: ing.name, grams: ing.grams });
+        }
+
+        // 记录到日历
+        if (!appData.mealLog[confirmDate]) {
+            appData.mealLog[confirmDate] = { breakfast: null, lunch: null, dinner: null };
+        }
+        appData.mealLog[confirmDate][confirmMealType] = {
+            recipeName: selectedRecipe.name,
+            recipeCategory: selectedRecipe.category,
+            servings: 1,
+            consumedIngredients: consumed,
+            timestamp: new Date().toISOString()
+        };
+
+        persist();
+        closeConfirmModal();
+        showToast(`已记录到 ${formatDate(confirmDate)} ${mealTypeLabel(confirmMealType)} ✅`, 'success');
+        renderInventory();
+        document.getElementById('recipeList').innerHTML = '';
+        selectedRecipe = null;
+
+        // 跳转到日历查看
+        switchTab('calendar');
+        calendarYear = new Date(confirmDate).getFullYear();
+        calendarMonth = new Date(confirmDate).getMonth() + 1;
+        selectedDate = confirmDate;
+        renderCalendar();
+    }
+
+    function mealTypeLabel(type) {
+        return { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' }[type] || type;
+    }
+
+    // ==================== 日历 ====================
+    function renderCalendar() {
+        if (!calendarYear) {
+            const now = new Date();
+            calendarYear = now.getFullYear();
+            calendarMonth = now.getMonth() + 1;
+            selectedDate = todayStr();
+        }
+
+        document.getElementById('monthTitle').textContent = `${calendarYear}年 ${calendarMonth}月`;
+
+        const firstDay = new Date(calendarYear, calendarMonth - 1, 1);
+        const lastDay = new Date(calendarYear, calendarMonth, 0);
+        const startDayOfWeek = firstDay.getDay() || 7; // 周一=1
+        const totalDays = lastDay.getDate();
+        const today = todayStr();
+
+        let html = '';
+        // 填充前面的空白
+        for (let i = 1; i < startDayOfWeek; i++) {
+            const d = new Date(calendarYear, calendarMonth - 1, 1 - (startDayOfWeek - i));
+            html += renderDayCell(d, today, true);
+        }
+        for (let d = 1; d <= totalDays; d++) {
+            const date = new Date(calendarYear, calendarMonth - 1, d);
+            html += renderDayCell(date, today, false);
+        }
+        document.getElementById('daysGrid').innerHTML = html;
+        renderDayDetail();
+    }
+
+    function renderDayCell(date, today, otherMonth) {
+        const dateStr = date.toISOString().slice(0, 10);
+        const isToday = dateStr === today;
+        const isSel = dateStr === selectedDate;
+        let cls = 'day-cell';
+        if (isToday) cls += ' today';
+        if (isSel && !isToday) cls += ' selected';
+        if (otherMonth) cls += ' other-month';
+
+        // 三餐圆点
+        const log = appData.mealLog[dateStr];
+        let dotsHtml = '';
+        if (log) {
+            ['breakfast', 'lunch', 'dinner'].forEach(meal => {
+                dotsHtml += `<span class="day-dot ${log[meal] ? 'has' : 'empty'}"></span>`;
+            });
+        }
+
+        return `<div class="${cls}" onclick="selectCalendarDate('${dateStr}')">
+            ${date.getDate()}
+            <div class="day-dots">${dotsHtml}</div>
+        </div>`;
+    }
+
+    function selectCalendarDate(dateStr) {
+        selectedDate = dateStr;
+        const d = new Date(dateStr);
+        calendarYear = d.getFullYear();
+        calendarMonth = d.getMonth() + 1;
+        renderCalendar();
+    }
+
+    function prevMonth() {
+        if (calendarMonth === 1) { calendarYear--; calendarMonth = 12; }
+        else calendarMonth--;
+        renderCalendar();
+    }
+
+    function nextMonth() {
+        if (calendarMonth === 12) { calendarYear++; calendarMonth = 1; }
+        else calendarMonth++;
+        renderCalendar();
+    }
+
+    function renderDayDetail() {
+        if (!selectedDate) {
+            document.getElementById('dayDetailTitle').textContent = '选择日期查看详情';
+            document.getElementById('mealSlots').innerHTML = '';
+            return;
+        }
+
+        document.getElementById('dayDetailTitle').textContent = formatDate(selectedDate);
+        const log = appData.mealLog[selectedDate] || { breakfast: null, lunch: null, dinner: null };
+
+        document.getElementById('mealSlots').innerHTML = ['breakfast', 'lunch', 'dinner'].map(meal => {
+            const emoji = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
+            const record = log[meal];
+            if (record) {
+                return `
+                <div style="margin-bottom:10px;">
+                    <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
+                    <div class="meal-slot has-meal">
+                        <div class="meal-recipe-name">🍽 ${record.recipeName}</div>
+                        <div class="meal-recipe-meta">📂 ${record.recipeCategory} · ${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
+                        <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
+                    </div>
+                </div>`;
+            } else {
+                return `
+                <div style="margin-bottom:10px;">
+                    <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
+                    <div class="meal-slot">
+                        <span class="meal-empty" onclick="goAddMeal('${selectedDate}','${meal}')">+ 添加${mealTypeLabel(meal)}</span>
+                    </div>
+                </div>`;
+            }
+        }).join('');
+    }
+
+    function goAddMeal(date, meal) {
+        confirmDate = date;
+        confirmMealType = meal;
+        switchTab('recipes');
+        generateRecipe();
+        // 如果已经生成了菜谱，直接打开确认弹窗
+        setTimeout(() => {
+            if (selectedRecipe) {
+                updateConfirmUI();
+                document.getElementById('confirmModal').classList.add('show');
+            }
+        }, 300);
+    }
+
+    function deleteMeal(date, meal) {
+        if (!confirm(`确定删除 ${formatDate(date)} ${mealTypeLabel(meal)} 的记录吗？食材库存不会恢复。`)) return;
+
+        // 不恢复库存（简化处理）
+        appData.mealLog[date][meal] = null;
+        // 如果当天三餐都为空，清理日期
+        const log = appData.mealLog[date];
+        if (!log.breakfast && !log.lunch && !log.dinner) {
+            delete appData.mealLog[date];
+        }
+        persist();
+        renderCalendar();
+        showToast('已删除记录');
+    }
+
+    // ==================== 视图切换 ====================
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + tab).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + tab).classList.add('active');
+
+        if (tab === 'inventory') renderInventory();
+        if (tab === 'recipes') renderRecipeBrowse();
+        if (tab === 'calendar') {
+            const now = new Date();
+            calendarYear = now.getFullYear();
+            calendarMonth = now.getMonth() + 1;
+            selectedDate = todayStr();
+            renderCalendar();
+        }
+        if (tab === 'settings') renderSettings();
+    }
+
+    // ==================== 工具函数 ====================
+    function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+    function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 周${weekdays[d.getDay()]}`;
+    }
+
+    function showToast(msg, type) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + (type || '');
+        toast.offsetHeight;
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ==================== 设置页面 ====================
+    function getCustomCategories() {
+        return appData.customCategories || {};
+    }
+
+    function renderSettings() {
+        renderCategoryManage();
+        renderIconManage();
+        renderAppIconPreview();
+    }
+
+    function renderCategoryManage() {
+        const cats = getCustomCategories();
+        const builtIn = {
+            '肉类':'🥩','蔬菜':'🥬','蛋类':'🥚','水产':'🐟','豆制品':'🫘',
+            '主食':'🍚','调料':'🧂','香料':'🌿','干货':'🍄','乳制品':'🥛',
+            '水果':'🍎','酱菜':'🫙','其他':'📦'
+        };
+        const all = { ...builtIn, ...cats };
+
+        document.getElementById('catManageList').innerHTML = Object.entries(all).map(([name, emoji]) => `
+            <div class="inv-item" style="padding:8px 12px;">
+                <span style="font-size:20px;">${emoji}</span>
+                <div class="inv-info"><div class="inv-name" style="font-size:13px;">${name}</div></div>
+                ${cats[name] ? `<button class="inv-del" onclick="deleteCategory('${name}')">×</button>` : '<span style="font-size:10px;color:var(--gray-400);">内置</span>'}
+            </div>
+        `).join('');
+    }
+
+    function addCategory() {
+        const name = document.getElementById('newCatName').value.trim();
+        const emoji = document.getElementById('newCatEmoji').value.trim() || '📦';
+        if (!name) { showToast('请输入分类名称'); return; }
+        if (['肉类','蔬菜','蛋类','水产','豆制品','主食','调料','香料','干货','乳制品','水果','酱菜','其他'].includes(name)) {
+            showToast('内置分类不可覆盖');
+            return;
+        }
+        if (!appData.customCategories) appData.customCategories = {};
+        appData.customCategories[name] = emoji;
+        persist();
+        document.getElementById('newCatName').value = '';
+        renderCategoryManage();
+        // 刷新库存页面
+        if (currentTab === 'inventory') renderInventory();
+        showToast(`分类「${name}」已添加`);
+    }
+
+    function deleteCategory(name) {
+        if (!appData.customCategories || !appData.customCategories[name]) return;
+        delete appData.customCategories[name];
+        persist();
+        renderCategoryManage();
+        showToast(`已删除分类「${name}」`);
+    }
+
+    function getCustomIcons() {
+        return appData.customIcons || {};
+    }
+
+    function renderIconManage() {
+        const icons = getCustomIcons();
+        if (Object.keys(icons).length === 0) {
+            document.getElementById('iconManageList').innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无自定义图标</div>';
+            return;
+        }
+        document.getElementById('iconManageList').innerHTML = Object.entries(icons).map(([name, emoji]) => `
+            <div class="inv-item" style="padding:8px 12px;">
+                <span style="font-size:20px;">${emoji}</span>
+                <div class="inv-info"><div class="inv-name" style="font-size:13px;">${name}</div></div>
+                <button class="inv-del" onclick="deleteIngredientIcon('${name}')">×</button>
+            </div>
+        `).join('');
+    }
+
+    function setIngredientIcon() {
+        const name = document.getElementById('iconIngName').value.trim();
+        const emoji = document.getElementById('iconIngEmoji').value.trim() || '🍽';
+        if (!name) { showToast('请输入食材名称'); return; }
+        if (!appData.customIcons) appData.customIcons = {};
+        appData.customIcons[name] = emoji;
+        persist();
+        document.getElementById('iconIngName').value = '';
+        document.getElementById('iconIngEmoji').value = '🍽';
+        renderIconManage();
+        if (currentTab === 'inventory') renderInventory();
+        showToast(`已为「${name}」设置图标 ${emoji}`);
+    }
+
+    function deleteIngredientIcon(name) {
+        if (!appData.customIcons) return;
+        delete appData.customIcons[name];
+        persist();
+        renderIconManage();
+        showToast(`已删除「${name}」的自定义图标`);
+    }
+
+    // 获取食材的显示图标（先查自定义，再查分类）
+    function getIngredientDisplayIcon(ingredientName) {
+        const customIcons = getCustomIcons();
+        if (customIcons[ingredientName]) return customIcons[ingredientName];
+        const invItem = appData.inventory[ingredientName];
+        if (invItem) {
+            const customCats = getCustomCategories();
+            const emoji = customCats[invItem.category] || CATEGORY_EMOJI[invItem.category] || '📦';
+            return emoji;
+        }
+        return '📦';
+    }
+
+    function renderAppIconPreview() {
+        const customIcon = appData.appIcon;
+        const preview = document.getElementById('iconPreview');
+        if (customIcon) {
+            preview.innerHTML = `<img src="${customIcon}" style="width:64px;height:64px;border-radius:16px;object-fit:cover;" alt="app icon">`;
+            preview.style.background = 'transparent';
+            preview.style.display = 'block';
+        } else {
+            preview.innerHTML = '🍳';
+            preview.style.background = 'var(--primary)';
+            preview.style.color = 'white';
+            preview.style.fontSize = '32px';
+            preview.style.display = 'flex';
+            preview.style.alignItems = 'center';
+            preview.style.justifyContent = 'center';
+        }
+    }
+
+    function uploadAppIcon(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const dataUrl = e.target.result;
+            appData.appIcon = dataUrl;
+            persist();
+
+            generateIconDataURL(dataUrl, 192, function(dataUrl192) {
+                generateIconDataURL(dataUrl, 512, function(dataUrl512) {
+                    appData.icon192 = dataUrl192;
+                    appData.icon512 = dataUrl512;
+                    persist();
+                    sendIconsToSW(dataUrl192, dataUrl512);
+                    const ts = Date.now();
+                    const appleLink = document.getElementById('appleTouchIcon');
+                    if (appleLink) appleLink.href = '/icon-192.png?v=' + ts;
+                    updateFavicon('/icon-192.png?v=' + ts);
+                    renderAppIconPreview();
+                    showToast('图标已更新！请重新添加到桌面', 'success');
+                });
+            });
+        };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+
+    function generateIconDataURL(dataUrl, size, callback) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const r = size * 0.18;
+            ctx.beginPath();
+            ctx.moveTo(r, 0); ctx.lineTo(size - r, 0);
+            ctx.arcTo(size, 0, size, r, r); ctx.lineTo(size, size - r);
+            ctx.arcTo(size, size, size - r, size, r); ctx.lineTo(r, size);
+            ctx.arcTo(0, size, 0, size - r, r); ctx.lineTo(0, r);
+            ctx.arcTo(0, 0, r, 0, r); ctx.closePath(); ctx.clip();
+            const minDim = Math.min(img.width, img.height);
+            const sx = (img.width - minDim) / 2, sy = (img.height - minDim) / 2;
+            ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+            callback(canvas.toDataURL('image/png'));
+        };
+        img.onerror = function() { callback(null); };
+        img.src = dataUrl;
+    }
+
+    function sendIconsToSW(dataUrl192, dataUrl512) {
+        if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+        navigator.serviceWorker.controller.postMessage({
+            type: 'set-icons',
+            icon192: dataUrl192,
+            icon512: dataUrl512
+        });
+    }
+
+    function restoreIconsToSW() {
+        if (!appData.icon192 || !appData.icon512) return;
+        const ts = Date.now();
+        const appleLink = document.getElementById('appleTouchIcon');
+        if (appleLink) appleLink.href = '/icon-192.png?v=' + ts;
+        updateFavicon('/icon-192.png?v=' + ts);
+        renderAppIconPreview();
+        const send = function() {
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                sendIconsToSW(appData.icon192, appData.icon512);
+            }
+        };
+        if (navigator.serviceWorker) {
+            if (navigator.serviceWorker.controller) { send(); }
+            else { navigator.serviceWorker.ready.then(function(reg) { if (reg.active) send(); }); }
+        }
+    }
+
+    function resetAppIcon() {
+        delete appData.appIcon;
+        delete appData.icon192;
+        delete appData.icon512;
+        persist();
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'clear-icons' });
+        }
+        const link = document.getElementById('manifestLink');
+        if (link) link.href = '/manifest.json';
+        const appleLink = document.getElementById('appleTouchIcon');
+        if (appleLink) appleLink.href = '/icon-192.png';
+        updateFavicon('/icon-192.png');
+        const preview = document.getElementById('iconPreview');
+        preview.innerHTML = '🍳';
+        preview.style.background = 'var(--primary)';
+        preview.style.display = 'flex';
+        preview.style.alignItems = 'center';
+        preview.style.justifyContent = 'center';
+        preview.style.fontSize = '32px';
+        preview.style.color = 'white';
+        showToast('已恢复默认图标');
+    }
+
+    // ==================== 数据导入导出 ====================
+    function exportData() {
+        const data = {
+            version: 2,
+            inventory: appData.inventory,
+            mealLog: appData.mealLog,
+            customRecipes: appData.customRecipes || [],
+            exportedAt: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `menu-data-${todayStr()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('数据已导出 ✅', 'success');
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!data.inventory || !data.mealLog) {
+                    showToast('文件格式不正确');
+                    return;
+                }
+                if (!confirm(`即将覆盖当前数据：\n- ${Object.keys(data.inventory).length} 种食材\n- ${Object.keys(data.mealLog).length} 天饮食记录\n\n确定导入吗？当前数据将被覆盖。`)) {
+                    event.target.value = '';
+                    return;
+                }
+                appData.inventory = data.inventory;
+                appData.mealLog = data.mealLog;
+                appData.customRecipes = data.customRecipes || [];
+                persist();
+                renderInventory();
+                if (currentTab === 'calendar') renderCalendar();
+                showToast('数据已导入 ✅', 'success');
+            } catch (err) {
+                showToast('文件解析失败，请检查文件');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // ==================== 初始化 ====================
+    function init() {
+        appData = loadData();
+        renderInventory();
+
+        // 回车添加食材
+        document.getElementById('invName').addEventListener('keydown', e => {
+            if (e.key === 'Enter') addInventory();
+        });
+        document.getElementById('invGrams').addEventListener('keydown', e => {
+            if (e.key === 'Enter') addInventory();
+        });
+
+        // 点击弹窗背景关闭
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) closeConfirmModal();
+        });
+        document.getElementById('inventoryModal').addEventListener('click', function(e) {
+            if (e.target === this) closeInventoryModal();
+        });
+        document.getElementById('recipeFormModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRecipeFormModal();
+        });
+
+        // 更新菜谱页摘要
+        const avail = getAvailableIngredients();
+        document.getElementById('availSummary').textContent =
+            `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+    }
+
+    init();
+    </script>
+    <script>
+    // 注册 Service Worker（PWA）
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(function(reg) {
+            console.log('SW registered:', reg.scope);
+            // 检测 SW 更新
+            reg.addEventListener('updatefound', function() {
+                var newWorker = reg.installing;
+                newWorker.addEventListener('statechange', function() {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // 新的 SW 已安装，提示用户
+                        console.log('New SW available, please refresh');
+                        if (confirm('应用已更新，点击确定刷新页面')) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        }).catch(function(err) {
+            console.log('SW failed:', err);
+        });
+
+        // 检测是否已从桌面启动（standalone 模式）
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                        || navigator.standalone
+                        || document.referrer.includes('android-app://');
+        if (isStandalone) {
+            document.body.classList.add('standalone-mode');
+            console.log('Running in standalone mode');
+        }
+    }
+    </script>
+</body>
+</html>
