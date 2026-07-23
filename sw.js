@@ -1,4 +1,4 @@
-const CACHE_NAME = 'menu-generator-v6';
+const CACHE_NAME = 'menu-generator-v7';
 
 // 内存中的自定义图标（通过 postMessage 从主线程获取）
 let customIcon192 = null;
