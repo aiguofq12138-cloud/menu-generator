@@ -10,9 +10,9 @@
     <!-- Android PWA -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#ff6b6b">
-    <link rel="manifest" id="manifestLink" href="/manifest.json">
-    <link rel="apple-touch-icon" id="appleTouchIcon" href="/icon-192.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="manifest" id="manifestLink" href="/menu-generator/manifest.json">
+    <link rel="apple-touch-icon" id="appleTouchIcon" href="/menu-generator/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/menu-generator/icon-192.png">
     <title>随机菜单生成器</title>
     <style>
         :root {
@@ -1926,8 +1926,8 @@
                     sendIconsToSW(dataUrl192, dataUrl512);
                     const ts = Date.now();
                     const appleLink = document.getElementById('appleTouchIcon');
-                    if (appleLink) appleLink.href = '/icon-192.png?v=' + ts;
-                    updateFavicon('/icon-192.png?v=' + ts);
+                    if (appleLink) appleLink.href = '/menu-generator/icon-192.png?v=' + ts;
+                    updateFavicon('/menu-generator/icon-192.png?v=' + ts);
                     renderAppIconPreview();
                     showToast('图标已更新！请重新添加到桌面', 'success');
                 });
@@ -1973,8 +1973,8 @@
         if (!appData.icon192 || !appData.icon512) return;
         const ts = Date.now();
         const appleLink = document.getElementById('appleTouchIcon');
-        if (appleLink) appleLink.href = '/icon-192.png?v=' + ts;
-        updateFavicon('/icon-192.png?v=' + ts);
+        if (appleLink) appleLink.href = '/menu-generator/icon-192.png?v=' + ts;
+        updateFavicon('/menu-generator/icon-192.png?v=' + ts);
         renderAppIconPreview();
         const send = function() {
             if (navigator.serviceWorker && navigator.serviceWorker.controller) {
@@ -1996,10 +1996,10 @@
             navigator.serviceWorker.controller.postMessage({ type: 'clear-icons' });
         }
         const link = document.getElementById('manifestLink');
-        if (link) link.href = '/manifest.json';
+        if (link) link.href = '/menu-generator/manifest.json';
         const appleLink = document.getElementById('appleTouchIcon');
-        if (appleLink) appleLink.href = '/icon-192.png';
-        updateFavicon('/icon-192.png');
+        if (appleLink) appleLink.href = '/menu-generator/icon-192.png';
+        updateFavicon('/menu-generator/icon-192.png');
         const preview = document.getElementById('iconPreview');
         preview.innerHTML = '🍳';
         preview.style.background = 'var(--primary)';
@@ -2097,7 +2097,7 @@
     <script>
     // 注册 Service Worker（PWA）
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(function(reg) {
+        navigator.serviceWorker.register('/menu-generator/sw.js').then(function(reg) {
             console.log('SW registered:', reg.scope);
             // 检测 SW 更新
             reg.addEventListener('updatefound', function() {

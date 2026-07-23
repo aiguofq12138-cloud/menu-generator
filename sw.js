@@ -6,9 +6,9 @@ let customIcon512 = null;
 
 // 预缓存的静态文件
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/menu-generator/',
+  '/menu-generator/index.html',
+  '/menu-generator/manifest.json'
 ];
 
 // Install
@@ -33,7 +33,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'set-icons') {
     if (event.data.icon192) {
-      // base64 → Uint8Array
       const binary192 = atob(event.data.icon192.split(',')[1]);
       const bytes192 = new Uint8Array(binary192.length);
       for (let i = 0; i < binary192.length; i++) bytes192[i] = binary192.charCodeAt(i);
@@ -59,8 +58,8 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const path = url.pathname;
 
-  // 图标拦截：如果有自定义图标，直接返回
-  if (path === '/icon-192.png' && customIcon192) {
+  // 图标拦截：如果有自定义图标，直接返回（适配子目录部署）
+  if (path.endsWith('/icon-192.png') && customIcon192) {
     event.respondWith(
       new Response(customIcon192, {
         status: 200,
@@ -69,7 +68,7 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
-  if (path === '/icon-512.png' && customIcon512) {
+  if (path.endsWith('/icon-512.png') && customIcon512) {
     event.respondWith(
       new Response(customIcon512, {
         status: 200,
@@ -79,14 +78,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // manifest: 永远走网络（不缓存，确保最新）
-  if (path === '/manifest.json') {
+  // manifest: 永远走网络
+  if (path.endsWith('/manifest.json')) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // 默认图标：网络优先
-  if (path.startsWith('/icon-')) {
+  // 图标文件：网络优先，不缓存
+  if (path.includes('/icon-')) {
     event.respondWith(fetch(event.request));
     return;
   }

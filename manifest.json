@@ -2,21 +2,21 @@
   "name": "随机菜单生成器",
   "short_name": "菜单生成器",
   "description": "管理食材库存，智能推荐菜谱，记录每日饮食",
-  "start_url": "/index.html",
-  "scope": "/",
+  "start_url": "/menu-generator/",
+  "scope": "/menu-generator/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#ff6b6b",
   "background_color": "#f2f2f7",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/menu-generator/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/menu-generator/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
