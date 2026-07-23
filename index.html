@@ -1789,6 +1789,16 @@
         renderCalendar();
     }
 
+    function calcMealCalories(meal) {
+        if (meal.calories) return meal.calories;
+        if (!meal.consumedIngredients) return 0;
+        var total = 0;
+        meal.consumedIngredients.forEach(function(c) {
+            total += Math.round(getIngredientCalories(c.name) * c.grams / 100);
+        });
+        return total;
+    }
+
     function renderDayDetail() {
         if (!selectedDate) {
             document.getElementById('dayDetailTitle').textContent = '选择日期查看详情';
