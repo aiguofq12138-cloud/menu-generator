@@ -1230,13 +1230,20 @@ function openInventoryModal() {
     document.getElementById('invCategory').value = '蔬菜';
     document.getElementById('unitDisplay').textContent = 'g'; // 重置单位
     
-    // 保存当前输入状态
-    document.getElementById('invName').addEventListener('input', updateUnitDisplay);
+    // 清除旧的事件监听器（避免重复添加）
+    var nameInput = document.getElementById('invName');
+    var newInput = nameInput.cloneNode(true);
+    nameInput.parentNode.replaceChild(newInput, nameInput);
+    
+    // 重新添加事件监听
+    newInput.addEventListener('input', updateUnitDisplay);
+    newInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') addInventory();
+    });
     
     document.getElementById('inventoryModal').classList.add('show');
-    setTimeout(() => document.getElementById('invName').focus(), 300);
+    setTimeout(() => newInput.focus(), 300);
 }
-
 function closeInventoryModal() {
     document.getElementById('inventoryModal').classList.remove('show');
 }
@@ -1361,7 +1368,7 @@ function renderCategoryFilter() {
             var active = invFilter === cat ? ' active' : '';
             html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
         });
-        // 收起按钮固定在最末尾
+        // 收起按钮固定在最末尾（使用 margin-left:auto）
         html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="margin-left:auto;font-weight:600;">收起 ▲</span>';
     } else {
         // 收起状态：只显示前3个分类
@@ -1378,7 +1385,6 @@ function renderCategoryFilter() {
     }
     container.innerHTML = html;
 }
-
 function toggleCatFilterExpand() {
     catFilterExpanded = !catFilterExpanded;
     renderCategoryFilter();
@@ -2567,10 +2573,7 @@ function toggleCatFilterExpand() {
         //setupInventoryNameSuggestions();
         renderInventory();
 
-        // 回车添加食材
-        document.getElementById('invName').addEventListener('keydown', e => {
-            if (e.key === 'Enter') addInventory();
-        });
+
         document.getElementById('invGrams').addEventListener('keydown', e => {
             if (e.key === 'Enter') addInventory();
         });
