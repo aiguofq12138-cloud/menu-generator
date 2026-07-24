@@ -721,19 +721,17 @@
 
         <!-- Inventory Add Modal -->
 <!-- Inventory Add Modal -->
+<!-- Inventory Add Modal -->
 <div class="modal-overlay" id="inventoryModal">
 <div class="modal-sheet">
 <h3>🥬 添加食材</h3>
-
-<!-- 1. 食材名称改为下拉选择 (使用 datalist 实现既可选择又可输入) -->
 <div class="recipe-form-group">
     <label>食材名称 (下拉选择或手动输入)</label>
-    <input type="text" id="invName" list="ingredientList" placeholder="请选择或输入食材" autocomplete="off" oninput="onIngredientSelect()">
-    <datalist id="ingredientList"></datalist>
+    <!-- 使用 datalist 实现下拉选择 -->
+    <input type="text" id="invName" list="invNameList" placeholder="请选择或输入食材" autocomplete="off" oninput="onInvNameInput()">
+    <datalist id="invNameList"></datalist>
 </div>
-
 <div class="form-row">
-    <!-- 2. 克数改为数量，并增加单位显示 -->
     <div class="recipe-form-group" style="flex:1;">
         <label>数量</label>
         <div style="display:flex; align-items:center; border:2px solid var(--gray-200); border-radius:10px; background:white; overflow:hidden;">
@@ -741,14 +739,12 @@
             <span id="unitDisplay" style="padding:0 12px; color:var(--gray-600); font-size:14px; border-left:1px solid var(--gray-200); background:var(--gray-50); min-width:40px; text-align:center;">g</span>
         </div>
     </div>
-    
     <div class="recipe-form-group" style="flex:1;">
         <label>分类</label>
         <select id="invCategory">
-            <!-- 选项保持不变 -->
             <option value="蔬菜">🥬 蔬菜</option>
             <option value="肉类">🥩 肉类</option>
-            <option value="蛋类">🥚 蛋类</option>
+            <option value="蛋类"> 蛋类</option>
             <option value="水产">🐟 水产</option>
             <option value="豆制品">🫘 豆制品</option>
             <option value="主食"> 主食</option>
@@ -757,12 +753,11 @@
             <option value="干货"> 干货</option>
             <option value="乳制品">🥛 乳制品</option>
             <option value="水果">🍎 水果</option>
-            <option value="酱菜"> 酱菜</option>
+            <option value="酱菜">🫙 酱菜</option>
             <option value="其他">📦 其他</option>
         </select>
     </div>
 </div>
-
 <div style="display:flex;gap:10px;margin-top:16px;">
     <button class="btn btn-secondary" onclick="closeInventoryModal()" style="flex:1;">取消</button>
     <button class="btn btn-primary" onclick="addInventory()" style="flex:1;">确认添加</button>
@@ -860,7 +855,17 @@
         '香料':'🌿','干货':'🍄','水产':'🐟','乳制品':'🥛','水果':'🍎','酱菜':'🫙'
     };
 
-    const CALORIE_TABLE = {
+// 食材单位配置 (名称: {单位, 每单位克数})
+const INGREDIENT_UNITS = {
+    '鸡蛋': { unit: '个', weight: 50 },
+    '鸭蛋': { unit: '个', weight: 70 },
+    '苹果': { unit: '个', weight: 200 },
+    '香蕉': { unit: '根', weight: 120 },
+    '番茄': { unit: '个', weight: 150 },
+    '土豆': { unit: '个', weight: 200 }
+    // 未列出的默认都是 'g'
+};   
+   const CALORIE_TABLE = {
         '猪肉':395,'猪瘦肉':143,'五花肉':518,'排骨':264,'猪肝':129,'猪蹄':260,'牛肉':125,'牛腩':163,'牛腱':113,'牛排':188,'羊肉':203,'羊排':236,'鸡肉':167,'鸡胸肉':133,'鸡腿':181,'鸡翅':194,'鸡爪':254,'鸭肉':240,'鸭腿':217,'猪肉末':395,'肉末':395,'培根':541,'火腿':330,'香肠':508,'鱼':105,'草鱼':113,'鲫鱼':108,'鲈鱼':105,'三文鱼':208,'带鱼':127,'虾':93,'虾仁':48,'基围虾':99,'小龙虾':93,'螃蟹':95,'蟹':95,'蟹黄':237,'贝类':80,'蛤蜊':56,'花甲':56,'蛏子':40,'生蚝':73,'鱿鱼':75,'墨鱼':83,'章鱼':135,'鸡蛋':144,'鸭蛋':180,'鹌鹑蛋':160,'咸鸭蛋':190,'皮蛋':171,'番茄':18,'西红柿':18,'黄瓜':16,'冬瓜':12,'南瓜':23,'苦瓜':19,'丝瓜':20,'白菜':13,'大白菜':13,'娃娃菜':13,'小白菜':15,'油菜':15,'菠菜':28,'生菜':13,'油麦菜':15,'芹菜':14,'韭菜':26,'香菜':31,'葱':30,'姜':41,'蒜':126,'蒜苗':40,'蒜薹':61,'青椒':22,'辣椒':38,'甜椒':19,'彩椒':19,'土豆':81,'马铃薯':81,'山药':57,'芋头':79,'红薯':86,'紫薯':82,'胡萝卜':37,'白萝卜':16,'萝卜':16,'莲藕':73,'藕':73,'茄子':23,'豆角':34,'四季豆':31,'豇豆':32,'豌豆':111,'毛豆':131,'西兰花':36,'花菜':24,'菜花':24,'卷心菜':22,'包菜':22,'甘蓝':22,'洋葱':39,'玉米':112,'玉米粒':112,'竹笋':23,'笋':23,'芦笋':22,'菌菇':25,'蘑菇':24,'香菇':26,'金针菇':32,'杏鲍菇':38,'木耳':27,'豆腐':82,'嫩豆腐':62,'老豆腐':82,'内酯豆腐':50,'豆腐干':140,'豆干':140,'香干':147,'豆皮':409,'千张':260,'腐竹':459,'豆腐皮':409,'油豆腐':245,'豆腐泡':245,'黄豆':359,'绿豆':316,'红豆':309,'米饭':116,'大米':346,'白米饭':116,'熟米饭':116,'面条':286,'挂面':346,'湿面':280,'方便面':472,'馒头':223,'包子':227,'饺子':240,'馄饨':218,'面包':312,'吐司':278,'全麦面包':246,'面粉':344,'小麦粉':344,'玉米面':341,'小米':358,'糯米':348,'燕麦':377,'食用油':899,'花生油':899,'菜籽油':899,'橄榄油':899,'香油':898,'盐':0,'食盐':0,'酱油':63,'生抽':53,'老抽':88,'蚝油':117,'醋':30,'陈醋':114,'白醋':6,'香醋':68,'糖':396,'白糖':396,'冰糖':397,'红糖':389,'料酒':70,'黄酒':66,'豆瓣酱':178,'辣椒酱':88,'番茄酱':83,'甜面酱':136,'芝麻酱':618,'鸡精':262,'味精':268,'花椒':258,'八角':281,'桂皮':259,'胡椒粉':296,'五香粉':348,'辣椒粉':314,'孜然粉':375,'淀粉':346,'玉米淀粉':345,'土豆淀粉':337,'生粉':346,'牛奶':54,'全脂牛奶':61,'脱脂牛奶':33,'酸奶':72,'奶酪':328,'黄油':717,'奶油':340,'苹果':53,'香蕉':93,'橙子':48,'橘子':44,'葡萄':45,'西瓜':31,'草莓':32,'猕猴桃':61,'芒果':35,'菠萝':44,'桃子':48,'梨':51,'柠檬':37,'蓝莓':57,'红枣':276,'枸杞':349,'桂圆':273,'莲子':344,'百合':342,'银耳':200,'紫菜':207,'海带':77,'海带丝':77,'虾皮':153,'干贝':264,'海米':198,'榨菜':29,'酸菜':16,'泡菜':24,'雪里红':25,'酱黄瓜':39,'萝卜干':59,'粉条':337,'粉丝':335,'宽粉':338,'年糕':154,'汤圆':231,'粽子':195,'花生':563,'核桃':627,'腰果':553,'杏仁':578,'瓜子':597,'蜂蜜':321,'巧克力':546,'冰淇淋':127,'蛋白':60,'蛋黄':328
     };
 	// ==================== 基础营养数据表 (每100g) ====================
@@ -1219,40 +1224,83 @@ function getNutritionData(name, cat) {
     function persist() { saveData(appData); }
 
     // ==================== 食材库存 ====================
-    function openInventoryModal() {
-        document.getElementById('invName').value = '';
-        document.getElementById('invGrams').value = '200';
-        document.getElementById('invCategory').value = '蔬菜';
-        document.getElementById('inventoryModal').classList.add('show');
-        setTimeout(() => document.getElementById('invName').focus(), 300);
-    }
+ function openInventoryModal() {
+    document.getElementById('invName').value = '';
+    document.getElementById('invGrams').value = '200';
+    document.getElementById('invCategory').value = '蔬菜';
+    document.getElementById('unitDisplay').textContent = 'g'; // 重置单位
+    
+    // 填充下拉列表 (来源：食材管理/库存)
+    var datalist = document.getElementById('invNameList');
+    datalist.innerHTML = '';
+    var names = Object.keys(appData.inventory);
+    names.sort().forEach(function(name) {
+        var option = document.createElement('option');
+        option.value = name;
+        datalist.appendChild(option);
+    });
 
-    function closeInventoryModal() {
-        document.getElementById('inventoryModal').classList.remove('show');
-    }
+    document.getElementById('inventoryModal').classList.add('show');
+    setTimeout(() => document.getElementById('invName').focus(), 300);
+}
 
-    function addInventory() {
-        const nameEl = document.getElementById('invName');
-        const gramsEl = document.getElementById('invGrams');
-        const catEl = document.getElementById('invCategory');
-        const name = nameEl.value.trim();
-        const grams = parseInt(gramsEl.value) || 0;
-        const cat = catEl.value;
-        if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
-        if (grams <= 0) { showToast('请输入有效的克数'); gramsEl.focus(); return; }
-
-        if (appData.inventory[name]) {
-            appData.inventory[name].grams += grams;
-            appData.inventory[name].category = cat;
-            appData.inventory[name].addedAt = appData.inventory[name].addedAt || todayStr();
+// 监听输入，自动切换单位
+function onInvNameInput() {
+    var name = document.getElementById('invName').value.trim();
+    var unitSpan = document.getElementById('unitDisplay');
+    
+    if (INGREDIENT_UNITS[name]) {
+        unitSpan.textContent = INGREDIENT_UNITS[name].unit;
+        // 如果单位不是 g，默认数量改为 1
+        if (INGREDIENT_UNITS[name].unit !== 'g') {
+            document.getElementById('invGrams').value = 1; 
         } else {
-            appData.inventory[name] = { name, grams, category: cat, addedAt: todayStr() };
+            document.getElementById('invGrams').value = 200;
         }
-        persist();
-        closeInventoryModal();
-        renderInventory();
-        showToast(`已添加 ${name} ${grams}g ✅`, 'success');
+    } else {
+        unitSpan.textContent = 'g'; // 默认单位
+        document.getElementById('invGrams').value = 200;
     }
+}
+
+function addInventory() {
+    const nameEl = document.getElementById('invName');
+    const gramsEl = document.getElementById('invGrams');
+    const catEl = document.getElementById('invCategory');
+    const unitText = document.getElementById('unitDisplay').textContent; // 获取当前显示的单位
+    
+    const name = nameEl.value.trim();
+    const quantity = parseInt(gramsEl.value) || 0;
+    const cat = catEl.value;
+    
+    if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
+    if (quantity <= 0) { showToast('请输入有效的数量'); gramsEl.focus(); return; }
+
+    // 计算实际克数 (用于库存显示)
+    var actualGrams = quantity;
+    if (unitText !== 'g' && INGREDIENT_UNITS[name]) {
+        actualGrams = quantity * INGREDIENT_UNITS[name].weight;
+    }
+
+    if (appData.inventory[name]) {
+        appData.inventory[name].grams += actualGrams;
+        appData.inventory[name].category = cat;
+        appData.inventory[name].unit = unitText; // 保存单位
+    } else {
+        appData.inventory[name] = { 
+            name, 
+            grams: actualGrams, 
+            category: cat, 
+            addedAt: todayStr(),
+            unit: unitText // 保存单位
+        };
+    }
+    
+    persist();
+    closeInventoryModal();
+    renderInventory();
+    showToast(`已添加 ${name} ${quantity}${unitText} ✅`, 'success');
+}
 
     function deleteInventory(name) {
         if (!confirm(`确定删除「${name}」吗？`)) return;
@@ -1281,49 +1329,49 @@ function getNutritionData(name, cat) {
     }
 
     var catFilterExpanded = false;
-    function renderCategoryFilter() {
-        var builtIn = { ...CATEGORY_EMOJI };
-        var customCats = appData.customCategories || {};
-        var allCats = { ...builtIn, ...customCats };
-        var catKeys = Object.keys(allCats);
-        var container = document.getElementById('catFilter');
-        var html = '';
 
-        // 始终显示的: 全部 + 前3个
-        var visibleCats = ['全部', ...catKeys.slice(0, 3)];
-        var hiddenCats = catKeys.slice(3);
-
-        visibleCats.forEach(function(cat) {
-            var emoji = cat === '全部' ? '' : (allCats[cat] || '📦');
-            var label = cat === '全部' ? '全部' : emoji + ' ' + cat;
-            var active = invFilter === cat ? ' active' : '';
-            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + label + '</span>';
-        });
-
-        if (hiddenCats.length > 0) {
-            var isExpanded = catFilterExpanded;
-            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + label + '</span>';
-    });
+function renderCategoryFilter() {
+    var builtIn = { ...CATEGORY_EMOJI };
+    var customCats = appData.customCategories || {};
+    var allCats = { ...builtIn, ...customCats };
+    var catKeys = Object.keys(allCats);
+    var container = document.getElementById('catFilter');
+    var html = '';
     
-    if (hiddenCats.length > 0) {
-        var isExpanded = catFilterExpanded;
-        // 1. 先渲染剩下的分类（如果展开了）
-        if (isExpanded) {
-            hiddenCats.forEach(function(cat) {
-                var emoji = allCats[cat] || '📦';
-                var active = invFilter === cat ? ' active' : '';
-                html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
-            });
+    // 1. 始终显示“全部”
+    var activeAll = invFilter === '全部' ? ' active' : '';
+    html += '<span class="cat-chip' + activeAll + '" onclick="filterCategory(\'全部\')">全部</span>';
+    
+    // 2. 根据展开状态渲染
+    if (catFilterExpanded) {
+        // 展开状态：显示所有分类，最后显示“收起”
+        catKeys.forEach(function(cat) {
+            var emoji = allCats[cat] || '📦';
+            var active = invFilter === cat ? ' active' : '';
+            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
+        });
+        // 收起按钮放在最末尾
+        html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;">收起 ▲</span>';
+    } else {
+        // 收起状态：显示前3个分类
+        var visibleCats = catKeys.slice(0, 3);
+        visibleCats.forEach(function(cat) {
+            var emoji = allCats[cat] || '📦';
+            var active = invFilter === cat ? ' active' : '';
+            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
+        });
+        // 如果分类超过3个，显示“更多”按钮
+        if (catKeys.length > 3) {
+            html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;">更多 ▼</span>';
         }
-        // 2. 最后渲染“更多/收起”按钮
-        html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
     }
     container.innerHTML = html;
-    }
-    function toggleCatFilterExpand() {
-        catFilterExpanded = !catFilterExpanded;
-        renderCategoryFilter();
-    }
+}
+
+function toggleCatFilterExpand() {
+    catFilterExpanded = !catFilterExpanded;
+    renderCategoryFilter();
+}
 
     function renderInventory() {
         renderCategoryFilter();
