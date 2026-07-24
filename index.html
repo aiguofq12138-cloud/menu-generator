@@ -722,22 +722,23 @@
         <!-- Inventory Add Modal -->
 <!-- Inventory Add Modal -->
 <!-- Inventory Add Modal -->
+<!-- Inventory Add Modal -->
 <div class="modal-overlay" id="inventoryModal">
 <div class="modal-sheet">
 <h3>🥬 添加食材</h3>
 <div class="recipe-form-group">
-    <label>食材名称 (下拉选择或手动输入)</label>
-    <!-- 使用 datalist 实现下拉选择 -->
-    <input type="text" id="invName" list="invNameList" placeholder="请选择或输入食材" autocomplete="off" oninput="onInvNameInput()">
-    <datalist id="invNameList"></datalist>
+    <label>食材名称</label>
+    <select id="invName" style="width:100%;padding:10px 12px;border:2px solid var(--gray-200);border-radius:10px;font-size:14px;outline:none;background:white;">
+        <option value="">-- 请选择或输入新食材 --</option>
+    </select>
+</div>
+<div class="recipe-form-group" style="margin-top:8px;">
+    <input type="text" id="invNameCustom" placeholder="或输入新食材名称" style="width:100%;padding:10px 12px;border:2px solid var(--gray-200);border-radius:10px;font-size:14px;outline:none;">
 </div>
 <div class="form-row">
     <div class="recipe-form-group" style="flex:1;">
-        <label>数量</label>
-        <div style="display:flex; align-items:center; border:2px solid var(--gray-200); border-radius:10px; background:white; overflow:hidden;">
-            <input type="number" id="invGrams" placeholder="数量" min="1" value="200" style="border:none; flex:1; padding:10px 12px; font-size:14px; outline:none;">
-            <span id="unitDisplay" style="padding:0 12px; color:var(--gray-600); font-size:14px; border-left:1px solid var(--gray-200); background:var(--gray-50); min-width:40px; text-align:center;">g</span>
-        </div>
+        <label>克数</label>
+        <input type="number" id="invGrams" placeholder="克数" min="1" value="200">
     </div>
     <div class="recipe-form-group" style="flex:1;">
         <label>分类</label>
@@ -1224,82 +1225,70 @@ function getNutritionData(name, cat) {
     function persist() { saveData(appData); }
 
     // ==================== 食材库存 ====================
- function openInventoryModal() {
-    document.getElementById('invName').value = '';
-    document.getElementById('invGrams').value = '200';
-    document.getElementById('invCategory').value = '蔬菜';
-    document.getElementById('unitDisplay').textContent = 'g'; // 重置单位
+function openInventoryModal() {
+    // 填充下拉选项
+    var selectEl = document.getElementById('invName');
+    var customEl = document.getElementById('invNameCustom');
+    selectEl.innerHTML = '<option value="">-- 请选择食材 --</option>';
     
-    // 填充下拉列表 (来源：食材管理/库存)
-    var datalist = document.getElementById('invNameList');
-    datalist.innerHTML = '';
-    var names = Object.keys(appData.inventory);
-    names.sort().forEach(function(name) {
+    // 从食材库存获取选项
+    var invNames = Object.keys(appData.inventory).sort();
+    invNames.forEach(function(name) {
         var option = document.createElement('option');
         option.value = name;
-        datalist.appendChild(option);
+        option.textContent = name;
+        selectEl.appendChild(option);
     });
-
+    
+    // 清空输入
+    selectEl.value = '';
+    customEl.value = '';
+    document.getElementById('invGrams').value = '200';
+    document.getElementById('invCategory').value = '蔬菜';
+    
     document.getElementById('inventoryModal').classList.add('show');
-    setTimeout(() => document.getElementById('invName').focus(), 300);
+    setTimeout(() => selectEl.focus(), 300);
 }
 
-// 监听输入，自动切换单位
-function onInvNameInput() {
-    var name = document.getElementById('invName').value.trim();
-    var unitSpan = document.getElementById('unitDisplay');
-    
-    if (INGREDIENT_UNITS[name]) {
-        unitSpan.textContent = INGREDIENT_UNITS[name].unit;
-        // 如果单位不是 g，默认数量改为 1
-        if (INGREDIENT_UNITS[name].unit !== 'g') {
-            document.getElementById('invGrams').value = 1; 
-        } else {
-            document.getElementById('invGrams').value = 200;
-        }
-    } else {
-        unitSpan.textContent = 'g'; // 默认单位
-        document.getElementById('invGrams').value = 200;
-    }
+function closeInventoryModal() {
+    document.getElementById('inventoryModal').classList.remove('show');
 }
 
 function addInventory() {
-    const nameEl = document.getElementById('invName');
-    const gramsEl = document.getElementById('invGrams');
-    const catEl = document.getElementById('invCategory');
-    const unitText = document.getElementById('unitDisplay').textContent; // 获取当前显示的单位
+    var selectEl = document.getElementById('invName');
+    var customEl = document.getElementById('invNameCustom');
+    var gramsEl = document.getElementById('invGrams');
+    var catEl = document.getElementById('invCategory');
     
-    const name = nameEl.value.trim();
-    const quantity = parseInt(gramsEl.value) || 0;
-    const cat = catEl.value;
+    // 优先使用下拉选择的名称，如果没有则使用自定义输入
+    var name = selectEl.value.trim() || customEl.value.trim();
+    var grams = parseInt(gramsEl.value) || 0;
+    var cat = catEl.value;
     
-    if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
-    if (quantity <= 0) { showToast('请输入有效的数量'); gramsEl.focus(); return; }
-
-    // 计算实际克数 (用于库存显示)
-    var actualGrams = quantity;
-    if (unitText !== 'g' && INGREDIENT_UNITS[name]) {
-        actualGrams = quantity * INGREDIENT_UNITS[name].weight;
+    if (!name) { 
+        showToast('请选择或输入食材名称'); 
+        if (selectEl.value) selectEl.focus(); 
+        else customEl.focus(); 
+        return; 
     }
-
+    if (grams <= 0) { 
+        showToast('请输入有效的克数'); 
+        gramsEl.focus(); 
+        return; 
+    }
+    
     if (appData.inventory[name]) {
-        appData.inventory[name].grams += actualGrams;
+        appData.inventory[name].grams += grams;
         appData.inventory[name].category = cat;
-        appData.inventory[name].unit = unitText; // 保存单位
+        appData.inventory[name].addedAt = appData.inventory[name].addedAt || todayStr();
     } else {
-        appData.inventory[name] = { 
-            name, 
-            grams: actualGrams, 
-            category: cat, 
-            addedAt: todayStr(),
-            unit: unitText // 保存单位
-        };
+        appData.inventory[name] = { name: name, grams: grams, category: cat, addedAt: todayStr() };
     }
     
     persist();
     closeInventoryModal();
     renderInventory();
-    showToast(`已添加 ${name} ${quantity}${unitText} ✅`, 'success');
+    showToast('已添加 ' + name + ' ' + grams + 'g ✅', 'success');
 }
 
     function deleteInventory(name) {
@@ -1328,8 +1317,7 @@ function addInventory() {
         if (body) body.classList.toggle('open', openedCategories[cat]);
     }
 
-    var catFilterExpanded = false;
-
+ var catFilterExpanded = false;
 function renderCategoryFilter() {
     var builtIn = { ...CATEGORY_EMOJI };
     var customCats = appData.customCategories || {};
@@ -1338,33 +1326,24 @@ function renderCategoryFilter() {
     var container = document.getElementById('catFilter');
     var html = '';
     
-    // 1. 始终显示“全部”
+    // 始终显示"全部"
     var activeAll = invFilter === '全部' ? ' active' : '';
     html += '<span class="cat-chip' + activeAll + '" onclick="filterCategory(\'全部\')">全部</span>';
     
-    // 2. 根据展开状态渲染
-    if (catFilterExpanded) {
-        // 展开状态：显示所有分类，最后显示“收起”
-        catKeys.forEach(function(cat) {
-            var emoji = allCats[cat] || '📦';
-            var active = invFilter === cat ? ' active' : '';
-            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
-        });
-        // 收起按钮放在最末尾
-        html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;">收起 ▲</span>';
-    } else {
-        // 收起状态：显示前3个分类
-        var visibleCats = catKeys.slice(0, 3);
-        visibleCats.forEach(function(cat) {
-            var emoji = allCats[cat] || '📦';
-            var active = invFilter === cat ? ' active' : '';
-            html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
-        });
-        // 如果分类超过3个，显示“更多”按钮
-        if (catKeys.length > 3) {
-            html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;">更多 ▼</span>';
-        }
+    // 显示分类（前3个或全部）
+    var catsToShow = catFilterExpanded ? catKeys : catKeys.slice(0, 3);
+    catsToShow.forEach(function(cat) {
+        var emoji = allCats[cat] || '';
+        var active = invFilter === cat ? ' active' : '';
+        html += '<span class="cat-chip' + active + '" onclick="filterCategory(\'' + cat + '\')">' + emoji + ' ' + cat + '</span>';
+    });
+    
+    // 如果有更多分类，显示"更多/收起"按钮（始终在最后）
+    if (catKeys.length > 3) {
+        var isExpanded = catFilterExpanded;
+        html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="font-weight:600;margin-left:auto;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
     }
+    
     container.innerHTML = html;
 }
 
@@ -2548,7 +2527,7 @@ function toggleCatFilterExpand() {
 
     function init() {
         appData = loadData();
-        setupInventoryNameSuggestions();
+        //setupInventoryNameSuggestions();
         renderInventory();
 
         // 回车添加食材
