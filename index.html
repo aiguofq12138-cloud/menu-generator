@@ -303,15 +303,15 @@
         .cat-filter {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;           /* 从 6px 改为 4px，节省空间 */
     padding-bottom: 8px;
     margin-bottom: 8px;
     position: relative;
-    padding-right: 50px;          /* 给按钮留空间，比之前小一些 */
+    padding-right: 50px;
     min-height: 32px;
         }
         .cat-chip {
-    padding: 5px 12px;
+    padding: 4px 8px;   /* 从 5px 12px 改为 4px 8px，更紧凑 */
     border-radius: 14px;
     font-size: 12px;
     white-space: nowrap;
@@ -320,6 +320,8 @@
     background: white;
     color: var(--gray-600);
     transition: all 0.2s;
+    flex-shrink: 1;      /* 允许收缩 */
+    min-width: 0;        /* 允许收缩到内容最小宽度 */
         }
 		/* 新增：为“更多/收起”按钮单独控制 */
 .cat-chip-more {
