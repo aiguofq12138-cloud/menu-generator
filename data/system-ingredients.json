@@ -6,6 +6,4 @@
   { "name": "米饭", "icon": "", "category": "主食", "unit": "g", "cal": 116, "carb": 25.9, "prot": 2.6, "fat": 0.3 },
   { "name": "牛奶", "icon": "🥛", "category": "乳制品", "unit": "ml", "cal": 54, "carb": 3.4, "prot": 3.0, "fat": 3.2 },
   { "name": "苹果", "icon": "🍎", "category": "水果", "unit": "个", "cal": 53, "carb": 13.8, "prot": 0.2, "fat": 0.2 },
-  { "name": "食用油", "icon": "🫙", "category": "调料", "unit": "g", "cal": 899, "carb": 0, "prot": 0, "fat": 99.9 },
-  { "name": "盐", "icon": "🧂", "category": "调料", "unit": "g", "cal": 0, "carb": 0, "prot": 0, "fat": 0 }
 ]
