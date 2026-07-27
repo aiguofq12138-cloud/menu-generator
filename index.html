@@ -1929,9 +1929,9 @@ function getIngredientDisplayIcon(ingredientName) {
             </div>`;
 
         const all = getAllRecipes();
-        const avail = getAvailableIngredients();
-        document.getElementById('availSummary').textContent =
-            `共 ${all.length} 道菜 · 可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+// 删掉或注释掉以下两行
+// const avail = getAvailableIngredients();
+// document.getElementById('availSummary').textContent = `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
 
         if (all.length === 0) {
             document.getElementById('recipeList').innerHTML = `
