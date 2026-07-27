@@ -8,7 +8,14 @@ let customIcon512 = null;
 const ASSETS = [
   '/menu-generator/',
   '/menu-generator/index.html',
-  '/menu-generator/manifest.json'
+  '/menu-generator/manifest.json',
+  '/menu-generator/data/categories.json',
+  '/menu-generator/data/ingredient-units.json',
+  '/menu-generator/data/calorie-table.json',
+  '/menu-generator/data/nutrition-table.json',
+  '/menu-generator/data/category-defaults.json',
+  '/menu-generator/data/system-ingredients.json',
+  '/menu-generator/data/recipes.json'
 ];
 
 // Install
