@@ -1789,7 +1789,11 @@ function renderInventory() {
                                 <div class="inv-meta">${i.addedAt || '未知日期'} · 单位: ${unit}</div>
                                 <div class="inv-bar"><div class="inv-bar-fill ${barClass}" style="width:${pct}%"></div></div>
                             </div>
-                            <div class="inv-grams">${i.grams}${unit}</div>
+                        let displayValue = i.grams;
+if (unit !== 'g' && INGREDIENT_UNITS[i.name]) {
+    displayValue = Math.round(i.grams / INGREDIENT_UNITS[i.name].weight);
+}
+<div class="inv-grams">${displayValue}${unit}</div>
                             <div style="display:flex;gap:4px;">
                                 <button class="inv-del" style="background:#e3f2fd;color:#1976d2;" onclick="event.stopPropagation();editInventory('${i.name}')">✏️</button>
                                 <button class="inv-del" onclick="event.stopPropagation();deleteInventory('${i.name}')">×</button>
