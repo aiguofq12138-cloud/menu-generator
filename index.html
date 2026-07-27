@@ -301,23 +301,32 @@
 
         /* ===== 分类筛选 ===== */
         .cat-filter {
-            display: flex;
-            gap: 6px;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
+    display: flex;
+    gap: 6px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    align-items: center;
         }
         .cat-chip {
-            padding: 5px 12px;
-            border-radius: 14px;
-            font-size: 12px;
-            white-space: nowrap;
-            cursor: pointer;
-            border: 1px solid var(--gray-200);
-            background: white;
-            color: var(--gray-600);
-            transition: all 0.2s;
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid var(--gray-200);
+    background: white;
+    color: var(--gray-600);
+    transition: all 0.2s;
+    flex-shrink: 1;      /* 允许压缩 */
+    min-width: 0;        /* 允许收缩到0 */
         }
+		/* 新增：为“更多/收起”按钮单独控制 */
+.cat-chip-more {
+    flex-shrink: 0;      /* 不允许压缩 */
+    white-space: nowrap;
+    /* 其他继承 cat-chip */
+}
         .cat-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
 
         /* ===== 菜谱卡片 ===== */
