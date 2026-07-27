@@ -668,38 +668,26 @@
 <!-- Inventory Add/Edit Modal -->
 <div class="modal-overlay" id="inventoryModal">
     <div class="modal-sheet">
-        <h3 id="invModalTitle"> 添加食材</h3>
+        <h3 id="invModalTitle">➕ 添加食材</h3>
         <div class="recipe-form-group">
-            <label>食材名称 (下拉选择或手动输入)</label>
-            <!-- 使用 datalist 实现下拉选择 -->
-            <input type="text" id="invName" list="invNameList" placeholder="请选择或输入食材" autocomplete="off" oninput="onInvNameInput()">
-            <datalist id="invNameList"></datalist>
+            <label>食材名称（从系统内置食材中选择）</label>
+            <select id="invName" onchange="onInvNameChange()">
+                <option value="">-- 请选择 --</option>
+                <!-- JS 填充选项 -->
+            </select>
         </div>
         <div class="form-row">
             <div class="recipe-form-group" style="flex:1;">
                 <label>数量</label>
                 <div style="display:flex;align-items:center;border:2px solid var(--gray-200);border-radius:10px;overflow:hidden;background:white;">
-                    <input type="number" id="invGrams" placeholder="数量" min="1" value="200" style="border:none;flex:1;padding:10px 12px;font-size:14px;outline:none;">
+                    <input type="number" id="invGrams" placeholder="数量" min="1" value="1" style="border:none;flex:1;padding:10px 12px;font-size:14px;outline:none;">
                     <span id="unitDisplay" style="padding:0 12px;color:var(--gray-600);font-size:14px;border-left:1px solid var(--gray-200);background:var(--gray-50);min-width:40px;text-align:center;">g</span>
                 </div>
             </div>
             <div class="recipe-form-group" style="flex:1;">
-                <label>分类</label>
-                <select id="invCategory">
-                    <option value="蔬菜"> 蔬菜</option>
-                    <option value="肉类">🥩 肉类</option>
-                    <option value="蛋类">🥚 蛋类</option>
-                    <option value="水产">🐟 水产</option>
-                    <option value="豆制品">🫘 豆制品</option>
-                    <option value="主食">🍚 主食</option>
-                    <option value="调料">🧂 调料</option>
-                    <option value="香料">🌿 香料</option>
-                    <option value="干货">🍄 干货</option>
-                    <option value="乳制品">🥛 乳制品</option>
-                    <option value="水果">🍎 水果</option>
-                    <option value="酱菜"> 酱菜</option>
-                    <option value="其他">📦 其他</option>
-                </select>
+                <label>分类（自动匹配）</label>
+                <input type="text" id="invCategoryDisplay" readonly style="width:100%;padding:10px 12px;border:2px solid var(--gray-200);border-radius:10px;font-size:14px;background:#f5f5f5;cursor:default;color:var(--gray-600);">
+                <input type="hidden" id="invCategory" value="蔬菜">
             </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:16px;">
@@ -1523,23 +1511,29 @@ function deleteIngredient(idx) {
 let isEditingInventory = false; // 标记是否为编辑模式
 
 function openInventoryModal() {
-    document.getElementById('invName').value = '';
-    document.getElementById('invGrams').value = '200';
-    document.getElementById('invCategory').value = '蔬菜';
-    document.getElementById('unitDisplay').textContent = 'g'; // 重置单位
+    // 重置表单
+    document.getElementById('invGrams').value = 1;
+    document.getElementById('unitDisplay').textContent = 'g';
+    document.getElementById('invCategoryDisplay').value = '';
+    document.getElementById('invCategory').value = '';
     
-    // 填充下拉列表 (来源：食材管理/已有库存)
-    var datalist = document.getElementById('invNameList');
-    datalist.innerHTML = '';
-    var names = Object.keys(appData.inventory).sort();
-    names.forEach(function(name) {
+    // 填充下拉列表：从 SYSTEM_INGREDIENTS 获取名称
+    var select = document.getElementById('invName');
+    select.innerHTML = '<option value="">-- 请选择 --</option>';
+    SYSTEM_INGREDIENTS.forEach(function(item) {
         var option = document.createElement('option');
-        option.value = name;
-        datalist.appendChild(option);
+        option.value = item.name;
+        option.textContent = item.name + ' (' + item.category + ')';
+        select.appendChild(option);
     });
+    
+    // 如果是编辑模式（由 editInventory 调用），需要预选值
+    // 编辑模式稍后处理
 
     document.getElementById('inventoryModal').classList.add('show');
-    setTimeout(() => document.getElementById('invName').focus(), 300);
+    setTimeout(function() {
+        document.getElementById('invName').focus();
+    }, 300);
 }
 
 function closeInventoryModal() {
@@ -1578,45 +1572,75 @@ function onInvNameInput() {
         gramsInput.value = 200;
     }
 }
-
-function addInventory() {
-    const nameEl = document.getElementById('invName');
-    const gramsEl = document.getElementById('invGrams');
-    const catEl = document.getElementById('invCategory');
-    
-    const name = nameEl.value.trim();
-    const quantity = parseInt(gramsEl.value) || 0;
-    const cat = catEl.value;
-    const unit = document.getElementById('unitDisplay').textContent; // 获取当前显示的单位
-    
-    if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
-    if (quantity <= 0) { showToast('请输入有效的数量'); gramsEl.focus(); return; }
-
-    // 计算实际克数 (用于库存计算)
-    var actualGrams = quantity;
-    if (unit !== 'g' && INGREDIENT_UNITS[name]) {
-        actualGrams = quantity * INGREDIENT_UNITS[name].weight;
+function onInvNameChange() {
+    var select = document.getElementById('invName');
+    var selectedName = select.value;
+    if (!selectedName) {
+        document.getElementById('invCategoryDisplay').value = '';
+        document.getElementById('invCategory').value = '';
+        document.getElementById('unitDisplay').textContent = 'g';
+        document.getElementById('invGrams').value = 1;
+        return;
     }
-
+    
+    var ingredient = SYSTEM_INGREDIENTS.find(function(item) {
+        return item.name === selectedName;
+    });
+    if (!ingredient) return;
+    
+    document.getElementById('invCategoryDisplay').value = ingredient.category;
+    document.getElementById('invCategory').value = ingredient.category;
+    
+    var unit = ingredient.unit || 'g';
+    document.getElementById('unitDisplay').textContent = unit;
+    
+    if (unit !== 'g') {
+        document.getElementById('invGrams').value = 1;
+    } else {
+        document.getElementById('invGrams').value = 100;
+    }
+}
+function addInventory() {
+    var select = document.getElementById('invName');
+    var name = select.value.trim();
+    var gramsInput = document.getElementById('invGrams');
+    var quantity = parseInt(gramsInput.value) || 0;
+    var category = document.getElementById('invCategory').value;
+    var unit = document.getElementById('unitDisplay').textContent;
+    
+    if (!name) { showToast('请选择食材名称'); select.focus(); return; }
+    if (quantity <= 0) { showToast('请输入有效的数量'); gramsInput.focus(); return; }
+    
+    // 计算实际克数（用于库存计算）
+    var actualGrams = quantity;
+    if (unit !== 'g') {
+        // 如果单位是“个/根”等，需要根据 INGREDIENT_UNITS 转换
+        var unitInfo = INGREDIENT_UNITS[name];
+        if (unitInfo) {
+            actualGrams = quantity * unitInfo.weight;
+        } else {
+            // 如果找不到重量，则按 1 个 = 100g 处理（或者直接按 quantity 算？）
+            actualGrams = quantity * 100; // 合理默认值
+        }
+    }
+    
+    // 接下来的逻辑不变：如果库存已存在则累加，否则新增
     if (appData.inventory[name]) {
         if (isEditingInventory) {
-            // 编辑模式：直接覆盖更新
-            appData.inventory[name].category = cat;
+            appData.inventory[name].category = category;
             appData.inventory[name].grams = actualGrams;
             appData.inventory[name].unit = unit;
         } else {
-            // 新增模式：累加克数
             appData.inventory[name].grams += actualGrams;
-            appData.inventory[name].category = cat;
+            appData.inventory[name].category = category;
             appData.inventory[name].unit = unit;
             appData.inventory[name].addedAt = appData.inventory[name].addedAt || todayStr();
         }
     } else {
-        // 全新食材
-        appData.inventory[name] = { 
-            name: name, 
-            grams: actualGrams, 
-            category: cat, 
+        appData.inventory[name] = {
+            name: name,
+            grams: actualGrams,
+            category: category,
             addedAt: todayStr(),
             unit: unit
         };
@@ -1626,31 +1650,32 @@ function addInventory() {
     closeInventoryModal();
     renderInventory();
     showToast(isEditingInventory ? `已更新 ${name} ✅` : `已添加 ${name} ${quantity}${unit} ✅`, 'success');
-    
-    // 👇 新增这一行，防止编辑模式状态污染后续的添加操作
-    isEditingInventory = false; 
+    isEditingInventory = false;
 }
 
 // 新增：编辑食材功能
 function editInventory(name) {
-    const item = appData.inventory[name];
+    var item = appData.inventory[name];
     if (!item) return;
     
     isEditingInventory = true;
     document.getElementById('invModalTitle').textContent = '✏️ 编辑食材';
     document.getElementById('invSubmitBtn').textContent = '保存修改';
     
-    document.getElementById('invName').value = name;
+    // 在 select 中选中该名称
+    var select = document.getElementById('invName');
+    select.value = name;
+    // 触发 change 事件以自动填充分类和单位
+    onInvNameChange();
     
-    // 反推显示数量
+    // 设置数量（如果是“个”单位，反推数量）
     if (item.unit !== 'g' && INGREDIENT_UNITS[name]) {
         document.getElementById('invGrams').value = Math.round(item.grams / INGREDIENT_UNITS[name].weight) || 1;
     } else {
         document.getElementById('invGrams').value = item.grams;
     }
     
-    document.getElementById('invCategory').value = item.category || '其他';
-    document.getElementById('unitDisplay').textContent = item.unit || 'g';
+    // 分类已自动填充，无需手动设置
     
     document.getElementById('inventoryModal').classList.add('show');
 }
