@@ -1515,14 +1515,19 @@ function openInventoryModal() {
     document.getElementById('invCategoryDisplay').value = '';
     document.getElementById('invCategory').value = '';
 
-    // 填充 datalist 为系统内置食材名称
     var datalist = document.getElementById('invNameList');
     datalist.innerHTML = '';
-    SYSTEM_INGREDIENTS.forEach(function(item) {
-        var option = document.createElement('option');
-        option.value = item.name;
-        datalist.appendChild(option);
-    });
+    if (SYSTEM_INGREDIENTS && SYSTEM_INGREDIENTS.length) {
+        var seen = new Set();
+        SYSTEM_INGREDIENTS.forEach(function(item) {
+            if (!seen.has(item.name)) {
+                seen.add(item.name);
+                var option = document.createElement('option');
+                option.value = item.name;
+                datalist.appendChild(option);
+            }
+        });
+    }
 
     document.getElementById('inventoryModal').classList.add('show');
     setTimeout(function() {
@@ -1777,29 +1782,30 @@ function renderInventory() {
                 </div>
                 <div class="cat-group-body ${isOpen ? 'open' : ''}" id="cat-body-${cat}">
                     ${items.map(i => {
-                        const maxGrams = (cat === '调料' || cat === '香料') ? 500 : 1000;
-                        const pct = Math.min(100, Math.round(i.grams / maxGrams * 100));
-                        const barClass = pct > 50 ? 'high' : pct > 20 ? 'mid' : 'low';
-                        const unit = i.unit || 'g';
-                        return `
-                        <div class="inv-item">
-                            <div class="inv-emoji">${getIngredientDisplayIcon(i.name)}</div>
-                            <div class="inv-info">
-                                <div class="inv-name">${i.name}</div>
-                                <div class="inv-meta">${i.addedAt || '未知日期'} · 单位: ${unit}</div>
-                                <div class="inv-bar"><div class="inv-bar-fill ${barClass}" style="width:${pct}%"></div></div>
-                            </div>
-                        let displayValue = i.grams;
-if (unit !== 'g' && INGREDIENT_UNITS[i.name]) {
-    displayValue = Math.round(i.grams / INGREDIENT_UNITS[i.name].weight);
-}
-<div class="inv-grams">${displayValue}${unit}</div>
-                            <div style="display:flex;gap:4px;">
-                                <button class="inv-del" style="background:#e3f2fd;color:#1976d2;" onclick="event.stopPropagation();editInventory('${i.name}')">✏️</button>
-                                <button class="inv-del" onclick="event.stopPropagation();deleteInventory('${i.name}')">×</button>
-                            </div>
-                        </div>`;
-                    }).join('')}
+    const maxGrams = (cat === '调料' || cat === '香料') ? 500 : 1000;
+    const pct = Math.min(100, Math.round(i.grams / maxGrams * 100));
+    const barClass = pct > 50 ? 'high' : pct > 20 ? 'mid' : 'low';
+    const unit = i.unit || 'g';
+    // 安全地反算数量
+    let displayValue = i.grams;
+    if (unit !== 'g' && INGREDIENT_UNITS && INGREDIENT_UNITS[i.name]) {
+        displayValue = Math.round(i.grams / INGREDIENT_UNITS[i.name].weight);
+    }
+    return `
+    <div class="inv-item">
+        <div class="inv-emoji">${getIngredientDisplayIcon(i.name)}</div>
+        <div class="inv-info">
+            <div class="inv-name">${i.name}</div>
+            <div class="inv-meta">${i.addedAt || '未知日期'} · 单位: ${unit}</div>
+            <div class="inv-bar"><div class="inv-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+        </div>
+        <div class="inv-grams">${displayValue}${unit}</div>
+        <div style="display:flex;gap:4px;">
+            <button class="inv-del" style="background:#e3f2fd;color:#1976d2;" onclick="event.stopPropagation();editInventory('${i.name}')">✏️</button>
+            <button class="inv-del" onclick="event.stopPropagation();deleteInventory('${i.name}')">×</button>
+        </div>
+    </div>`;
+}).join('')}
                 </div>
             </div>`;
         }).join('');
