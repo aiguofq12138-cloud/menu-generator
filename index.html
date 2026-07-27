@@ -655,12 +655,7 @@
     </div>
 </div>
 
-                        <!-- Recipes View -->
-            <div class="view" id="view-recipes">
-                <div id="recipeContent"></div>
-            </div>
-
-<!-- Calendar View -->
+            <!-- Calendar View -->
             <div class="view" id="view-calendar">
                 <div class="card">
                     <div class="month-nav">
@@ -725,7 +720,6 @@
         </div>
     </div>
 </div>
-    </div>
 
         <!-- Bottom Nav -->
         <div class="bottom-nav">
@@ -745,6 +739,48 @@
 
         <!-- Toast -->
         <div class="toast" id="toast"></div>
+
+        <!-- Inventory Add Modal -->
+<div class="modal-overlay" id="inventoryModal">
+<div class="modal-sheet">
+<h3>🥬 添加食材</h3>
+<div class="recipe-form-group">
+    <label>食材名称</label>
+    <input type="text" id="invName" placeholder="如：鸡蛋、番茄" autocomplete="off">
+</div>
+<div class="form-row">
+    <div class="recipe-form-group" style="flex:1;">
+        <label>数量</label>
+        <div style="display:flex;align-items:center;border:2px solid var(--gray-200);border-radius:10px;overflow:hidden;background:white;">
+            <input type="number" id="invGrams" placeholder="数量" min="1" value="200" style="border:none;flex:1;padding:10px 12px;font-size:14px;outline:none;">
+            <span id="unitDisplay" style="padding:0 12px;color:var(--gray-600);font-size:14px;border-left:1px solid var(--gray-200);background:var(--gray-50);min-width:40px;text-align:center;">g</span>
+        </div>
+    </div>
+    <div class="recipe-form-group" style="flex:1;">
+        <label>分类</label>
+        <select id="invCategory">
+            <option value="蔬菜">🥬 蔬菜</option>
+            <option value="肉类">🥩 肉类</option>
+            <option value="蛋类">🥚 蛋类</option>
+            <option value="水产">🐟 水产</option>
+            <option value="豆制品">🫘 豆制品</option>
+            <option value="主食"> 主食</option>
+            <option value="调料">🧂 调料</option>
+            <option value="香料">🌿 香料</option>
+            <option value="干货"> 干货</option>
+            <option value="乳制品">🥛 乳制品</option>
+            <option value="水果">🍎 水果</option>
+            <option value="酱菜"> 酱菜</option>
+            <option value="其他">📦 其他</option>
+        </select>
+    </div>
+</div>
+<div style="display:flex;gap:10px;margin-top:16px;">
+    <button class="btn btn-secondary" onclick="closeInventoryModal()" style="flex:1;">取消</button>
+    <button class="btn btn-primary" onclick="addInventory()" style="flex:1;">确认添加</button>
+</div>
+</div>
+</div>
 
         <!-- Add Recipe Modal -->
         <div class="modal-overlay" id="recipeFormModal">
