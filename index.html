@@ -302,11 +302,13 @@
         /* ===== 分类筛选 ===== */
         .cat-filter {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     padding-bottom: 8px;
     margin-bottom: 8px;
-    flex-wrap: wrap;
-    align-items: center;
+    position: relative;          /* 为绝对定位的按钮提供参考 */
+    padding-right: 70px;         /* 为按钮预留空间，防止被标签遮挡 */
+    min-height: 32px;   
         }
         .cat-chip {
     padding: 5px 12px;
@@ -318,13 +320,16 @@
     background: white;
     color: var(--gray-600);
     transition: all 0.2s;
-    flex-shrink: 1;      /* 允许压缩 */
-    min-width: 0;        /* 允许收缩到0 */
         }
 		/* 新增：为“更多/收起”按钮单独控制 */
 .cat-chip-more {
-    flex-shrink: 0;      /* 不允许压缩 */
-    white-space: nowrap;
+    position: absolute;
+    right: 0;
+    top: 0;
+    flex-shrink: 0;
+    margin-left: 0;              /* 取消之前的 margin-left:auto */
+    background: white;
+    border: 1px solid var(--gray-200);
     /* 其他继承 cat-chip */
 }
         .cat-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
@@ -1690,7 +1695,7 @@ function renderCategoryFilter() {
     // 3. "更多/收起"按钮（固定在第一行最右侧）
     if (catKeys.length > 3) {
         var isExpanded = catFilterExpanded;
-        html += '<span class="cat-chip cat-chip-more" onclick="toggleCatFilterExpand()" style="margin-left:auto;font-weight:600;flex-shrink:0;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
+        html += '<span class="cat-chip cat-chip-more" onclick="toggleCatFilterExpand()" style="font-weight:600;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
     }
     
     // 4. 如果已展开，渲染隐藏的分类（会自动换行）
