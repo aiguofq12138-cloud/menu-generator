@@ -306,9 +306,9 @@
     gap: 6px;
     padding-bottom: 8px;
     margin-bottom: 8px;
-    position: relative;          /* 为绝对定位的按钮提供参考 */
-    padding-right: 70px;         /* 为按钮预留空间，防止被标签遮挡 */
-    min-height: 32px;   
+    position: relative;
+    padding-right: 50px;          /* 给按钮留空间，比之前小一些 */
+    min-height: 32px;
         }
         .cat-chip {
     padding: 5px 12px;
@@ -326,11 +326,15 @@
     position: absolute;
     right: 0;
     top: 0;
-    flex-shrink: 0;
-    margin-left: 0;              /* 取消之前的 margin-left:auto */
-    background: white;
-    border: 1px solid var(--gray-200);
-    /* 其他继承 cat-chip */
+    background: transparent;      /* 去掉背景 */
+    border: none;                /* 去掉边框 */
+    font-weight: 600;
+    color: var(--primary);       /* 用主色，或者用 var(--gray-600) 更低调 */
+    padding: 5px 0;              /* 去掉左右内边距，只保留上下 */
+    z-index: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 12px;
 }
         .cat-chip.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
 
