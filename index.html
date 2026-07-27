@@ -1690,7 +1690,7 @@ function renderCategoryFilter() {
     // 3. "更多/收起"按钮（固定在第一行最右侧）
     if (catKeys.length > 3) {
         var isExpanded = catFilterExpanded;
-        html += '<span class="cat-chip" onclick="toggleCatFilterExpand()" style="margin-left:auto;font-weight:600;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
+        html += '<span class="cat-chip cat-chip-more" onclick="toggleCatFilterExpand()" style="margin-left:auto;font-weight:600;flex-shrink:0;">' + (isExpanded ? '收起 ▲' : '更多 ▼') + '</span>';
     }
     
     // 4. 如果已展开，渲染隐藏的分类（会自动换行）
