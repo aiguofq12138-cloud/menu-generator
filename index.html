@@ -2385,14 +2385,14 @@ function getIngredientDisplayIcon(ingredientName) {
             html += '</div></div>';
         }
 
-        var builtInNames = Object.keys(builtIn);
-        var isOpenBI = categoryAccordionState['builtin'] !== false;
-        html += '<div class="accordion-item"><div class="accordion-header ' + (isOpenBI ? 'open' : '') + '" onclick="toggleCategoryAccordion(\'builtin\')">📦 内置分类 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + builtInNames.length + '个)</span><span class="arrow">▼</span></div><div class="accordion-body ' + (isOpenBI ? 'open' : '') + '">';
-        builtInNames.forEach(function(name) {
-            var cal = (cats[name + '_cal']) || CATEGORY_DEFAULT_CALORIES[name] || 100;
-            html += '<div class="sub-item"><span style="font-size:18px;">' + builtIn[name] + '</span><span>' + name + '</span><span style="font-size:11px;color:var(--gray-400);">~' + cal + ' kcal/100g</span><span style="font-size:10px;color:var(--gray-400);margin-left:auto;">内置</span></div>';
-        });
-        html += '</div></div>';
+ // 系统分类（原内置分类）
+var builtInNames = Object.keys(builtIn);
+var isOpenBI = categoryAccordionState['builtin'] !== false;
+html += '<div class="accordion-item"><div class="accordion-header ' + (isOpenBI ? 'open' : '') + '" onclick="toggleCategoryAccordion(\'builtin\')">📦 系统分类 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + builtInNames.length + '个)</span><span class="arrow">▼</span></div><div class="accordion-body ' + (isOpenBI ? 'open' : '') + '">';
+builtInNames.forEach(function(name) {
+    html += '<div class="sub-item"><span style="font-size:18px;">' + builtIn[name] + '</span><span>' + name + '</span><span style="font-size:10px;color:var(--gray-400);margin-left:auto;">系统</span></div>';
+});
+html += '</div></div>';
         document.getElementById('catManageList').innerHTML = html;
     }
 
