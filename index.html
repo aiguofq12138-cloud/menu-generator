@@ -1078,7 +1078,10 @@ function saveIngredient() {
     
     persist();
     closeIngredientModal();
-    renderIconManage(); // 刷新食材管理列表
+    
+    // ✅ 强制展开“我的食材”手风琴，并刷新
+    iconAccordionState['custom'] = true;
+    renderIconManage();
 }
 
 // 渲染食材管理列表（包含系统食材和自定义食材）
