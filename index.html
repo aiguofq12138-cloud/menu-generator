@@ -1325,7 +1325,13 @@ if (SYSTEM_INGREDIENTS && SYSTEM_INGREDIENTS.length) {
         }
     });
 }
-
+    var input = document.getElementById('invName');
+    input.addEventListener('focus', function() {
+        // 延迟一点确保键盘弹出后滚动
+        setTimeout(function() {
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    });
     document.getElementById('inventoryModal').classList.add('show');
     setTimeout(function() {
         document.getElementById('invName').focus();
