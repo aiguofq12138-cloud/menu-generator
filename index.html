@@ -720,17 +720,6 @@
 </div>
             <!-- Settings View -->
 <div class="view" id="view-settings">
-    <!-- 1. 分类管理 -->
-    <div class="card">
-        <div class="card-title">️ 分类标签管理</div>
-        <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">增删分类标签，用于食材分类和筛选</div>
-        <div class="form-row">
-            <input type="text" id="newCatName" placeholder="分类名，如：零食" autocomplete="off">
-            <input type="text" id="newCatEmoji" placeholder="ICON" style="width:60px;flex-shrink:0;" maxlength="2" value="📦">
-            <button class="btn btn-primary btn-sm" onclick="addCategory()" style="width:auto;">添加</button>
-        </div>
-        <div id="catManageList" style="margin-top:8px;"></div>
-    </div>
 
     <!-- 2. 食材管理 (核心修改区) -->
     <div class="card">
@@ -739,7 +728,19 @@
         <button class="btn btn-primary btn-sm" onclick="openIngredientModal()" style="width:100%;margin-bottom:12px;">+ 添加新食材</button>
         <div id="iconManageList" style="max-height:300px;overflow-y:auto;"></div>
     </div>
-
+<!-- 2. 食材管理（合并分类管理） -->
+<div class="card">
+    <div class="card-title">🎨 食材管理</div>
+    <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">管理系统内置食材、自定义食材及分类</div>
+    <!-- 👇 添加分类区域 -->
+    <div class="form-row">
+        <input type="text" id="newCatName" placeholder="新分类名，如：零食" autocomplete="off">
+        <input type="text" id="newCatEmoji" placeholder="ICON" style="width:60px;flex-shrink:0;" maxlength="2" value="📦">
+        <button class="btn btn-primary btn-sm" onclick="addCategory()" style="width:auto;">添加分类</button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openIngredientModal()" style="width:100%;margin-bottom:12px;">+ 添加新食材</button>
+    <div id="iconManageList" style="max-height:300px;overflow-y:auto;"></div>
+</div>
     <!-- 3. 桌面图标 -->
     <div class="card">
         <div class="card-title">🖼️ 桌面图标</div>
@@ -1142,86 +1143,76 @@ function saveIngredient() {
 
 // 渲染食材管理列表（包含系统食材和自定义食材）
 function renderIconManage() {
+    // 获取所有分类（系统 + 自定义）
+    var builtInCats = {
+        '肉类':'🥩','蔬菜':'🥬','蛋类':'🥚','水产':'🐟','豆制品':'🫘',
+        '主食':'🍚','调料':'🧂','香料':'🌿','干货':'🍄','乳制品':'🥛',
+        '水果':'🍎','酱菜':'🫙','其他':'📦'
+    };
+    var customCats = appData.customCategories || {};
+    var allCats = { ...builtInCats, ...customCats };
+
+    // 按分类顺序排序
+    var catOrder = ['肉类', '蔬菜', '蛋类', '水产', '豆制品', '主食', '调料', '香料', '干货', '乳制品', '水果', '酱菜', '其他'];
+    var customCatNames = Object.keys(customCats);
+    var sortedCatNames = catOrder.filter(c => allCats[c]).concat(customCatNames.filter(c => !catOrder.includes(c)));
+
     var html = '';
 
-    // ========== 1. 系统食材（按分类分组） ==========
-    var isOpenSys = iconAccordionState['system'] !== false;
-    html += '<div class="accordion-item">';
-    html += '<div class="accordion-header' + (isOpenSys ? ' open' : '') + '" onclick="iconAccordionState[\'system\']=!iconAccordionState[\'system\'];renderIconManage();">';
-    html += '🏭 系统食材 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + SYSTEM_INGREDIENTS.length + '种)</span>';
-    html += '<span class="arrow">▼</span>';
-    html += '</div>';
-    html += '<div class="accordion-body' + (isOpenSys ? ' open' : '') + '">';
+    // 遍历分类，每个分类生成一个手风琴
+    sortedCatNames.forEach(function(cat) {
+        // 获取该分类下的所有食材（系统+自定义）
+        var systemItems = SYSTEM_INGREDIENTS.filter(function(item) {
+            return item.category === cat;
+        });
+        var customItems = (appData.customIngredients || []).filter(function(item) {
+            return item.category === cat;
+        });
 
-    // 按分类分组
-    var groups = {};
-    SYSTEM_INGREDIENTS.forEach(function(item) {
-        var cat = item.category || '其他';
-        if (!groups[cat]) groups[cat] = [];
-        groups[cat].push(item);
-    });
+        var allItems = systemItems.concat(customItems);
+        if (allItems.length === 0) return;
 
-    // 分类排序
-    var catOrder = ['肉类', '蔬菜', '蛋类', '水产', '豆制品', '主食', '调料', '香料', '干货', '乳制品', '水果', '酱菜', '其他'];
-    var sortedCats = Object.keys(groups).sort(function(a, b) {
-        var ai = catOrder.indexOf(a);
-        var bi = catOrder.indexOf(b);
-        if (ai === -1 && bi === -1) return a.localeCompare(b);
-        if (ai === -1) return 1;
-        if (bi === -1) return -1;
-        return ai - bi;
-    });
+        var catKey = 'cat_' + cat;
+        var isOpen = iconAccordionState[catKey] !== false;
+        var isSystemCat = builtInCats.hasOwnProperty(cat);
+        var emoji = allCats[cat] || '📦';
 
-    sortedCats.forEach(function(cat) {
-        var items = groups[cat];
-        var catKey = 'sys_cat_' + cat;
-        var isOpenCat = iconAccordionState[catKey] !== false;
-        html += '<div class="accordion-item" style="margin-top:4px;border:1px solid var(--gray-200);">';
-        html += '<div class="accordion-header' + (isOpenCat ? ' open' : '') + '" onclick="iconAccordionState[\'' + catKey + '\']=!iconAccordionState[\'' + catKey + '\'];renderIconManage();" style="font-size:13px;padding:8px 12px;">';
-        var catEmoji = CATEGORY_EMOJI[cat] || '📦';
-        html += catEmoji + ' ' + cat + ' <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + items.length + '种)</span>';
+        html += '<div class="accordion-item">';
+        html += '<div class="accordion-header' + (isOpen ? ' open' : '') + '" onclick="iconAccordionState[\'' + catKey + '\']=!iconAccordionState[\'' + catKey + '\'];renderIconManage();">';
+        html += emoji + ' ' + cat + ' <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + allItems.length + '种)</span>';
+        if (isSystemCat) {
+            html += '<span style="font-size:10px;color:var(--gray-400);margin-left:auto;">系统</span>';
+        } else {
+            html += '<div class="accordion-actions" style="margin-left:auto;">';
+            html += '<button onclick="event.stopPropagation();editCategory(\'' + cat + '\')" style="color:var(--primary);">✏️</button>';
+            html += '<button onclick="event.stopPropagation();deleteCategory(\'' + cat + '\')" class="danger">×</button>';
+            html += '</div>';
+        }
         html += '<span class="arrow">▼</span>';
         html += '</div>';
-        html += '<div class="accordion-body' + (isOpenCat ? ' open' : '') + '" style="padding:0 8px 8px;">';
-        items.forEach(function(item) {
+
+        html += '<div class="accordion-body' + (isOpen ? ' open' : '') + '" style="padding:0 8px 8px;">';
+        allItems.forEach(function(item) {
+            var isSystem = SYSTEM_INGREDIENTS.some(function(s) { return s.name === item.name; });
             html += '<div class="sub-item" style="padding:4px 8px;">';
             html += '<span style="font-size:18px;">' + (item.icon || '📦') + '</span>';
             html += '<span>' + item.name + '</span>';
             html += '<span style="font-size:11px;color:var(--gray-400);">' + item.unit + '</span>';
             html += '<span style="font-size:10px;color:var(--gray-400);margin-left:auto;">' + item.cal + ' kcal</span>';
+            if (!isSystem) {
+                var idx = appData.customIngredients.findIndex(function(c) { return c.name === item.name; });
+                if (idx >= 0) {
+                    html += '<button onclick="event.stopPropagation();openIngredientModal(' + idx + ')" style="margin-left:8px;border:none;background:none;color:var(--primary);font-size:14px;">✏️</button>';
+                }
+            }
             html += '</div>';
         });
         html += '</div></div>';
     });
 
-    html += '</div></div>';
-
-    // ========== 2. 自定义食材（我的食材） ==========
-    var customIngs = appData.customIngredients || [];
-    var isOpenCustom = iconAccordionState['custom'] !== false;
-    html += '<div class="accordion-item">';
-    html += '<div class="accordion-header' + (isOpenCustom ? ' open' : '') + '" onclick="iconAccordionState[\'custom\']=!iconAccordionState[\'custom\'];renderIconManage();">';
-    html += '✨ 我的食材 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + customIngs.length + '种)</span>';
-    html += '<span class="arrow">▼</span>';
-    html += '</div>';
-    html += '<div class="accordion-body' + (isOpenCustom ? ' open' : '') + '">';
-    if (customIngs.length === 0) {
-        html += '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无自定义食材，点击上方按钮添加</div>';
-    } else {
-        for (var j = 0; j < customIngs.length; j++) {
-            var item = customIngs[j];
-            html += '<div class="sub-item">';
-            html += '<span style="font-size:18px;">' + (item.icon || '🍽') + '</span>';
-            html += '<span>' + item.name + '</span>';
-            html += '<span style="font-size:11px;color:var(--gray-400);">' + item.category + ' · ' + item.unit + '</span>';
-            html += '<div class="accordion-actions">';
-            html += '<button onclick="event.stopPropagation();openIngredientModal(' + j + ');" style="color:var(--primary);">✏️</button>';
-            html += '<button onclick="event.stopPropagation();deleteIngredient(' + j + ');" class="danger">×</button>';
-            html += '</div>';
-            html += '</div>';
-        }
+    if (html === '') {
+        html = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无食材，请添加</div>';
     }
-    html += '</div></div>';
 
     document.getElementById('iconManageList').innerHTML = html;
 }
@@ -2517,7 +2508,6 @@ function getIngredientDisplayIcon(ingredientName) {
     }
 
     function renderSettings() {
-        renderCategoryManage();
         renderIconManage();
         renderAppIconPreview();
     }
@@ -2658,60 +2648,6 @@ html += '</div></div>';
         appData.customCategories = Object.fromEntries(entries);
         persist();
         renderCategoryManage();
-    }
-
-    function getCustomIcons() {
-        return appData.customIcons || {};
-    }
-
-    function renderIconManage() {
-        var icons = getCustomIcons();
-        if (Object.keys(icons).length === 0) {
-            document.getElementById('iconManageList').innerHTML = '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无自定义图标</div>';
-            return;
-        }
-        // 按分类分组
-        var groups = {};
-        for (var name in icons) {
-            if (!icons.hasOwnProperty(name)) continue;
-            var invItem = appData.inventory[name];
-            var cat = invItem ? invItem.category : '其他';
-            if (!groups[cat]) groups[cat] = [];
-            groups[cat].push({ name: name, emoji: icons[name] });
-        }
-        var catOrder = ['肉类','蔬菜','蛋类','水产','豆制品','主食','酱菜','水果','乳制品','干货','调料','香料','其他'];
-        var sortedCats = Object.keys(groups).sort(function(a, b) {
-            var ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
-            if (ai === -1 && bi === -1) return a.localeCompare(b);
-            if (ai === -1) return 1; if (bi === -1) return -1; return ai - bi;
-        });
-
-        var html = '';
-        sortedCats.forEach(function(cat) {
-            var items = groups[cat];
-            var customCats = getCustomCategories();
-            var catEmoji = customCats[cat] || CATEGORY_EMOJI[cat] || '📦';
-            var isOpen = iconAccordionState[cat] !== false;
-            html += '<div class="accordion-item">' +
-                '<div class="accordion-header ' + (isOpen ? 'open' : '') + '" onclick="toggleIconAccordion(\'' + cat + '\')">' +
-                catEmoji + ' ' + cat + ' <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + items.length + '个)</span>' +
-                '<span class="arrow">▼</span></div>' +
-                '<div class="accordion-body ' + (isOpen ? 'open' : '') + '">';
-             items.forEach(function(item) {
-        var unit = appData.inventory[item.name] && appData.inventory[item.name].unit ? 
-                   appData.inventory[item.name].unit : 'g';
-        html += '<div class="sub-item">' +
-                '<span style="font-size:18px;">' + item.emoji + '</span>' +
-                '<span>' + item.name + '</span>' +
-                '<span style="font-size:11px;color:var(--gray-400);">(' + unit + ')</span>' +
-                '<div class="accordion-actions">' +
-                '<button onclick="event.stopPropagation();editIngredientIcon(\'' + item.name + '\')" style="color:var(--primary);">✏️</button>' +
-                '<button onclick="event.stopPropagation();deleteIngredientIcon(\'' + item.name + '\')" class="danger">×</button>' +
-                '</div></div>';
-    });
-            html += '</div></div>';
-        });
-        document.getElementById('iconManageList').innerHTML = html;
     }
 
     function toggleIconAccordion(cat) {
