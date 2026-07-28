@@ -1621,7 +1621,7 @@ const countLabel = `×${items.length}`;
 // 修改标题
 return `
 <div class="cat-group">
-    <div class="cat-group-header ${isOpen ? 'open' : ''}" onclick="toggleCategory('${cat}')">
+    <div class="cat-group-header ${(invFilter !== '全部' || openedCategories[cat]) ? 'open' : ''}" onclick="toggleCategory('${cat}')">
         ${emoji} ${cat}
         <span class="cat-count">${countLabel}  ${unitSummary}</span>
         <span class="arrow">▼</span>
@@ -2324,7 +2324,7 @@ function getCustomIcons() {
 
     function renderSettings() {
         renderIconManage();
-        renderAppIconPreview();
+       // renderAppIconPreview();
     }
 
     function renderCategoryManage() {
