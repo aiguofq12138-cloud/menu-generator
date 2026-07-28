@@ -1920,6 +1920,8 @@ function renderRecipeDetail(recipe, showActions) {
             <span class="recipe-meta-tag">📊 ${recipe.difficulty}</span>
             <span class="recipe-meta-tag">🔥 ${calText}</span>   <!-- 👈 热量标签已添加 -->
         </div>
+		<!-- 👇 添加这一行显示细分热量 -->
+    <div style="font-size:11px;color:var(--gray-400);text-align:center;margin-top:-6px;margin-bottom:8px;">${detailText}</div>
         <div class="section-title">📋 主食材</div>
         ${mainIngs.map(ing => {
             const have = invMap[ing.name] || 0;
@@ -1966,7 +1968,6 @@ var calInfo = calcRecipeCalories(recipe);
                 <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
             </div>
         </div>
-        <div style="font-size:11px;color:var(--gray-400);text-align:center;margin-top:-6px;margin-bottom:8px;">${detailText}</div>
         <!-- 食材标签 -->
             <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
                 ${mainIngs.map(ing => {
