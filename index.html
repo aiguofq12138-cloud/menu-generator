@@ -1585,15 +1585,47 @@ function renderInventory() {
         listEl.innerHTML = sortedCats.map(cat => {
             const items = groups[cat].sort((a, b) => b.grams - a.grams);
             const emoji = CATEGORY_EMOJI[cat] || '📦';
-            const totalGrams = items.reduce((s, i) => s + i.grams, 0);
-            const isOpen = invFilter !== '全部' || openedCategories[cat];
-            return `
-            <div class="cat-group">
-                <div class="cat-group-header ${isOpen ? 'open' : ''}" onclick="toggleCategory('${cat}')">
-                    ${emoji} ${cat}
-                    <span class="cat-count">${items.length}种 · ${totalGrams}g</span>
-                    <span class="arrow">▼</span>
-                </div>
+const unitCounts = {};
+items.forEach(item => {
+    const unit = item.unit || 'g';
+    let count = item.grams;
+    // 如果是非克单位，尝试用 INGREDIENT_UNITS 反算数量
+    if (unit !== 'g' && INGREDIENT_UNITS && INGREDIENT_UNITS[item.name]) {
+        count = Math.round(item.grams / INGREDIENT_UNITS[item.name].weight);
+    }
+    if (!unitCounts[unit]) unitCounts[unit] = 0;
+    unitCounts[unit] += count;
+});
+
+// 构造单位汇总字符串（按单位排序，g在前，其他按字母）
+const unitOrder = ['g', 'ml', '个', '根', '片', '瓣', '只', '条', '杯', '碗'];
+const unitParts = Object.keys(unitCounts)
+    .sort((a, b) => {
+        const ia = unitOrder.indexOf(a);
+        const ib = unitOrder.indexOf(b);
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+    })
+    .map(unit => {
+        const count = unitCounts[unit];
+        // 单位显示：g -> g, ml -> ml, 其他原样
+        return `${count}${unit}`;
+    });
+const unitSummary = unitParts.join('  ');
+
+// 种类数量显示为 ×N
+const countLabel = `×${items.length}`;
+
+// 修改标题
+return `
+<div class="cat-group">
+    <div class="cat-group-header ${isOpen ? 'open' : ''}" onclick="toggleCategory('${cat}')">
+        ${emoji} ${cat}
+        <span class="cat-count">${countLabel}  ${unitSummary}</span>
+        <span class="arrow">▼</span>
+    </div>
                 <div class="cat-group-body ${isOpen ? 'open' : ''}" id="cat-body-${cat}">
                     ${items.map(i => {
     const maxGrams = (cat === '调料' || cat === '香料') ? 500 : 1000;
