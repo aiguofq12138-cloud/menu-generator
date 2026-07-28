@@ -1006,15 +1006,8 @@ function getNutritionData(name, cat) {
 	// ==================== 食材管理相关常量与逻辑 ====================
 // 系统内置食材数据
 const SYSTEM_INGREDIENTS = [
-    { name: '鸡蛋', icon: '', category: '蛋类', unit: '个', cal: 144, carb: 1.1, prot: 13.3, fat: 9.5 },
-    { name: '番茄', icon: '🍅', category: '蔬菜', unit: '个', cal: 18, carb: 3.9, prot: 0.9, fat: 0.2 },
-    { name: '猪瘦肉', icon: '🥩', category: '肉类', unit: 'g', cal: 143, carb: 0, prot: 20.3, fat: 6.2 },
-    { name: '鸡胸肉', icon: '🍗', category: '肉类', unit: 'g', cal: 133, carb: 0, prot: 19.4, fat: 5.0 },
-    { name: '米饭', icon: '', category: '主食', unit: 'g', cal: 116, carb: 25.9, prot: 2.6, fat: 0.3 },
-    { name: '牛奶', icon: '🥛', category: '乳制品', unit: 'ml', cal: 54, carb: 3.4, prot: 3.0, fat: 3.2 },
-    { name: '苹果', icon: '🍎', category: '水果', unit: '个', cal: 53, carb: 13.8, prot: 0.2, fat: 0.2 },
-    { name: '食用油', icon: '🫙', category: '调料', unit: 'g', cal: 899, carb: 0, prot: 0, fat: 99.9 },
-    { name: '盐', icon: '🧂', category: '调料', unit: 'g', cal: 0, carb: 0, prot: 0, fat: 0 }
+ // 系统内置食材数据（从 JSON 加载）
+let SYSTEM_INGREDIENTS = [];
 ];
 
 let editingIngredientIdx = -1;
@@ -1484,7 +1477,57 @@ function deleteIngredient(idx) {
     let iconAccordionState = {};
 
     // ==================== 数据管理 ====================
-    function loadData() {
+   // ==================== 从 JSON 加载基础数据 ====================
+const DATA_BASE_PATH = '/menu-generator/data/';
+
+// 声明基础数据变量（在函数外部，全局可用）
+let CATEGORY_EMOJI = {};
+let INGREDIENT_UNITS = {};
+let CALORIE_TABLE = {};
+let NUTRITION_TABLE = {};
+let CATEGORY_DEFAULT_CALORIES = {};
+let SYSTEM_INGREDIENTS = [];
+let RECIPES = [];
+
+async function loadBaseData() {
+    try {
+        const files = [
+            'categories.json',          // results[0]
+            'ingredient-units.json',    // results[1]
+            'calorie-table.json',       // results[2]
+            'nutrition-table.json',     // results[3]
+            'category-defaults.json',   // results[4]
+            'system-ingredients.json',  // results[5]
+            'recipes.json'              // results[6]
+        ];
+
+        const results = await Promise.all(
+            files.map(file => fetch(DATA_BASE_PATH + file).then(r => {
+                if (!r.ok) throw new Error(`${file} 加载失败 (${r.status})`);
+                return r.json();
+            }))
+        );
+
+        // 按顺序赋值
+        CATEGORY_EMOJI = results[0];
+        INGREDIENT_UNITS = results[1];
+        CALORIE_TABLE = results[2];
+        NUTRITION_TABLE = results[3];
+        CATEGORY_DEFAULT_CALORIES = results[4];
+        SYSTEM_INGREDIENTS = results[5];
+        RECIPES = results[6];
+
+        console.log('✅ 所有基础数据加载完成');
+        console.log('系统食材数量:', SYSTEM_INGREDIENTS.length);
+        initApp();
+    } catch (err) {
+        console.error('❌ 加载基础数据失败:', err);
+        showToast('数据加载失败，请刷新重试', 'error');
+        // 用空数据初始化，至少部分功能可用
+        initApp();
+    }
+}
+		function loadData() {
         let raw = localStorage.getItem(STORAGE_KEY);
         let data = raw ? JSON.parse(raw) : null;
         if (!data || data.version < 2) {
@@ -2976,34 +3019,33 @@ function removeSuggestions() {
     if (existing) existing.remove();
 }
 
-    function init() {
-        appData = loadData();
-         // setupInventoryNameSuggestions();   // 注释掉这一行
-        renderInventory();
+function initApp() {
+    appData = loadData();
+    // setupInventoryNameSuggestions();   // 注释掉这一行
+    renderInventory();
 
+    document.getElementById('invGrams').addEventListener('keydown', e => {
+        if (e.key === 'Enter') addInventory();
+    });
 
-        document.getElementById('invGrams').addEventListener('keydown', e => {
-            if (e.key === 'Enter') addInventory();
-        });
+    // 点击弹窗背景关闭
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirmModal();
+    });
+    document.getElementById('inventoryModal').addEventListener('click', function(e) {
+        if (e.target === this) closeInventoryModal();
+    });
+    document.getElementById('recipeFormModal').addEventListener('click', function(e) {
+        if (e.target === this) closeRecipeFormModal();
+    });
 
-        // 点击弹窗背景关闭
-        document.getElementById('confirmModal').addEventListener('click', function(e) {
-            if (e.target === this) closeConfirmModal();
-        });
-        document.getElementById('inventoryModal').addEventListener('click', function(e) {
-            if (e.target === this) closeInventoryModal();
-        });
-        document.getElementById('recipeFormModal').addEventListener('click', function(e) {
-            if (e.target === this) closeRecipeFormModal();
-        });
+    // 更新菜谱页摘要
+    const avail = getAvailableIngredients();
+    document.getElementById('availSummary').textContent =
+        `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+}
 
-        // 更新菜谱页摘要
-        const avail = getAvailableIngredients();
-        document.getElementById('availSummary').textContent =
-            `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
-    }
-
-    init();
+    loadBaseData();
     </script>
     <script>
     // 注册 Service Worker（PWA）
