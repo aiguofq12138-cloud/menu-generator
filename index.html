@@ -1613,7 +1613,7 @@ const unitParts = Object.keys(unitCounts)
         // 单位显示：g -> g, ml -> ml, 其他原样
         return `${count}${unit}`;
     });
-const unitSummary = unitParts.join('  ');
+const unitSummary = unitParts.join(', ');
 
 // 种类数量显示为 ×N
 const countLabel = `×${items.length}`;
