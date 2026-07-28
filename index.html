@@ -1019,17 +1019,22 @@ function getIngredientCaloriesStrict(name) {
     return null;
 }
 function calcRecipeCalories(recipe) {
-    var total = 0;
+    var mainTotal = 0;
+    var condimentTotal = 0;
     var missing = [];
+    var condimentCats = ['调料', '香料'];
     recipe.ingredients.forEach(function(ing) {
         var cal = getIngredientCaloriesStrict(ing.name);
+        var isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
         if (cal !== null && cal !== undefined) {
-            total += Math.round(cal * ing.grams / 100);
+            var amount = Math.round(cal * ing.grams / 100);
+            if (isCondiment) condimentTotal += amount;
+            else mainTotal += amount;
         } else {
             missing.push(ing.name);
         }
     });
-    return { total: total, missing: missing };
+    return { mainTotal: mainTotal, condimentTotal: condimentTotal, total: mainTotal + condimentTotal, missing: missing };
 }
 
     const DEFAULT_PANTRY = {};
@@ -1935,9 +1940,10 @@ function renderRecipeDetail(recipe, showActions) {
     // ===== 计算热量 =====
     var calInfo = calcRecipeCalories(recipe);
     var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
-    if (calInfo.missing.length > 0) {
-        calText += ' (⚠️部分食材无数据)';
-    }
+    var detailText = '';
+    if (calInfo.mainTotal > 0) detailText += '食材 ' + calInfo.mainTotal + ' kcal';
+    if (calInfo.condimentTotal > 0) detailText += (detailText ? '，' : '') + '调料 ' + calInfo.condimentTotal + ' kcal';
+    if (calInfo.missing.length > 0) detailText += '（⚠️部分食材无热量）';
 
     return `
     <div class="recipe-card selected" id="recipeDetail">
@@ -2073,7 +2079,47 @@ var calInfo = calcRecipeCalories(recipe);
         updateConfirmUI();
     }
 
-    function updateConfirmUI() {
+   function updateConfirmUI() {
+    document.getElementById('confirmDateText').textContent = formatDate(confirmDate);
+    if (!selectedRecipe) return;
+    const invMap = {};
+    for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
+    const condimentCats = ['调料', '香料'];
+
+    // 生成调整控件（仅主食材）
+    var adjustHtml = selectedRecipe.ingredients.map(ing => {
+        var isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
+        if (isCondiment) return '';
+        var current = recipeConfirmGrams[ing.name] || ing.grams;
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="flex:1;font-size:13px;">${ing.name}</span>
+            <input type="number" value="${current}" min="0" step="5" 
+                onchange="recipeConfirmGrams['${ing.name}'] = parseInt(this.value) || 0; updateConfirmUI();" 
+                style="width:70px;padding:4px;border:1px solid var(--gray-200);border-radius:6px;text-align:center;font-size:13px;">
+            <span style="font-size:12px;color:var(--gray-400);">g</span>
+        </div>`;
+    }).join('');
+    document.getElementById('confirmGramsAdjust').innerHTML = adjustHtml;
+
+    // 消耗预览
+    var previewHtml = selectedRecipe.ingredients.map(ing => {
+        var isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
+        var before = invMap[ing.name] || 0;
+        var useGrams = recipeConfirmGrams[ing.name] !== undefined ? recipeConfirmGrams[ing.name] : ing.grams;
+        if (isCondiment) {
+            return `<div class="preview-item">
+                <span>${ing.name} <span style="color:var(--gray-400);font-size:11px;">(调料)</span></span>
+                <span style="color:var(--gray-400);">需 ${useGrams}g (不扣库存)</span>
+            </div>`;
+        }
+        var after = before - useGrams;
+        return `<div class="preview-item">
+            <span>${ing.name}</span>
+            <span>${before}g → <span class="deduct">${Math.max(0, after)}g</span>${after <= 0 ? '<span class="exhausted"> (耗尽)</span>' : ''}</span>
+        </div>`;
+    }).join('');
+    document.getElementById('consumptionPreview').innerHTML = previewHtml;
+}
         document.getElementById('confirmDateText').textContent = formatDate(confirmDate);
         if (!selectedRecipe) return;
         const invMap = {};
