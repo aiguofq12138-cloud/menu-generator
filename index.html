@@ -722,11 +722,11 @@
 <div class="view" id="view-settings">
 
  
-<!-- 2. 食材管理（合并分类管理） -->
+<!-- 2. 食材标签管理（合并分类管理） -->
 <div class="card">
-    <div class="card-title">🎨 食材管理</div>
-    <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">管理系统内置食材、自定义食材及分类</div>
-    <!-- 👇 添加分类区域 -->
+    <div class="card-title">📌 食材标签管理</div>
+    <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">管理自定义分类、系统食材及自定义食材</div>
+    <!-- 下方保持不变 -->
     <div class="form-row">
         <input type="text" id="newCatName" placeholder="新分类名，如：零食" autocomplete="off">
         <input type="text" id="newCatEmoji" placeholder="ICON" style="width:60px;flex-shrink:0;" maxlength="2" value="📦">
@@ -735,27 +735,26 @@
     <button class="btn btn-primary btn-sm" onclick="openIngredientModal()" style="width:100%;margin-bottom:12px;">+ 添加新食材</button>
     <div id="iconManageList" style="max-height:300px;overflow-y:auto;"></div>
 </div>
-    <!-- 3. 桌面图标 -->
-    <div class="card">
-        <div class="card-title">🖼️ 桌面图标</div>
-        <div style="display:flex;align-items:center;gap:12px;">
-            <div id="iconPreview" style="width:64px;height:64px;border-radius:16px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;flex-shrink:0;">🍳</div>
-            <div>
-                <button class="btn btn-sm btn-outline" onclick="document.getElementById('iconUpload').click()">📷 选择图片</button>
-                <input type="file" id="iconUpload" accept="image/*" onchange="uploadAppIcon(event)" style="display:none;">
-                <button class="btn btn-sm btn-secondary" onclick="resetAppIcon()" style="margin-top:4px;">恢复默认</button>
-            </div>
+   <!-- 3. 桌面图标 -->
+<div class="card">
+    <div class="card-title">🖼️ 桌面图标</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div id="iconPreview" style="width:64px;height:64px;border-radius:16px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;flex-shrink:0;">🍳</div>
+        <div>
+            <button class="btn btn-sm btn-outline" onclick="document.getElementById('iconUpload').click()">📷 选择图片</button>
+            <input type="file" id="iconUpload" accept="image/*" onchange="uploadAppIcon(event)" style="display:none;">
+            <button class="btn btn-sm btn-secondary" onclick="resetAppIcon()" style="margin-top:4px;">恢复默认</button>
         </div>
     </div>
+</div>
 
-    <!-- 4. 数据管理 -->
-    <div class="card">
-        <div class="card-title"> 数据管理</div>
-        <div style="display:flex;gap:10px;">
-            <button class="btn btn-secondary btn-sm" onclick="exportData()" style="flex:1;">📤 导出数据</button>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()" style="flex:1;"> 导入数据</button>
-            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
-        </div>
+<!-- 4. 数据管理 -->
+<div class="card" style="display:none;">
+    <div class="card-title">💾 数据管理</div>
+    <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="exportData()" style="flex:1;">📤 导出数据</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()" style="flex:1;">📥 导入数据</button>
+        <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
     </div>
 </div>
 
