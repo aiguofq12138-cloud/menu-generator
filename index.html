@@ -2495,6 +2495,14 @@ function getIngredientDisplayIcon(ingredientName) {
         clearTimeout(toast._timeout);
         toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
     }
+		function getCustomCategories() {
+    return appData.customCategories || {};
+}
+
+// 👇 在这里添加 getCustomIcons
+function getCustomIcons() {
+    return appData.customIcons || {};
+}
 
     // ==================== 设置页面 ====================
     function getCustomCategories() {
@@ -2682,17 +2690,19 @@ html += '</div></div>';
     }
 
     // 获取食材的显示图标（先查自定义，再查分类）
-    function getIngredientDisplayIcon(ingredientName) {
-        const customIcons = getCustomIcons();
-        if (customIcons[ingredientName]) return customIcons[ingredientName];
-        const invItem = appData.inventory[ingredientName];
-        if (invItem) {
-            const customCats = getCustomCategories();
-            const emoji = customCats[invItem.category] || CATEGORY_EMOJI[invItem.category] || '📦';
-            return emoji;
-        }
-        return '📦';
+// 获取食材的显示图标（先查自定义图标，再查分类）
+function getIngredientDisplayIcon(ingredientName) {
+    // 直接使用 appData.customIcons，并提供空对象保护
+    var customIcons = appData.customIcons || {};
+    if (customIcons[ingredientName]) return customIcons[ingredientName];
+    var invItem = appData.inventory[ingredientName];
+    if (invItem) {
+        var customCats = appData.customCategories || {};
+        var emoji = customCats[invItem.category] || CATEGORY_EMOJI[invItem.category] || '📦';
+        return emoji;
     }
+    return '📦';
+}
 
     function renderAppIconPreview() {
         const customIcon = appData.appIcon;
