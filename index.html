@@ -1312,19 +1312,19 @@ function openInventoryModal() {
     document.getElementById('invCategoryDisplay').value = '';
     document.getElementById('invCategory').value = '';
 
-    var datalist = document.getElementById('invNameList');
-    datalist.innerHTML = '';
-    if (SYSTEM_INGREDIENTS && SYSTEM_INGREDIENTS.length) {
-        var seen = new Set();
-        SYSTEM_INGREDIENTS.forEach(function(item) {
-            if (!seen.has(item.name)) {
-                seen.add(item.name);
-                var option = document.createElement('option');
-                option.value = item.name;
-                datalist.appendChild(option);
-            }
-        });
-    }
+var datalist = document.getElementById('invNameList');
+datalist.innerHTML = '';
+if (SYSTEM_INGREDIENTS && SYSTEM_INGREDIENTS.length) {
+    var seen = new Set();
+    SYSTEM_INGREDIENTS.forEach(function(item) {
+        if (!seen.has(item.name)) {
+            seen.add(item.name);
+            var option = document.createElement('option');
+            option.value = item.name;
+            datalist.appendChild(option);
+        }
+    });
+}
 
     document.getElementById('inventoryModal').classList.add('show');
     setTimeout(function() {
