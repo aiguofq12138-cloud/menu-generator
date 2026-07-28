@@ -1991,16 +1991,18 @@ function getIngredientDisplayIcon(ingredientName) {
 var calInfo = calcRecipeCalories(recipe);
     var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
     return `
-    <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
+     <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
         <div style="display:flex;justify-content:space-between;align-items:center;">
             <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
             <div style="display:flex;gap:6px;align-items:center;">
+                <span style="font-size:12px;color:var(--gray-600);">🔥 ${calText}</span>   <!-- 👈 添加热量 -->
                 <span style="font-size:12px;color:var(--primary);font-weight:600;">${matchRate > 0 ? '匹配' + matchRate + '%' : ''}</span>
                 <button class="btn btn-sm" style="background:#e3f2fd;color:#1976d2;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();openRecipeEditModal('${recipe.name}')">编辑</button>
                 <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
             </div>
         </div>
         <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
+        <!-- 食材标签 -->
             <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
                 ${mainIngs.map(ing => {
                     const have = invMap[ing.name] || 0;
