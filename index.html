@@ -723,18 +723,11 @@
 <div class="view" id="view-settings">
 
  
-<!-- 2. 食材标签管理（合并分类管理） -->
+<!-- 2. 食材标签管理 -->
 <div class="card">
     <div class="card-title">📌 食材标签管理</div>
     <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">管理自定义分类、系统食材及自定义食材</div>
-    <!-- 下方保持不变 -->
-    <div class="form-row">
-        <input type="text" id="newCatName" placeholder="新分类名，如：零食" autocomplete="off">
-        <input type="text" id="newCatEmoji" placeholder="ICON" style="width:60px;flex-shrink:0;" maxlength="2" value="📦">
-        <button class="btn btn-primary btn-sm" onclick="addCategory()" style="width:auto;">添加分类</button>
-    </div>
-    <button class="btn btn-primary btn-sm" onclick="openIngredientModal()" style="width:100%;margin-bottom:12px;">+ 添加新食材</button>
-    <div id="iconManageList" style="max-height:none;overflow-y:visible;"></div>
+    <div id="iconManageList" style="max-height:none;overflow:visible;"></div>
 </div>
   
 
