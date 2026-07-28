@@ -1144,69 +1144,84 @@ function saveIngredient() {
 function renderIconManage() {
     var html = '';
 
-// 1. 系统食材（按分类分组）
-var isOpenSys = iconAccordionState['system'] !== false;
-html += '<div class="accordion-item">';
-html += '<div class="accordion-header' + (isOpenSys ? ' open' : '') + '" onclick="iconAccordionState[\'system\']=!iconAccordionState[\'system\'];renderIconManage();">';
-html += '🏭 系统食材 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + SYSTEM_INGREDIENTS.length + '种)</span>';
-html += '<span class="arrow">▼</span>';
-html += '</div>';
-html += '<div class="accordion-body' + (isOpenSys ? ' open' : '') + '">';
-
-// 按分类分组
-var groups = {};
-SYSTEM_INGREDIENTS.forEach(function(item) {
-    var cat = item.category || '其他';
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push(item);
-});
-
-// 排序分类（自定义顺序）
-var catOrder = ['肉类', '蔬菜', '蛋类', '水产', '豆制品', '主食', '调料', '香料', '干货', '乳制品', '水果', '酱菜', '其他'];
-var sortedCats = Object.keys(groups).sort(function(a, b) {
-    var ai = catOrder.indexOf(a);
-    var bi = catOrder.indexOf(b);
-    if (ai === -1 && bi === -1) return a.localeCompare(b);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-});
-
-sortedCats.forEach(function(cat) {
-    var items = groups[cat];
-    var catKey = 'sys_cat_' + cat;
-    var isOpenCat = iconAccordionState[catKey] !== false;
-    html += '<div class="accordion-item" style="margin-top:4px;border:1px solid var(--gray-200);">';
-    html += '<div class="accordion-header' + (isOpenCat ? ' open' : '') + '" onclick="iconAccordionState[\'' + catKey + '\']=!iconAccordionState[\'' + catKey + '\'];renderIconManage();" style="font-size:13px;padding:8px 12px;">';
-    var catEmoji = CATEGORY_EMOJI[cat] || '📦';
-    html += catEmoji + ' ' + cat + ' <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + items.length + '种)</span>';
+    // ========== 1. 系统食材（按分类分组） ==========
+    var isOpenSys = iconAccordionState['system'] !== false;
+    html += '<div class="accordion-item">';
+    html += '<div class="accordion-header' + (isOpenSys ? ' open' : '') + '" onclick="iconAccordionState[\'system\']=!iconAccordionState[\'system\'];renderIconManage();">';
+    html += '🏭 系统食材 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + SYSTEM_INGREDIENTS.length + '种)</span>';
     html += '<span class="arrow">▼</span>';
     html += '</div>';
-    html += '<div class="accordion-body' + (isOpenCat ? ' open' : '') + '" style="padding:0 8px 8px;">';
-    items.forEach(function(item) {
-        html += '<div class="sub-item" style="padding:4px 8px;">';
-        html += '<span style="font-size:18px;">' + (item.icon || '📦') + '</span>';
-        html += '<span>' + item.name + '</span>';
-        html += '<span style="font-size:11px;color:var(--gray-400);">' + item.unit + '</span>';
-        html += '<span style="font-size:10px;color:var(--gray-400);margin-left:auto;">' + item.cal + ' kcal</span>';
-        html += '</div>';
-    });
-    html += '</div></div>';
-});
+    html += '<div class="accordion-body' + (isOpenSys ? ' open' : '') + '">';
 
-html += '</div></div>';
-// 2. 自定义食材区域（始终显示手风琴）
-var customIngs = appData.customIngredients || [];
-var isOpenCustom = iconAccordionState['custom'] !== false;
-html += '<div class="accordion-item"><div class="accordion-header ' + (isOpenCustom ? 'open' : '') + '" onclick="iconAccordionState[\'custom\']=!iconAccordionState[\'custom\'];renderIconManage();">✨ 我的食材 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + customIngs.length + '种)</span><span class="arrow">▼</span></div><div class="accordion-body ' + (isOpenCustom ? 'open' : '') + '">';
-if (customIngs.length === 0) {
-    html += '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无自定义食材，点击上方按钮添加</div>';
-} else {
-    customIngs.forEach(function(item, idx) {
-        html += '<div class="sub-item"><span style="font-size:18px;">' + item.icon + '</span><span>' + item.name + '</span><span style="font-size:11px;color:var(--gray-400);">' + item.category + ' · ' + item.unit + '</span><div class="accordion-actions"><button onclick="event.stopPropagation();openIngredientModal(' + idx + ')" style="color:var(--primary);">✏️</button><button onclick="event.stopPropagation();deleteIngredient(' + idx + ')" class="danger">×</button></div></div>';
+    // 按分类分组
+    var groups = {};
+    SYSTEM_INGREDIENTS.forEach(function(item) {
+        var cat = item.category || '其他';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(item);
     });
-}
-html += '</div></div>';
+
+    // 分类排序
+    var catOrder = ['肉类', '蔬菜', '蛋类', '水产', '豆制品', '主食', '调料', '香料', '干货', '乳制品', '水果', '酱菜', '其他'];
+    var sortedCats = Object.keys(groups).sort(function(a, b) {
+        var ai = catOrder.indexOf(a);
+        var bi = catOrder.indexOf(b);
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+    });
+
+    sortedCats.forEach(function(cat) {
+        var items = groups[cat];
+        var catKey = 'sys_cat_' + cat;
+        var isOpenCat = iconAccordionState[catKey] !== false;
+        html += '<div class="accordion-item" style="margin-top:4px;border:1px solid var(--gray-200);">';
+        html += '<div class="accordion-header' + (isOpenCat ? ' open' : '') + '" onclick="iconAccordionState[\'' + catKey + '\']=!iconAccordionState[\'' + catKey + '\'];renderIconManage();" style="font-size:13px;padding:8px 12px;">';
+        var catEmoji = CATEGORY_EMOJI[cat] || '📦';
+        html += catEmoji + ' ' + cat + ' <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + items.length + '种)</span>';
+        html += '<span class="arrow">▼</span>';
+        html += '</div>';
+        html += '<div class="accordion-body' + (isOpenCat ? ' open' : '') + '" style="padding:0 8px 8px;">';
+        items.forEach(function(item) {
+            html += '<div class="sub-item" style="padding:4px 8px;">';
+            html += '<span style="font-size:18px;">' + (item.icon || '📦') + '</span>';
+            html += '<span>' + item.name + '</span>';
+            html += '<span style="font-size:11px;color:var(--gray-400);">' + item.unit + '</span>';
+            html += '<span style="font-size:10px;color:var(--gray-400);margin-left:auto;">' + item.cal + ' kcal</span>';
+            html += '</div>';
+        });
+        html += '</div></div>';
+    });
+
+    html += '</div></div>';
+
+    // ========== 2. 自定义食材（我的食材） ==========
+    var customIngs = appData.customIngredients || [];
+    var isOpenCustom = iconAccordionState['custom'] !== false;
+    html += '<div class="accordion-item">';
+    html += '<div class="accordion-header' + (isOpenCustom ? ' open' : '') + '" onclick="iconAccordionState[\'custom\']=!iconAccordionState[\'custom\'];renderIconManage();">';
+    html += '✨ 我的食材 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + customIngs.length + '种)</span>';
+    html += '<span class="arrow">▼</span>';
+    html += '</div>';
+    html += '<div class="accordion-body' + (isOpenCustom ? ' open' : '') + '">';
+    if (customIngs.length === 0) {
+        html += '<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:16px;">暂无自定义食材，点击上方按钮添加</div>';
+    } else {
+        for (var j = 0; j < customIngs.length; j++) {
+            var item = customIngs[j];
+            html += '<div class="sub-item">';
+            html += '<span style="font-size:18px;">' + (item.icon || '🍽') + '</span>';
+            html += '<span>' + item.name + '</span>';
+            html += '<span style="font-size:11px;color:var(--gray-400);">' + item.category + ' · ' + item.unit + '</span>';
+            html += '<div class="accordion-actions">';
+            html += '<button onclick="event.stopPropagation();openIngredientModal(' + j + ');" style="color:var(--primary);">✏️</button>';
+            html += '<button onclick="event.stopPropagation();deleteIngredient(' + j + ');" class="danger">×</button>';
+            html += '</div>';
+            html += '</div>';
+        }
+    }
+    html += '</div></div>';
 
     document.getElementById('iconManageList').innerHTML = html;
 }
