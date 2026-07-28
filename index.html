@@ -721,13 +721,7 @@
             <!-- Settings View -->
 <div class="view" id="view-settings">
 
-    <!-- 2. 食材管理 (核心修改区) -->
-    <div class="card">
-        <div class="card-title">🎨 食材管理</div>
-        <div style="margin-bottom:8px;font-size:12px;color:var(--gray-400);">管理系统内置食材及自定义食材</div>
-        <button class="btn btn-primary btn-sm" onclick="openIngredientModal()" style="width:100%;margin-bottom:12px;">+ 添加新食材</button>
-        <div id="iconManageList" style="max-height:300px;overflow-y:auto;"></div>
-    </div>
+ 
 <!-- 2. 食材管理（合并分类管理） -->
 <div class="card">
     <div class="card-title">🎨 食材管理</div>
@@ -2547,72 +2541,71 @@ html += '</div></div>';
         renderCategoryManage();
     }
 
-    function addCategory() {
-        const name = document.getElementById('newCatName').value.trim();
-        const emoji = document.getElementById('newCatEmoji').value.trim() || '📦';
-        if (!name) { showToast('请输入分类名称'); return; }
-        if (['肉类','蔬菜','蛋类','水产','豆制品','主食','调料','香料','干货','乳制品','水果','酱菜','其他'].includes(name)) {
-            showToast('内置分类不可覆盖');
-            return;
-        }
-        if (!appData.customCategories) appData.customCategories = {};
-        appData.customCategories[name] = emoji;
-        persist();
-        document.getElementById('newCatName').value = '';
-        renderCategoryManage();
-        // 刷新库存页面
-        if (currentTab === 'inventory') renderInventory();
-        showToast(`分类「${name}」已添加`);
+   function addCategory() {
+    const name = document.getElementById('newCatName').value.trim();
+    const emoji = document.getElementById('newCatEmoji').value.trim() || '📦';
+    if (!name) { showToast('请输入分类名称'); return; }
+    if (['肉类','蔬菜','蛋类','水产','豆制品','主食','调料','香料','干货','乳制品','水果','酱菜','其他'].includes(name)) {
+        showToast('内置分类不可覆盖');
+        return;
     }
+    if (!appData.customCategories) appData.customCategories = {};
+    appData.customCategories[name] = emoji;
+    persist();
+    document.getElementById('newCatName').value = '';
+    // 刷新合并后的卡片
+    renderIconManage();
+    if (currentTab === 'inventory') renderInventory();
+    showToast(`分类「${name}」已添加`);
+}
 
-    function deleteCategory(name) {
-        if (!appData.customCategories || !appData.customCategories[name]) return;
-        delete appData.customCategories[name];
-        persist();
-        renderCategoryManage();
-        showToast(`已删除分类「${name}」`);
-    }
+   function deleteCategory(name) {
+    if (!appData.customCategories || !appData.customCategories[name]) return;
+    delete appData.customCategories[name];
+    persist();
+    renderIconManage();  // 刷新
+    showToast(`已删除分类「${name}」`);
+}
 
-    function moveCategoryUp(name) {
-        var keys = Object.keys(appData.customCategories);
-        var idx = keys.indexOf(name);
-        if (idx <= 0) return;
-        var entries = Object.entries(appData.customCategories);
-        var temp = entries[idx];
-        entries[idx] = entries[idx - 1];
-        entries[idx - 1] = temp;
-        appData.customCategories = Object.fromEntries(entries);
-        persist();
-        renderCategoryManage();
-        if (currentTab === 'inventory') renderInventory();
-    }
+ function moveCategoryUp(name) {
+    var keys = Object.keys(appData.customCategories);
+    var idx = keys.indexOf(name);
+    if (idx <= 0) return;
+    var entries = Object.entries(appData.customCategories);
+    var temp = entries[idx];
+    entries[idx] = entries[idx - 1];
+    entries[idx - 1] = temp;
+    appData.customCategories = Object.fromEntries(entries);
+    persist();
+    renderIconManage();
+    if (currentTab === 'inventory') renderInventory();
+}
 
-    function moveCategoryDown(name) {
-        var keys = Object.keys(appData.customCategories);
-        var idx = keys.indexOf(name);
-        if (idx < 0 || idx >= keys.length - 1) return;
-        var entries = Object.entries(appData.customCategories);
-        var temp = entries[idx];
-        entries[idx] = entries[idx + 1];
-        entries[idx + 1] = temp;
-        appData.customCategories = Object.fromEntries(entries);
-        persist();
-        renderCategoryManage();
-        if (currentTab === 'inventory') renderInventory();
-    }
-
-    function editCategory(name) {
-        var emoji = appData.customCategories[name] || '📦';
-        var newName = prompt('修改分类名称：', name);
-        if (!newName || newName.trim() === '') return;
-        var newEmoji = prompt('修改图标（1-2个字符）：', emoji);
-        if (newName.trim() !== name) delete appData.customCategories[name];
-        appData.customCategories[newName.trim()] = (newEmoji && newEmoji.trim()) || emoji;
-        persist();
-        renderCategoryManage();
-        if (currentTab === 'inventory') renderInventory();
-        showToast('分类已更新 ✅', 'success');
-    }
+   function moveCategoryDown(name) {
+    var keys = Object.keys(appData.customCategories);
+    var idx = keys.indexOf(name);
+    if (idx < 0 || idx >= keys.length - 1) return;
+    var entries = Object.entries(appData.customCategories);
+    var temp = entries[idx];
+    entries[idx] = entries[idx + 1];
+    entries[idx + 1] = temp;
+    appData.customCategories = Object.fromEntries(entries);
+    persist();
+    renderIconManage();
+    if (currentTab === 'inventory') renderInventory();
+}
+   function editCategory(name) {
+    var emoji = appData.customCategories[name] || '📦';
+    var newName = prompt('修改分类名称：', name);
+    if (!newName || newName.trim() === '') return;
+    var newEmoji = prompt('修改图标（1-2个字符）：', emoji);
+    if (newName.trim() !== name) delete appData.customCategories[name];
+    appData.customCategories[newName.trim()] = (newEmoji && newEmoji.trim()) || emoji;
+    persist();
+    renderIconManage();
+    if (currentTab === 'inventory') renderInventory();
+    showToast('分类已更新 ✅', 'success');
+}
 
     function editCategoryCal(name) {
         var cats = appData.customCategories || {};
