@@ -735,18 +735,7 @@
     <button class="btn btn-primary btn-sm" onclick="openIngredientModal()" style="width:100%;margin-bottom:12px;">+ 添加新食材</button>
     <div id="iconManageList" style="max-height:300px;overflow-y:auto;"></div>
 </div>
-   <!-- 3. 桌面图标 -->
-<div class="card">
-    <div class="card-title">🖼️ 桌面图标</div>
-    <div style="display:flex;align-items:center;gap:12px;">
-        <div id="iconPreview" style="width:64px;height:64px;border-radius:16px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;flex-shrink:0;">🍳</div>
-        <div>
-            <button class="btn btn-sm btn-outline" onclick="document.getElementById('iconUpload').click()">📷 选择图片</button>
-            <input type="file" id="iconUpload" accept="image/*" onchange="uploadAppIcon(event)" style="display:none;">
-            <button class="btn btn-sm btn-secondary" onclick="resetAppIcon()" style="margin-top:4px;">恢复默认</button>
-        </div>
-    </div>
-</div>
+  
 
 <!-- 4. 数据管理 -->
 <div class="card" style="display:none;">
