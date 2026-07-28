@@ -1622,9 +1622,10 @@ const countLabel = `×${items.length}`;
 return `
 <div class="cat-group">
     <div class="cat-group-header ${(invFilter !== '全部' || openedCategories[cat]) ? 'open' : ''}" onclick="toggleCategory('${cat}')">
-        ${emoji} ${cat}*${items.length}  库存：${unitSummary}
-        <span class="arrow">▼</span>
-    </div>
+   <span>${emoji} ${cat}*${items.length}</span>
+    <span class="cat-count">库存：${unitSummary}</span>
+    <span class="arrow">▼</span>
+</div>
     <div class="cat-group-body ${(invFilter !== '全部' || openedCategories[cat]) ? 'open' : ''}" id="cat-body-${cat}">
                     ${items.map(i => {
     const maxGrams = (cat === '调料' || cat === '香料') ? 500 : 1000;
