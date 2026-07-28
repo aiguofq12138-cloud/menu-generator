@@ -1257,12 +1257,14 @@ async function loadBaseData() {
         console.log('✅ 所有基础数据加载完成');
         console.log('系统食材数量:', SYSTEM_INGREDIENTS.length);
         initApp();
-    } catch (err) {
-        console.error('❌ 加载基础数据失败:', err);
-        showToast('数据加载失败，请刷新重试', 'error');
-        // 用空数据初始化，至少部分功能可用
-        initApp();
-    }
+} catch (err) {
+    console.error('❌ 加载基础数据失败:', err);
+    console.error('错误详情:', err.message);
+    // 如果有响应状态，也打印
+    if (err.response) console.error('响应状态:', err.response.status);
+    showToast('数据加载失败，请刷新重试', 'error');
+    initApp();
+}
 }
 		function loadData() {
         let raw = localStorage.getItem(STORAGE_KEY);
@@ -2579,7 +2581,14 @@ function getIngredientDisplayIcon(ingredientName) {
         }
     }
 
-    function resetAppIcon() {
+   function updateFavicon(href) {
+    var link = document.querySelector('link[rel="icon"]');
+    if (link) {
+        link.href = href;
+    }
+}
+		
+		function resetAppIcon() {
         delete appData.appIcon;
         delete appData.icon192;
         delete appData.icon512;
@@ -2777,9 +2786,8 @@ function initApp() {
     });
 
     // 更新菜谱页摘要
-    const avail = getAvailableIngredients();
-    document.getElementById('availSummary').textContent =
-        `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+   //  const avail = getAvailableIngredients();
+   //  document.getElementById('availSummary').textContent =`可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
 }
 
     loadBaseData();
