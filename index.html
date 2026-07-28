@@ -993,13 +993,44 @@ function getNutritionData(name, cat) {
         if (customCats[invItem.category + '_cal']) return customCats[invItem.category + '_cal'];
         return CATEGORY_DEFAULT_CALORIES[invItem.category] || 100;
     }
-    function calcRecipeCalories(recipe) {
-        var total = 0;
-        recipe.ingredients.forEach(function(ing) {
-            total += Math.round(getIngredientCalories(ing.name) * ing.grams / 100);
-        });
-        return total;
+		// 严格热量查找：找不到则返回 null
+function getIngredientCaloriesStrict(name) {
+    // 1. 从全局热量表查找
+    if (CALORIE_TABLE && CALORIE_TABLE[name]) {
+        return CALORIE_TABLE[name];
     }
+    // 2. 从库存中查找（用户可能自定义了该食材的热量）
+    var invItem = appData.inventory[name];
+    if (invItem && invItem.cal !== undefined) {
+        return invItem.cal;
+    }
+    // 3. 从分类默认热量查找（如果库存中有该食材且分类有默认热量）
+    if (invItem) {
+        var customCats = appData.customCategories || {};
+        var cat = invItem.category;
+        if (customCats[cat + '_cal']) {
+            return customCats[cat + '_cal'];
+        }
+        if (CATEGORY_DEFAULT_CALORIES && CATEGORY_DEFAULT_CALORIES[cat]) {
+            return CATEGORY_DEFAULT_CALORIES[cat];
+        }
+    }
+    // 都找不到返回 null
+    return null;
+}
+function calcRecipeCalories(recipe) {
+    var total = 0;
+    var missing = [];
+    recipe.ingredients.forEach(function(ing) {
+        var cal = getIngredientCaloriesStrict(ing.name);
+        if (cal !== null && cal !== undefined) {
+            total += Math.round(cal * ing.grams / 100);
+        } else {
+            missing.push(ing.name);
+        }
+    });
+    return { total: total, missing: missing };
+}
 
     const DEFAULT_PANTRY = {};
 	
@@ -1900,7 +1931,13 @@ function getIngredientDisplayIcon(ingredientName) {
 
         const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
         const condimentIngs = recipe.ingredients.filter(ing => condimentCats.includes(guessIngredientCategory(ing.name)));
-
+		    // ===== 计算热量 =====
+    var calInfo = calcRecipeCalories(recipe);
+    var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
+    if (calInfo.missing.length > 0) {
+        calText += ' (部分食材无热量数据)';
+    }
+    // 在 recipe-meta-row 后面插入
         return `
         <div class="recipe-card selected" id="recipeDetail">
             <div class="recipe-name">${recipe.name}</div>
@@ -1931,6 +1968,17 @@ function getIngredientDisplayIcon(ingredientName) {
                 <button class="btn btn-outline" onclick="generateRecipe()">🔄 再换一个</button>
                 <button class="btn btn-primary" onclick="openConfirmModal('${recipe.name}')">✅ 确认采用</button>
             </div>` : ''}
+
+   // return `
+    <div class="recipe-card selected" id="recipeDetail">
+        <div class="recipe-name">${recipe.name}</div>
+        <div class="recipe-meta-row">
+            <span class="recipe-meta-tag">📂 ${recipe.category}</span>
+            <span class="recipe-meta-tag">⏱ ${recipe.time}</span>
+            <span class="recipe-meta-tag">📊 ${recipe.difficulty}</span>
+            <span class="recipe-meta-tag">🔥 ${calText}</span>
+        </div>
+			
         </div>`;
     }
 
@@ -1940,7 +1988,8 @@ function getIngredientDisplayIcon(ingredientName) {
         const condimentCats = ['调料', '香料'];
         const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
         const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
-
+var calInfo = calcRecipeCalories(recipe);
+    var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
     return `
     <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
         <div style="display:flex;justify-content:space-between;align-items:center;">
