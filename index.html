@@ -1552,6 +1552,11 @@ function openInventoryModal() {
 
 function closeInventoryModal() {
     document.getElementById('inventoryModal').classList.remove('show');
+    // 恢复输入框可编辑
+    var nameInput = document.getElementById('invName');
+    nameInput.removeAttribute('readonly');
+    nameInput.setAttribute('list', 'invNameList');
+    isEditingInventory = false;
 }
 
 // 监听输入/选择，自动切换单位并带入分类
@@ -1629,11 +1634,24 @@ function addInventory() {
     var category = document.getElementById('invCategory').value;
     var unit = document.getElementById('unitDisplay').textContent;
 
+    // ===== 新增校验：名称必须在系统内置食材中 =====
+    var exists = SYSTEM_INGREDIENTS.some(function(item) {
+        return item.name === name;
+    });
+    if (!exists) {
+        showToast('❌ 请从列表中选择食材，不支持自定义名称', 'error');
+        nameEl.focus();
+        return;
+    }
+
     if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
     if (quantity <= 0) { showToast('请输入有效的数量'); gramsEl.focus(); return; }
 
+    // ... 后续逻辑不变 ...
+}
+
     // 如果分类为空，设置为“其他”
-    if (!category) category = '其他';
+    // if (!category) category = '其他';
 
     // 计算实际克数
     var actualGrams = quantity;
@@ -1677,8 +1695,13 @@ function editInventory(name) {
     document.getElementById('invModalTitle').textContent = '✏️ 编辑食材';
     document.getElementById('invSubmitBtn').textContent = '保存修改';
 
-    document.getElementById('invName').value = name;
-    // 触发 input 事件，自动匹配分类和单位
+    // 锁定名称输入框，不允许修改
+    var nameInput = document.getElementById('invName');
+    nameInput.value = name;
+    nameInput.setAttribute('readonly', true);
+    nameInput.removeAttribute('list');
+
+    // 触发匹配（但此时不会改变名称）
     onInvNameInput();
 
     // 设置数量
