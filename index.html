@@ -1634,7 +1634,7 @@ function addInventory() {
     var category = document.getElementById('invCategory').value;
     var unit = document.getElementById('unitDisplay').textContent;
 
-    // ===== 新增校验：名称必须在系统内置食材中 =====
+    // 校验：名称必须在系统内置食材中
     var exists = SYSTEM_INGREDIENTS.some(function(item) {
         return item.name === name;
     });
@@ -1646,12 +1646,6 @@ function addInventory() {
 
     if (!name) { showToast('请输入食材名称'); nameEl.focus(); return; }
     if (quantity <= 0) { showToast('请输入有效的数量'); gramsEl.focus(); return; }
-
-    // ... 后续逻辑不变 ...
-}
-
-    // 如果分类为空，设置为“其他”
-    // if (!category) category = '其他';
 
     // 计算实际克数
     var actualGrams = quantity;
