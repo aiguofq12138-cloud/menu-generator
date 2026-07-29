@@ -2299,17 +2299,7 @@ for (const ing of selectedRecipe.ingredients) {
 }
 
        // 在标题下方添加当日总热量汇总
-    var totalHtml = '';
-    if (dailyTotal > 0) {
-        totalHtml = `<div style="font-size:13px;color:var(--gray-600);margin-top:-6px;margin-bottom:10px;">📊 当日总热量：${dailyTotal} kcal</div>`;
-    } else {
-        totalHtml = `<div style="font-size:13px;color:var(--gray-400);margin-top:-6px;margin-bottom:10px;">📊 今日暂无饮食记录</div>`;
-    }
-
-    // 将汇总插入到 dayDetailTitle 之后（在 card 中）
-    // 我们可以在 dayDetailTitle 下面追加，但需要修改 DOM 结构：可以插入到 mealSlots 之前。
-    document.getElementById('mealSlots').innerHTML = totalHtml + slotsHtml;
-}
+   
     function goAddMeal(date, meal) {
         confirmDate = date;
         confirmMealType = meal;
