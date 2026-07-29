@@ -268,4 +268,1202 @@
           ],
           "steps":["包菜手撕成块，蒜切片","热锅凉油，下花椒、干辣椒、蒜片爆香","下包菜大火翻炒至变软","沿锅边淋入醋","加生抽、盐调味，翻炒均匀出锅"] }
 
+
+  [
+  {
+    "name": "蒜香鸡胸炒西兰花",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 150},
+      {"name": "西兰花", "grams": 200},
+      {"name": "蒜", "grams": 10},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "生抽", "grams": 10},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "盐", "grams": 2}
+    ],
+    "steps": [
+      "鸡胸肉切小块，用生抽和黑胡椒腌制10分钟",
+      "西兰花切小朵焯水备用",
+      "热锅倒入橄榄油，爆香蒜末",
+      "下鸡胸肉煎炒至表面金黄",
+      "加入西兰花翻炒均匀，加盐调味出锅"
+    ]
+  },
+  {
+    "name": "柠檬黑椒鸡胸",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 200},
+      {"name": "柠檬汁", "grams": 10},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "盐", "grams": 2},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "蒜粉", "grams": 1}
+    ],
+    "steps": [
+      "鸡胸肉横剖成薄片，用柠檬汁、盐、黑胡椒、蒜粉腌制15分钟",
+      "平底锅喷橄榄油，中火加热",
+      "放入鸡胸肉，两面各煎3-4分钟至熟透",
+      "盛出静置2分钟后切片食用"
+    ]
+  },
+  {
+    "name": "彩椒鸡丁藜麦饭",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "25分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 120},
+      {"name": "藜麦", "grams": 50},
+      {"name": "红黄彩椒", "grams": 100},
+      {"name": "洋葱", "grams": 30},
+      {"name": "生抽", "grams": 8},
+      {"name": "蚝油", "grams": 5},
+      {"name": "料酒", "grams": 5},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "盐", "grams": 1}
+    ],
+    "steps": [
+      "藜麦洗净加水煮熟，约15分钟，沥干备用",
+      "鸡胸肉切丁，用料酒、生抽、少许盐腌制10分钟",
+      "彩椒和洋葱切丁",
+      "锅中放油，炒香洋葱，加入鸡丁炒至变色",
+      "加入彩椒丁翻炒，再倒入藜麦和蚝油，翻炒均匀即可"
+    ]
+  },
+  {
+    "name": "香菇滑鸡胸",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 150},
+      {"name": "鲜香菇", "grams": 100},
+      {"name": "蒜", "grams": 5},
+      {"name": "姜", "grams": 5},
+      {"name": "生抽", "grams": 10},
+      {"name": "料酒", "grams": 5},
+      {"name": "淀粉", "grams": 3},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "盐", "grams": 2}
+    ],
+    "steps": [
+      "鸡胸肉切片，加料酒、生抽、淀粉抓匀",
+      "香菇切片，姜蒜切末",
+      "锅热倒油，爆香姜蒜，下鸡片滑炒至变色盛出",
+      "锅中加入香菇翻炒，加少许水焖1分钟",
+      "倒回鸡片，加盐翻炒均匀出锅"
+    ]
+  },
+  {
+    "name": "孜然鸡胸肉条",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 180},
+      {"name": "孜然粉", "grams": 3},
+      {"name": "辣椒粉", "grams": 1},
+      {"name": "生抽", "grams": 8},
+      {"name": "料酒", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "鸡胸肉切条，用生抽、料酒、盐、孜然粉、辣椒粉腌制",
+      "不粘锅喷少量油，放入鸡胸条中火煎",
+      "煎至两面焦香，撒上额外孜然粉翻拌出锅"
+    ]
+  },
+  {
+    "name": "番茄鸡胸丸子汤",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "25分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 150},
+      {"name": "番茄", "grams": 200},
+      {"name": "鸡蛋清", "grams": 20},
+      {"name": "葱", "grams": 5},
+      {"name": "姜末", "grams": 5},
+      {"name": "盐", "grams": 3},
+      {"name": "白胡椒粉", "grams": 1},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "鸡胸肉剁成泥，加蛋清、姜末、盐、白胡椒粉搅打上劲",
+      "番茄切块，葱切末",
+      "锅放少许油，炒香番茄至出汁，加水煮开",
+      "转小火，将鸡肉泥挤成丸子下锅，煮至浮起",
+      "加盐调味，撒葱花即可"
+    ]
+  },
+  {
+    "name": "泰式酸辣鸡丝沙拉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 120},
+      {"name": "黄瓜", "grams": 100},
+      {"name": "洋葱", "grams": 50},
+      {"name": "小番茄", "grams": 80},
+      {"name": "香菜", "grams": 5},
+      {"name": "小米辣", "grams": 5},
+      {"name": "柠檬汁", "grams": 15},
+      {"name": "鱼露", "grams": 5},
+      {"name": "代糖", "grams": 1}
+    ],
+    "steps": [
+      "鸡胸肉煮熟撕成细丝",
+      "黄瓜切丝，洋葱切薄片，小番茄对切，小米辣切圈",
+      "柠檬汁、鱼露、代糖混合成酱汁",
+      "所有食材拌匀，撒香菜即可"
+    ]
+  },
+  {
+    "name": "照烧鸡胸（低卡）",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 180},
+      {"name": "生抽", "grams": 10},
+      {"name": "料酒", "grams": 5},
+      {"name": "代糖", "grams": 3},
+      {"name": "老抽", "grams": 2},
+      {"name": "姜", "grams": 5},
+      {"name": "水", "grams": 20}
+    ],
+    "steps": [
+      "鸡胸肉表面划几刀，用姜片和料酒腌制",
+      "生抽、老抽、代糖、水调成照烧汁",
+      "不粘锅不放油，下鸡胸两面煎至上色",
+      "倒入照烧汁，小火收汁，翻面上色，切片食用"
+    ]
+  },
+  {
+    "name": "鸡胸肉末炒豆腐",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 100},
+      {"name": "嫩豆腐", "grams": 200},
+      {"name": "蒜", "grams": 5},
+      {"name": "生抽", "grams": 8},
+      {"name": "蚝油", "grams": 3},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "小葱", "grams": 5}
+    ],
+    "steps": [
+      "鸡胸肉剁成肉末，加生抽腌制",
+      "豆腐切小块焯水",
+      "热油爆香蒜末，下肉末炒散",
+      "加入豆腐轻轻推动，加蚝油和少许水焖2分钟，撒葱花"
+    ]
+  },
+  {
+    "name": "辣炒鸡丁（低油版）",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 150},
+      {"name": "青椒", "grams": 80},
+      {"name": "干辣椒", "grams": 5},
+      {"name": "花椒", "grams": 2},
+      {"name": "蒜", "grams": 5},
+      {"name": "生抽", "grams": 10},
+      {"name": "醋", "grams": 5},
+      {"name": "料酒", "grams": 5},
+      {"name": "淀粉", "grams": 3},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "鸡胸切丁，加料酒、生抽、淀粉腌制",
+      "青椒切块，干辣椒剪段",
+      "热锅少油，爆香花椒干辣椒蒜片",
+      "下鸡丁滑炒变色，加青椒翻炒，淋醋提香，翻匀出锅"
+    ]
+  },
+  {
+    "name": "香煎巴沙鱼配芦笋",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "巴沙鱼", "grams": 200},
+      {"name": "芦笋", "grams": 150},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "柠檬", "grams": 10}
+    ],
+    "steps": [
+      "巴沙鱼吸干水分，抹盐、黑胡椒腌制",
+      "芦笋去老根，焯水备用",
+      "不粘锅倒油，中火煎鱼片，每面2-3分钟",
+      "芦笋同锅稍煎，出锅挤柠檬汁"
+    ]
+  },
+  {
+    "name": "清蒸龙利鱼",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "龙利鱼柳", "grams": 200},
+      {"name": "葱", "grams": 10},
+      {"name": "姜", "grams": 10},
+      {"name": "蒸鱼豉油", "grams": 10},
+      {"name": "料酒", "grams": 5},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "鱼柳用料酒、姜片腌制，铺入盘中",
+      "蒸锅上汽后蒸8分钟，倒掉汤汁",
+      "撒上葱丝，淋蒸鱼豉油",
+      "烧热橄榄油浇在葱丝上即可"
+    ]
+  },
+  {
+    "name": "蒜蓉蒸鱼片",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "龙利鱼", "grams": 200},
+      {"name": "蒜", "grams": 15},
+      {"name": "粉丝", "grams": 20},
+      {"name": "生抽", "grams": 8},
+      {"name": "蚝油", "grams": 3},
+      {"name": "油", "grams": 3}
+    ],
+    "steps": [
+      "粉丝泡软铺盘底，鱼切片铺上",
+      "蒜切末，用少许油炒香，加生抽蚝油拌匀",
+      "酱汁淋在鱼片上，蒸锅蒸8分钟",
+      "出锅撒葱花"
+    ]
+  },
+  {
+    "name": "番茄鱼片汤",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "龙利鱼", "grams": 150},
+      {"name": "番茄", "grams": 200},
+      {"name": "金针菇", "grams": 80},
+      {"name": "姜", "grams": 5},
+      {"name": "盐", "grams": 3},
+      {"name": "白胡椒粉", "grams": 1},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "鱼切片用姜丝、胡椒粉腌制，番茄切块",
+      "锅放油炒番茄至软烂，加水煮开",
+      "下金针菇煮2分钟",
+      "滑入鱼片煮至变白，加盐调味"
+    ]
+  },
+  {
+    "name": "烤箱柠檬香草鱼",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "25分钟",
+    "ingredients": [
+      {"name": "巴沙鱼", "grams": 200},
+      {"name": "柠檬", "grams": 15},
+      {"name": "混合香草", "grams": 1},
+      {"name": "盐", "grams": 2},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "橄榄油", "grams": 5}
+    ],
+    "steps": [
+      "鱼表面划刀，抹盐、黑胡椒、香草、橄榄油，铺柠檬片",
+      "锡纸包裹，烤箱200度烤15分钟",
+      "打开锡纸再烤2分钟收干表面"
+    ]
+  },
+  {
+    "name": "葱油鱼片",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "龙利鱼", "grams": 200},
+      {"name": "小葱", "grams": 20},
+      {"name": "姜", "grams": 5},
+      {"name": "蒸鱼豉油", "grams": 10},
+      {"name": "橄榄油", "grams": 5}
+    ],
+    "steps": [
+      "鱼切片焯水至熟，捞出装盘",
+      "葱姜切细丝放鱼上，淋蒸鱼豉油",
+      "油烧热浇在葱姜丝上即可"
+    ]
+  },
+  {
+    "name": "剁椒蒸鱼块",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "巴沙鱼", "grams": 200},
+      {"name": "剁椒", "grams": 15},
+      {"name": "姜", "grams": 5},
+      {"name": "蒜", "grams": 5},
+      {"name": "蒸鱼豉油", "grams": 8}
+    ],
+    "steps": [
+      "鱼切块，姜蒜切末与剁椒混合，铺在鱼上",
+      "淋蒸鱼豉油，蒸锅上汽蒸10分钟",
+      "取出即可"
+    ]
+  },
+  {
+    "name": "滑蛋虾仁",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "虾仁", "grams": 150},
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "盐", "grams": 2},
+      {"name": "料酒", "grams": 5},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "小葱", "grams": 5}
+    ],
+    "steps": [
+      "虾仁用料酒、盐腌制，鸡蛋打散",
+      "锅热油，下虾仁滑炒至变色盛出",
+      "倒入蛋液，半凝固时加入虾仁，推炒至嫩滑，撒葱花"
+    ]
+  },
+  {
+    "name": "蒜蓉西兰花炒虾仁",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "虾仁", "grams": 120},
+      {"name": "西兰花", "grams": 180},
+      {"name": "蒜", "grams": 10},
+      {"name": "盐", "grams": 2},
+      {"name": "料酒", "grams": 5},
+      {"name": "橄榄油", "grams": 5}
+    ],
+    "steps": [
+      "虾仁开背去线，用料酒腌；西兰花焯水",
+      "蒜切片，热油爆香",
+      "下虾仁炒至卷曲，加入西兰花翻炒，加盐出锅"
+    ]
+  },
+  {
+    "name": "芦笋炒虾仁",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "12分钟",
+    "ingredients": [
+      {"name": "虾仁", "grams": 130},
+      {"name": "芦笋", "grams": 150},
+      {"name": "姜", "grams": 3},
+      {"name": "盐", "grams": 2},
+      {"name": "料酒", "grams": 5},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "芦笋切段焯水，虾仁料酒腌制",
+      "姜丝爆锅，下虾仁炒变色",
+      "加入芦笋翻炒，盐调味即可"
+    ]
+  },
+  {
+    "name": "酸辣柠檬虾",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "鲜虾", "grams": 200},
+      {"name": "柠檬汁", "grams": 15},
+      {"name": "小米辣", "grams": 5},
+      {"name": "蒜", "grams": 8},
+      {"name": "生抽", "grams": 8},
+      {"name": "代糖", "grams": 1},
+      {"name": "香菜", "grams": 5}
+    ],
+    "steps": [
+      "虾煮熟去壳",
+      "蒜末、小米辣圈、柠檬汁、生抽、代糖调汁",
+      "虾仁放入拌匀，冷藏半小时，撒香菜"
+    ]
+  },
+  {
+    "name": "虾仁豆腐煲",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "18分钟",
+    "ingredients": [
+      {"name": "虾仁", "grams": 100},
+      {"name": "嫩豆腐", "grams": 200},
+      {"name": "香菇", "grams": 50},
+      {"name": "姜", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "白胡椒粉", "grams": 1},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "豆腐切块，香菇切片，虾仁腌制",
+      "砂锅放油，姜丝炝锅，下香菇炒香",
+      "加水煮开，放入豆腐、虾仁煮3分钟，加盐和白胡椒粉"
+    ]
+  },
+  {
+    "name": "芥末虾球（低脂版）",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "虾仁", "grams": 150},
+      {"name": "无糖酸奶", "grams": 30},
+      {"name": "青芥末", "grams": 3},
+      {"name": "柠檬汁", "grams": 5},
+      {"name": "盐", "grams": 1}
+    ],
+    "steps": [
+      "虾仁焯熟过凉水",
+      "酸奶、芥末、柠檬汁、盐调酱",
+      "虾仁拌入酱料即可"
+    ]
+  },
+  {
+    "name": "番茄虾仁意面",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "全麦意面", "grams": 60},
+      {"name": "虾仁", "grams": 80},
+      {"name": "番茄", "grams": 150},
+      {"name": "洋葱", "grams": 30},
+      {"name": "蒜", "grams": 5},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "黑胡椒", "grams": 1}
+    ],
+    "steps": [
+      "意面煮至八分熟捞出",
+      "番茄去皮切碎，洋葱蒜切末",
+      "锅中放油炒香洋葱蒜末，加番茄炒成酱",
+      "加入虾仁炒熟，放入意面翻拌，加盐和黑胡椒"
+    ]
+  },
+  {
+    "name": "鲜虾牛油果沙拉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "虾仁", "grams": 100},
+      {"name": "牛油果", "grams": 80},
+      {"name": "生菜", "grams": 50},
+      {"name": "小番茄", "grams": 60},
+      {"name": "柠檬汁", "grams": 10},
+      {"name": "盐", "grams": 1},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "虾仁煮熟，牛油果切块，小番茄对半",
+      "生菜撕碎铺底，摆上虾仁等",
+      "淋柠檬汁、橄榄油和盐拌匀"
+    ]
+  },
+  {
+    "name": "芹菜炒牛肉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "12分钟",
+    "ingredients": [
+      {"name": "瘦牛肉", "grams": 120},
+      {"name": "芹菜", "grams": 150},
+      {"name": "蒜", "grams": 5},
+      {"name": "生抽", "grams": 8},
+      {"name": "料酒", "grams": 5},
+      {"name": "淀粉", "grams": 3},
+      {"name": "橄榄油", "grams": 5}
+    ],
+    "steps": [
+      "牛肉切丝，加生抽、料酒、淀粉抓匀",
+      "芹菜切段焯水",
+      "热锅少油，滑炒牛肉丝至变色盛出",
+      "炒香蒜，下芹菜、牛肉翻炒，加盐调味"
+    ]
+  },
+  {
+    "name": "彩椒牛肉粒",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "牛里脊", "grams": 130},
+      {"name": "彩椒", "grams": 100},
+      {"name": "洋葱", "grams": 40},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "生抽", "grams": 8},
+      {"name": "料酒", "grams": 5},
+      {"name": "淀粉", "grams": 3},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "牛肉切粒腌制，彩椒洋葱切块",
+      "牛肉粒滑炒至变色盛出",
+      "锅中炒香洋葱彩椒，倒回牛肉，加黑胡椒翻匀"
+    ]
+  },
+  {
+    "name": "黑椒牛柳炒意面",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "瘦牛肉", "grams": 100},
+      {"name": "全麦意面", "grams": 60},
+      {"name": "青椒", "grams": 50},
+      {"name": "洋葱", "grams": 40},
+      {"name": "黑胡椒酱", "grams": 10},
+      {"name": "生抽", "grams": 5},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "意面煮好，牛肉切条腌制",
+      "牛肉滑炒盛出，炒香洋葱青椒",
+      "放入意面，加黑胡椒酱和生抽翻炒，加牛肉拌匀"
+    ]
+  },
+  {
+    "name": "洋葱炒牛肉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "12分钟",
+    "ingredients": [
+      {"name": "瘦牛肉", "grams": 120},
+      {"name": "洋葱", "grams": 100},
+      {"name": "生抽", "grams": 8},
+      {"name": "料酒", "grams": 5},
+      {"name": "蚝油", "grams": 5},
+      {"name": "油", "grams": 5},
+      {"name": "淀粉", "grams": 3}
+    ],
+    "steps": [
+      "牛肉切片腌制，洋葱切丝",
+      "滑炒牛肉至变色盛出",
+      "炒软洋葱，加牛肉、蚝油翻炒均匀"
+    ]
+  },
+  {
+    "name": "番茄牛肉汤",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "30分钟",
+    "ingredients": [
+      {"name": "瘦牛肉", "grams": 150},
+      {"name": "番茄", "grams": 200},
+      {"name": "胡萝卜", "grams": 80},
+      {"name": "洋葱", "grams": 50},
+      {"name": "姜", "grams": 5},
+      {"name": "盐", "grams": 3},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "牛肉切块焯水，番茄胡萝卜切块",
+      "锅放油炒香洋葱姜，加番茄炒出汁",
+      "加入牛肉、胡萝卜和水，炖煮25分钟，加盐调味"
+    ]
+  },
+  {
+    "name": "泡菜牛肉炒糙米饭",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "糙米饭", "grams": 150},
+      {"name": "瘦牛肉", "grams": 80},
+      {"name": "韩国泡菜", "grams": 50},
+      {"name": "洋葱", "grams": 30},
+      {"name": "生抽", "grams": 5},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "牛肉切碎，泡菜切段，洋葱切末",
+      "锅中炒香洋葱，加牛肉炒变色",
+      "加入泡菜和糙米饭，淋生抽翻炒均匀"
+    ]
+  },
+  {
+    "name": "牛肉末蒸蛋",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "瘦牛肉末", "grams": 60},
+      {"name": "生抽", "grams": 5},
+      {"name": "料酒", "grams": 3},
+      {"name": "水", "grams": 80},
+      {"name": "盐", "grams": 1}
+    ],
+    "steps": [
+      "鸡蛋打散加水盐搅匀过滤，牛肉末加料酒生抽炒熟",
+      "蛋液倒入碗中，铺上牛肉末",
+      "蒸锅上汽蒸10分钟，关火焖2分钟"
+    ]
+  },
+  {
+    "name": "牛排沙拉",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "瘦牛排", "grams": 130},
+      {"name": "混合生菜", "grams": 80},
+      {"name": "小番茄", "grams": 70},
+      {"name": "黄瓜", "grams": 50},
+      {"name": "油醋汁", "grams": 10},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "盐", "grams": 2}
+    ],
+    "steps": [
+      "牛排用盐黑胡椒腌制，煎至五分熟切片",
+      "生菜番茄黄瓜摆盘，放上牛肉片",
+      "淋油醋汁"
+    ]
+  },
+  {
+    "name": "蚝油牛肉炒芦笋",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "12分钟",
+    "ingredients": [
+      {"name": "瘦牛肉", "grams": 120},
+      {"name": "芦笋", "grams": 150},
+      {"name": "蚝油", "grams": 8},
+      {"name": "生抽", "grams": 5},
+      {"name": "蒜", "grams": 5},
+      {"name": "淀粉", "grams": 3},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "牛肉切片腌制，芦笋切段焯水",
+      "牛肉滑炒盛出，蒜炒香下芦笋",
+      "放入牛肉，加蚝油翻炒均匀"
+    ]
+  },
+  {
+    "name": "烤三文鱼配时蔬",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "25分钟",
+    "ingredients": [
+      {"name": "三文鱼", "grams": 150},
+      {"name": "西兰花", "grams": 80},
+      {"name": "胡萝卜", "grams": 80},
+      {"name": "盐", "grams": 2},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "柠檬汁", "grams": 10},
+      {"name": "橄榄油", "grams": 5}
+    ],
+    "steps": [
+      "三文鱼用盐、黑胡椒、柠檬汁腌制",
+      "蔬菜切块，拌入橄榄油",
+      "烤箱200度，三文鱼和蔬菜同烤15分钟"
+    ]
+  },
+  {
+    "name": "香煎三文鱼扒",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "三文鱼", "grams": 150},
+      {"name": "盐", "grams": 2},
+      {"name": "黑胡椒", "grams": 2},
+      {"name": "橄榄油", "grams": 3},
+      {"name": "柠檬", "grams": 10}
+    ],
+    "steps": [
+      "三文鱼抹盐和黑胡椒",
+      "不粘锅喷油，鱼皮朝下煎3分钟，翻面再煎2分钟",
+      "挤柠檬汁"
+    ]
+  },
+  {
+    "name": "三文鱼刺身沙拉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "三文鱼刺身", "grams": 120},
+      {"name": "混合生菜", "grams": 80},
+      {"name": "樱桃萝卜", "grams": 40},
+      {"name": "日式酱油", "grams": 8},
+      {"name": "芥末", "grams": 2}
+    ],
+    "steps": [
+      "三文鱼切片，蔬菜洗净",
+      "摆盘，蘸食酱油芥末"
+    ]
+  },
+  {
+    "name": "照烧三文鱼",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "三文鱼", "grams": 150},
+      {"name": "生抽", "grams": 10},
+      {"name": "料酒", "grams": 5},
+      {"name": "代糖", "grams": 3},
+      {"name": "姜", "grams": 5}
+    ],
+    "steps": [
+      "酱汁混合，三文鱼腌制10分钟",
+      "不粘锅煎三文鱼两面，倒入酱汁收浓即可"
+    ]
+  },
+  {
+    "name": "味噌三文鱼",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "三文鱼", "grams": 150},
+      {"name": "白味噌", "grams": 15},
+      {"name": "料酒", "grams": 5},
+      {"name": "代糖", "grams": 2},
+      {"name": "水", "grams": 10}
+    ],
+    "steps": [
+      "味噌、料酒、代糖、水调匀，涂抹三文鱼腌制",
+      "烤箱200度烤12分钟，或平底锅煎熟"
+    ]
+  },
+  {
+    "name": "金枪鱼沙拉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "5分钟",
+    "ingredients": [
+      {"name": "水浸金枪鱼罐头", "grams": 100},
+      {"name": "生菜", "grams": 100},
+      {"name": "黄瓜", "grams": 80},
+      {"name": "玉米粒", "grams": 30},
+      {"name": "低脂沙拉酱", "grams": 10}
+    ],
+    "steps": [
+      "金枪鱼沥干水分，蔬菜切好",
+      "全部混合，加沙拉酱拌匀"
+    ]
+  },
+  {
+    "name": "金枪鱼豆腐饼",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "水浸金枪鱼", "grams": 100},
+      {"name": "嫩豆腐", "grams": 150},
+      {"name": "鸡蛋", "grams": 50},
+      {"name": "全麦粉", "grams": 20},
+      {"name": "盐", "grams": 2},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "豆腐捏碎，金枪鱼沥干，加入鸡蛋、全麦粉、盐混合",
+      "团成小饼，不粘锅少油煎至两面金黄"
+    ]
+  },
+  {
+    "name": "金枪鱼拌饭",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "糙米饭", "grams": 150},
+      {"name": "水浸金枪鱼", "grams": 80},
+      {"name": "黄瓜", "grams": 60},
+      {"name": "海苔碎", "grams": 3},
+      {"name": "生抽", "grams": 5},
+      {"name": "香油", "grams": 2}
+    ],
+    "steps": [
+      "黄瓜切丁，金枪鱼捣碎",
+      "糙米饭放上配料，淋生抽和香油拌匀"
+    ]
+  },
+  {
+    "name": "低卡麻辣豆腐",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "12分钟",
+    "ingredients": [
+      {"name": "嫩豆腐", "grams": 250},
+      {"name": "蒜", "grams": 5},
+      {"name": "花椒粉", "grams": 2},
+      {"name": "辣椒粉", "grams": 2},
+      {"name": "生抽", "grams": 10},
+      {"name": "醋", "grams": 5},
+      {"name": "代糖", "grams": 1},
+      {"name": "橄榄油", "grams": 3}
+    ],
+    "steps": [
+      "豆腐切块焯水",
+      "调料混合成汁，蒜末用热油泼香",
+      "料汁浇在豆腐上"
+    ]
+  },
+  {
+    "name": "番茄炖豆腐",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "豆腐", "grams": 200},
+      {"name": "番茄", "grams": 200},
+      {"name": "葱", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "生抽", "grams": 5},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "豆腐切块，番茄去皮切块",
+      "炒香葱花，下番茄炒软，加水煮开",
+      "放入豆腐炖5分钟，调味"
+    ]
+  },
+  {
+    "name": "虾仁豆腐蒸蛋",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "虾仁", "grams": 60},
+      {"name": "嫩豆腐", "grams": 150},
+      {"name": "盐", "grams": 2},
+      {"name": "水", "grams": 100},
+      {"name": "生抽", "grams": 3}
+    ],
+    "steps": [
+      "豆腐切块铺碗底，鸡蛋加水盐打散过滤倒入",
+      "摆上虾仁，蒸10分钟，淋生抽"
+    ]
+  },
+  {
+    "name": "青菜豆腐汤",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "嫩豆腐", "grams": 200},
+      {"name": "小青菜", "grams": 100},
+      {"name": "姜", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "香油", "grams": 2}
+    ],
+    "steps": [
+      "豆腐切块，青菜洗净",
+      "水烧开，下姜片、豆腐煮3分钟",
+      "放入青菜烫熟，加盐和香油"
+    ]
+  },
+  {
+    "name": "鸡胸麻婆豆腐",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "豆腐", "grams": 250},
+      {"name": "鸡胸肉末", "grams": 70},
+      {"name": "豆瓣酱", "grams": 8},
+      {"name": "蒜", "grams": 5},
+      {"name": "生抽", "grams": 5},
+      {"name": "花椒粉", "grams": 2},
+      {"name": "淀粉水", "grams": 20},
+      {"name": "油", "grams": 5}
+    ],
+    "steps": [
+      "豆腐焯水，鸡胸肉末炒散",
+      "炒香豆瓣酱蒜末，加水、豆腐煮开",
+      "放入肉末，淋生抽，勾薄芡，撒花椒粉"
+    ]
+  },
+  {
+    "name": "凉拌豆腐",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "5分钟",
+    "ingredients": [
+      {"name": "内酯豆腐", "grams": 250},
+      {"name": "小葱", "grams": 10},
+      {"name": "生抽", "grams": 10},
+      {"name": "醋", "grams": 5},
+      {"name": "香油", "grams": 2}
+    ],
+    "steps": [
+      "豆腐倒扣入盘，撒葱花",
+      "淋上生抽、醋、香油"
+    ]
+  },
+  {
+    "name": "秋葵拌豆腐",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "8分钟",
+    "ingredients": [
+      {"name": "嫩豆腐", "grams": 200},
+      {"name": "秋葵", "grams": 80},
+      {"name": "日式酱油", "grams": 8},
+      {"name": "木鱼花", "grams": 2}
+    ],
+    "steps": [
+      "秋葵焯水切片，豆腐切块",
+      "摆上秋葵，淋酱油，撒木鱼花"
+    ]
+  },
+  {
+    "name": "烤豆腐块",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "老豆腐", "grams": 250},
+      {"name": "橄榄油", "grams": 5},
+      {"name": "盐", "grams": 2},
+      {"name": "孜然粉", "grams": 2},
+      {"name": "辣椒粉", "grams": 1}
+    ],
+    "steps": [
+      "豆腐切块，刷油撒调料",
+      "烤箱200度烤15分钟，翻面再烤5分钟"
+    ]
+  },
+  {
+    "name": "西葫芦鸡蛋饼",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "西葫芦", "grams": 150},
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "全麦粉", "grams": 20},
+      {"name": "盐", "grams": 2},
+      {"name": "油", "grams": 3}
+    ],
+    "steps": [
+      "西葫芦擦丝，加盐挤水，打入鸡蛋和全麦粉搅匀",
+      "不粘锅刷油，摊成小饼，两面煎金黄"
+    ]
+  },
+  {
+    "name": "菠菜鸡蛋饼",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "菠菜", "grams": 100},
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "盐", "grams": 2},
+      {"name": "油", "grams": 3}
+    ],
+    "steps": [
+      "菠菜焯水切碎，鸡蛋打散加盐和菠菜",
+      "不粘锅刷油，倒入蛋液摊平，煎熟"
+    ]
+  },
+  {
+    "name": "番茄炒蛋（低油）",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "8分钟",
+    "ingredients": [
+      {"name": "番茄", "grams": 200},
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "盐", "grams": 2},
+      {"name": "油", "grams": 5},
+      {"name": "代糖", "grams": 1}
+    ],
+    "steps": [
+      "鸡蛋加盐打散，番茄切块",
+      "锅中油热炒熟鸡蛋盛出，炒软番茄，倒回鸡蛋，加代糖炒匀"
+    ]
+  },
+  {
+    "name": "秋葵厚蛋烧",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "鸡蛋", "grams": 120},
+      {"name": "秋葵", "grams": 60},
+      {"name": "盐", "grams": 2},
+      {"name": "油", "grams": 3}
+    ],
+    "steps": [
+      "秋葵焯水去头尾，鸡蛋加盐打散",
+      "玉子烧锅刷油，倒一层蛋液，放秋葵卷起，重复至用完蛋液"
+    ]
+  },
+  {
+    "name": "蒸水蛋",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "12分钟",
+    "ingredients": [
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "温水", "grams": 150},
+      {"name": "盐", "grams": 1},
+      {"name": "生抽", "grams": 3},
+      {"name": "香油", "grams": 1}
+    ],
+    "steps": [
+      "鸡蛋加盐打散，加入温水过滤，盖上保鲜膜扎孔",
+      "蒸锅上汽蒸10分钟，淋生抽香油"
+    ]
+  },
+  {
+    "name": "花菜无米炒饭",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "花菜", "grams": 200},
+      {"name": "鸡蛋", "grams": 100},
+      {"name": "虾仁", "grams": 60},
+      {"name": "胡萝卜", "grams": 50},
+      {"name": "生抽", "grams": 8},
+      {"name": "油", "grams": 5},
+      {"name": "小葱", "grams": 5}
+    ],
+    "steps": [
+      "花菜打碎成米粒状，胡萝卜切丁，虾仁切粒",
+      "鸡蛋炒散，虾仁炒熟备用",
+      "锅放油，炒胡萝卜，加入花菜碎炒干，加鸡蛋虾仁生抽，撒葱花"
+    ]
+  },
+  {
+    "name": "青椒鸡蛋酱拌魔芋面",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "魔芋面", "grams": 200},
+      {"name": "鸡蛋", "grams": 50},
+      {"name": "青椒", "grams": 60},
+      {"name": "黄豆酱", "grams": 8},
+      {"name": "生抽", "grams": 5},
+      {"name": "油", "grams": 3}
+    ],
+    "steps": [
+      "魔芋面冲洗沥干，青椒切丝",
+      "鸡蛋炒碎，加青椒炒香，加黄豆酱生抽和少量水煮成酱",
+      "浇在魔芋面上拌匀"
+    ]
+  },
+  {
+    "name": "裙带菜蛋花汤",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "8分钟",
+    "ingredients": [
+      {"name": "干裙带菜", "grams": 3},
+      {"name": "鸡蛋", "grams": 50},
+      {"name": "盐", "grams": 2},
+      {"name": "白胡椒粉", "grams": 1},
+      {"name": "香油", "grams": 2}
+    ],
+    "steps": [
+      "裙带菜泡发，水烧开",
+      "放入裙带菜煮1分钟，淋入蛋液成蛋花",
+      "加盐、白胡椒粉、香油"
+    ]
+  },
+  {
+    "name": "紫菜蛋花汤",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "5分钟",
+    "ingredients": [
+      {"name": "紫菜", "grams": 2},
+      {"name": "鸡蛋", "grams": 50},
+      {"name": "虾皮", "grams": 3},
+      {"name": "盐", "grams": 1},
+      {"name": "葱花", "grams": 5}
+    ],
+    "steps": [
+      "水烧开，下虾皮、紫菜",
+      "淋入蛋液，加盐，撒葱花"
+    ]
+  },
+  {
+    "name": "藜麦鸡胸沙拉",
+    "category": "减脂餐",
+    "difficulty": "中等",
+    "time": "20分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 100},
+      {"name": "藜麦", "grams": 40},
+      {"name": "生菜", "grams": 60},
+      {"name": "小番茄", "grams": 60},
+      {"name": "黄瓜", "grams": 50},
+      {"name": "油醋汁", "grams": 10}
+    ],
+    "steps": [
+      "藜麦煮熟晾凉，鸡胸煮熟撕丝",
+      "蔬菜切好，全部混合淋油醋汁"
+    ]
+  },
+  {
+    "name": "考伯沙拉（低脂）",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "15分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 80},
+      {"name": "鸡蛋", "grams": 50},
+      {"name": "牛油果", "grams": 50},
+      {"name": "小番茄", "grams": 60},
+      {"name": "生菜", "grams": 60},
+      {"name": "低脂酸奶酱", "grams": 15}
+    ],
+    "steps": [
+      "鸡胸煮熟切丁，鸡蛋煮熟切块，牛油果切丁",
+      "生菜铺底，食材排列，淋酱"
+    ]
+  },
+  {
+    "name": "鸡胸牛油果沙拉",
+    "category": "减脂餐",
+    "difficulty": "简单",
+    "time": "10分钟",
+    "ingredients": [
+      {"name": "鸡胸肉", "grams": 100},
+      {"name": "牛油果", "grams": 70},
+      {"name": "混合生菜", "grams": 70},
+      {"name": "柠檬汁", "grams": 8},
+      {"name": "盐", "grams": 1},
+      {"name": "黑胡椒", "grams": 1}
+    ],
+    "steps": [
+      "鸡胸煎熟切片，牛油果切片",
+      "生菜打底，摆上食材，撒调味"
+    ]
+  }
+
 ]
