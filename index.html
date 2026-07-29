@@ -2055,17 +2055,17 @@ function renderRecipeDetail(recipe, showActions) {
 
     // 生成调整控件（仅主食材）
     var adjustHtml = selectedRecipe.ingredients.map(ing => {
-        var isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
-        if (isCondiment) return '';
-        var current = recipeConfirmGrams[ing.name] || ing.grams;
-        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <span style="flex:1;font-size:13px;">${ing.name}</span>
-            <input type="number" value="${current}" min="0" step="5" 
-                onchange="recipeConfirmGrams['${ing.name}'] = parseInt(this.value) || 0; updateConfirmUI();" 
-                style="width:70px;padding:4px;border:1px solid var(--gray-200);border-radius:6px;text-align:center;font-size:13px;">
-            <span style="font-size:12px;color:var(--gray-400);">g</span>
-        </div>`;
-    }).join('');
+    var isCondiment = condimentCats.includes(guessIngredientCategory(ing.name));
+    var current = recipeConfirmGrams[ing.name] || ing.grams;
+    var label = isCondiment ? '<span style="color:var(--gray-400);font-size:11px;">(调料)</span>' : '';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="flex:1;font-size:13px;">${ing.name} ${label}</span>
+        <input type="number" value="${current}" min="0" step="5" 
+            onchange="recipeConfirmGrams['${ing.name}'] = parseInt(this.value) || 0; updateConfirmUI();" 
+            style="width:70px;padding:4px;border:1px solid var(--gray-200);border-radius:6px;text-align:center;font-size:13px;">
+        <span style="font-size:12px;color:var(--gray-400);">g</span>
+    </div>`;
+}).join('');
     document.getElementById('confirmGramsAdjust').innerHTML = adjustHtml;
 
     // 消耗预览
@@ -2252,17 +2252,23 @@ function renderRecipeDetail(recipe, showActions) {
             const emoji = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
             const record = log[meal];
            if (record) {
-    var totalCal = calcMealCalories(record); // 计算热量
+    var calDetail = calcMealCaloriesDetail(record);
+    var totalCal = calDetail.total;
+    var detailText = '';
+    if (calDetail.ingredient > 0) detailText += '食材 ' + calDetail.ingredient + ' kcal';
+    if (calDetail.condiment > 0) detailText += (detailText ? '，' : '') + '调料 ' + calDetail.condiment + ' kcal';
+    if (!detailText) detailText = '无热量数据';
     return `
     <div style="margin-bottom:10px;">
         <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
         <div class="meal-slot has-meal">
-            <div class="meal-recipe-name">🍽 ${record.recipeName}  (🔥 ${totalCal} kcal)</div>
+            <div class="meal-recipe-name">🍽 ${record.recipeName}</div>
+            <div style="font-size:12px;color:var(--gray-600);">🔥 总 ${totalCal} kcal（${detailText}）</div>
             <div class="meal-recipe-meta">📂 ${record.recipeCategory} · ${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
             <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
         </div>
     </div>`;
-} else {
+}else {
                 return `
                 <div style="margin-bottom:10px;">
                     <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
@@ -2349,7 +2355,26 @@ function renderRecipeDetail(recipe, showActions) {
 function getCustomIcons() {
     return appData.customIcons || {};
 }
-
+// 计算餐食的热量细分（食材/调料）
+function calcMealCaloriesDetail(meal) {
+    if (!meal.consumedIngredients) return { total: 0, ingredient: 0, condiment: 0 };
+    var ingredientTotal = 0;
+    var condimentTotal = 0;
+    meal.consumedIngredients.forEach(function(c) {
+        var cal = getIngredientCalories(c.name);
+        var amount = Math.round(cal * c.grams / 100);
+        if (c.isCondiment) {
+            condimentTotal += amount;
+        } else {
+            ingredientTotal += amount;
+        }
+    });
+    return {
+        total: ingredientTotal + condimentTotal,
+        ingredient: ingredientTotal,
+        condiment: condimentTotal
+    };
+}
     // ==================== 设置页面 ====================
     function getCustomCategories() {
         return appData.customCategories || {};
