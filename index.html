@@ -2097,17 +2097,18 @@ function renderRecipeDetail(recipe, showActions) {
         // 再次检查库存是否充足
             const condimentCats = ['调料', '香料']; // 定义不扣库存的分类
     
-    // 再次检查库存是否充足 (跳过调料)
-    for (const ing of selectedRecipe.ingredients) {
-        // 如果是调料或香料，直接跳过，不检查库存
-        if (condimentCats.includes(guessIngredientCategory(ing.name))) {
-            continue; 
-        }
-        if (!invMap[ing.name] || invMap[ing.name] < ing.grams) {
-            showToast(`食材不足：${ing.name} 需要 ${ing.grams}g，库存只有 ${invMap[ing.name] || 0}g`);
-            return;
-        }
+    // 再次检查库存是否充足 (跳过调料)，使用调整后的克数
+for (const ing of selectedRecipe.ingredients) {
+    if (condimentCats.includes(guessIngredientCategory(ing.name))) {
+        continue; 
     }
+    var useGrams = recipeConfirmGrams[ing.name] !== undefined ? recipeConfirmGrams[ing.name] : ing.grams;
+    if (useGrams <= 0) continue; // 如果调整后为0，不消耗库存，跳过检查
+    if (!invMap[ing.name] || invMap[ing.name] < useGrams) {
+        showToast(`食材不足：${ing.name} 需要 ${useGrams}g，库存只有 ${invMap[ing.name] || 0}g`);
+        return;
+    }
+}
     
     // 扣减库存 (跳过调料)
     const consumed = [];
