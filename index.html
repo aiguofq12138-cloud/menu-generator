@@ -1949,15 +1949,15 @@ function renderRecipeDetail(recipe, showActions) {
 }
 
 
-    function renderMiniRecipe(recipe, idx, fullMatch) {
-        const invMap = {};
-        for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
-        const condimentCats = ['调料', '香料'];
-        const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
-        const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
-var calInfo = calcRecipeCalories(recipe);
+  function renderMiniRecipe(recipe, idx, fullMatch) {
+    const invMap = {};
+    for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
+    const condimentCats = ['调料', '香料'];
+    const mainIngs = recipe.ingredients.filter(ing => !condimentCats.includes(guessIngredientCategory(ing.name)));
+    const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
+    var calInfo = calcRecipeCalories(recipe);
     var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
-   return `
+    return `
 <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
     <div style="display:flex;justify-content:space-between;align-items:center;">
         <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
@@ -1970,10 +1970,14 @@ var calInfo = calcRecipeCalories(recipe);
     </div>
     <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
     <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
-        ${mainIngs.map(ing => { ... }).join('')}
+        ${mainIngs.map(ing => {
+            const have = invMap[ing.name] || 0;
+            const sufficient = have >= ing.grams;
+            return `<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:${sufficient ? 'var(--green-bg)' : 'var(--orange-bg)'};color:${sufficient ? 'var(--green)' : 'var(--orange)'};">${ing.name} ${ing.grams}g</span>`;
+        }).join('')}
     </div>
 </div>`;
-    }
+}
 
     function selectMiniRecipe(name, idx) {
         const recipe = getAllRecipes().find(r => r.name === name);
