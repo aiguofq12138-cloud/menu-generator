@@ -2331,24 +2331,29 @@ for (const ing of selectedRecipe.ingredients) {
 
     // ==================== 视图切换 ====================
     function switchTab(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + tab).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-' + tab).classList.add('active');
-
-        if (tab === 'inventory') renderInventory();
-        if (tab === 'recipes') renderRecipeBrowse();
-        if (tab === 'calendar') {
-            const now = new Date();
-            calendarYear = now.getFullYear();
-            calendarMonth = now.getMonth() + 1;
-            selectedDate = todayStr();
-            renderCalendar();
-        }
-        if (tab === 'settings') renderSettings();
+    // 如果未传参或无效，默认为 'inventory'
+    if (!tab || !document.getElementById('view-' + tab)) {
+        tab = 'inventory';
     }
-sessionStorage.setItem('currentTab', tab);
+    currentTab = tab;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + tab).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-' + tab).classList.add('active');
+
+    if (tab === 'inventory') renderInventory();
+    if (tab === 'recipes') renderRecipeBrowse();
+    if (tab === 'calendar') {
+        const now = new Date();
+        calendarYear = now.getFullYear();
+        calendarMonth = now.getMonth() + 1;
+        selectedDate = todayStr();
+        renderCalendar();
+    }
+    if (tab === 'settings') renderSettings();
+
+    sessionStorage.setItem('currentTab', tab);
+}
     // ==================== 工具函数 ====================
     function todayStr() { return new Date().toISOString().slice(0, 10); }
 
@@ -2878,22 +2883,18 @@ function removeSuggestions() {
 function initApp() {
     appData = loadData();
 
-    // 恢复上次的 Tab（如果存在且有效）
+    // 恢复上次的 Tab
     var savedTab = sessionStorage.getItem('currentTab');
-    if (savedTab && document.getElementById('view-' + savedTab)) {
-        currentTab = savedTab;
-    } else {
-        currentTab = 'inventory';
-    }
+    var validTab = savedTab && document.getElementById('view-' + savedTab) ? savedTab : 'inventory';
+    currentTab = validTab;
 
-    // 切换到恢复的 Tab（或默认）
+    // 执行切换（会渲染对应视图）
     switchTab(currentTab);
 
-    // 其他事件绑定（不变）
+    // 绑定事件（保持不变）
     document.getElementById('invGrams').addEventListener('keydown', e => {
         if (e.key === 'Enter') addInventory();
     });
-
     document.getElementById('confirmModal').addEventListener('click', function(e) {
         if (e.target === this) closeConfirmModal();
     });
