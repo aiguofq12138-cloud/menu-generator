@@ -1957,26 +1957,22 @@ function renderRecipeDetail(recipe, showActions) {
         const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
 var calInfo = calcRecipeCalories(recipe);
     var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
-    return `
-     <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
-            <div style="display:flex;gap:6px;align-items:center;">
-                <span style="font-size:12px;color:var(--gray-600);">🔥 ${calText}</span>   <!-- 👈 添加热量 -->
-                <span style="font-size:12px;color:var(--primary);font-weight:600;">${matchRate > 0 ? '匹配' + matchRate + '%' : ''}</span>
-                <button class="btn btn-sm" style="background:#e3f2fd;color:#1976d2;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();openRecipeEditModal('${recipe.name}')">编辑</button>
-                <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
-            </div>
+   return `
+<div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="recipe-name" style="font-size:16px;text-align:left;margin:0;">${recipe.name}</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+            <span style="font-size:12px;color:var(--gray-600);">🔥 ${calText}</span>
+            <span style="font-size:12px;color:var(--primary);font-weight:600;">${matchRate > 0 ? '匹配' + matchRate + '%' : ''}</span>
+            <button class="btn btn-sm" style="background:#e3f2fd;color:#1976d2;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();openRecipeEditModal('${recipe.name}')">编辑</button>
+            <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
         </div>
-        <!-- 食材标签 -->
-            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
-                ${mainIngs.map(ing => {
-                    const have = invMap[ing.name] || 0;
-                    const sufficient = have >= ing.grams;
-                    return `<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:${sufficient ? 'var(--green-bg)' : 'var(--orange-bg)'};color:${sufficient ? 'var(--green)' : 'var(--orange)'};">${ing.name} ${ing.grams}g</span>`;
-                }).join('')}
-            </div>
-        </div>`;
+    </div>
+    <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+        ${mainIngs.map(ing => { ... }).join('')}
+    </div>
+</div>`;
     }
 
     function selectMiniRecipe(name, idx) {
@@ -2251,17 +2247,18 @@ var calInfo = calcRecipeCalories(recipe);
         document.getElementById('mealSlots').innerHTML = ['breakfast', 'lunch', 'dinner'].map(meal => {
             const emoji = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
             const record = log[meal];
-            if (record) {
-                return `
-                <div style="margin-bottom:10px;">
-                    <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
-                    <div class="meal-slot has-meal">
-                        <div class="meal-recipe-name">🍽 ${record.recipeName}  (🔥 ${totalCal} kcal)</div>
-                        <div class="meal-recipe-meta">📂 ${record.recipeCategory} · ${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
-                        <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
-                    </div>
-                </div>`;
-            } else {
+           if (record) {
+    var totalCal = calcMealCalories(record); // 计算热量
+    return `
+    <div style="margin-bottom:10px;">
+        <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
+        <div class="meal-slot has-meal">
+            <div class="meal-recipe-name">🍽 ${record.recipeName}  (🔥 ${totalCal} kcal)</div>
+            <div class="meal-recipe-meta">📂 ${record.recipeCategory} · ${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
+            <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
+        </div>
+    </div>`;
+} else {
                 return `
                 <div style="margin-bottom:10px;">
                     <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
