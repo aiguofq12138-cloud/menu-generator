@@ -2239,14 +2239,13 @@ for (const ing of selectedRecipe.ingredients) {
         return total;
     }
 
-   function renderDayDetail() {
+  function renderDayDetail() {
     if (!selectedDate) {
         document.getElementById('dayDetailTitle').textContent = '选择日期查看详情';
         document.getElementById('mealSlots').innerHTML = '';
         return;
     }
 
-    document.getElementById('dayDetailTitle').textContent = formatDate(selectedDate);
     const log = appData.mealLog[selectedDate] || { breakfast: null, lunch: null, dinner: null };
 
     // 计算当日总热量
@@ -2254,24 +2253,34 @@ for (const ing of selectedRecipe.ingredients) {
     ['breakfast', 'lunch', 'dinner'].forEach(function(meal) {
         var record = log[meal];
         if (record) {
-            var cal = calcMealCalories(record); // 使用简单总热量计算
+            var cal = calcMealCalories(record);
             dailyTotal += cal;
         }
     });
+
+    // 设置标题，包含总热量
+    document.getElementById('dayDetailTitle').innerHTML = formatDate(selectedDate) + ' <span style="font-size:13px;font-weight:400;color:var(--gray-400);">📊 当日总热量：' + dailyTotal + ' kcal</span>';
 
     // 构建餐食插槽
     var slotsHtml = ['breakfast', 'lunch', 'dinner'].map(function(meal) {
         const emoji = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
         const record = log[meal];
         if (record) {
-            // 计算该餐总热量（用于显示）
-            var totalCal = calcMealCalories(record);
+            // 计算餐食热量细分
+            var calDetail = calcMealCaloriesDetail(record);
+            var totalCal = calDetail.total;
+            var detailText = '';
+            if (calDetail.ingredient > 0) detailText += '食材 ' + calDetail.ingredient + ' kcal';
+            if (calDetail.condiment > 0) detailText += (detailText ? '，' : '') + '调料 ' + calDetail.condiment + ' kcal';
+            if (!detailText) detailText = '无热量数据';
+
             return `
             <div style="margin-bottom:10px;">
                 <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)} 🔥 ${totalCal} kcal</div>
                 <div class="meal-slot has-meal">
                     <div class="meal-recipe-name">🍽 ${record.recipeName}</div>
-                    <div style="font-size:12px;color:var(--gray-600);">${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
+                    <div style="font-size:12px;color:var(--gray-600);">${detailText}</div>
+                    <div class="meal-recipe-meta">${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
                     <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
                 </div>
             </div>`;
@@ -2285,6 +2294,9 @@ for (const ing of selectedRecipe.ingredients) {
             </div>`;
         }
     }).join('');
+
+    document.getElementById('mealSlots').innerHTML = slotsHtml;
+}
 
     // 在标题下方添加当日总热量汇总
     var totalHtml = '';
