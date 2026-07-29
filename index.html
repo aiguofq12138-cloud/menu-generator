@@ -2348,7 +2348,7 @@ for (const ing of selectedRecipe.ingredients) {
         }
         if (tab === 'settings') renderSettings();
     }
-
+sessionStorage.setItem('currentTab', tab);
     // ==================== 工具函数 ====================
     function todayStr() { return new Date().toISOString().slice(0, 10); }
 
@@ -2877,14 +2877,23 @@ function removeSuggestions() {
 
 function initApp() {
     appData = loadData();
-    // setupInventoryNameSuggestions();   // 注释掉这一行
-    renderInventory();
 
+    // 恢复上次的 Tab（如果存在且有效）
+    var savedTab = sessionStorage.getItem('currentTab');
+    if (savedTab && document.getElementById('view-' + savedTab)) {
+        currentTab = savedTab;
+    } else {
+        currentTab = 'inventory';
+    }
+
+    // 切换到恢复的 Tab（或默认）
+    switchTab(currentTab);
+
+    // 其他事件绑定...
     document.getElementById('invGrams').addEventListener('keydown', e => {
         if (e.key === 'Enter') addInventory();
     });
 
-    // 点击弹窗背景关闭
     document.getElementById('confirmModal').addEventListener('click', function(e) {
         if (e.target === this) closeConfirmModal();
     });
@@ -2894,10 +2903,6 @@ function initApp() {
     document.getElementById('recipeFormModal').addEventListener('click', function(e) {
         if (e.target === this) closeRecipeFormModal();
     });
-
-    // 更新菜谱页摘要
-   //  const avail = getAvailableIngredients();
-   //  document.getElementById('availSummary').textContent =`可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
 }
 
     loadBaseData();
