@@ -1,6 +1,6 @@
 {
-  "name": "随机菜单生成器",
-  "short_name": "菜单生成器",
+  "name": "吃啥",
+  "short_name": "吃啥",
   "description": "管理食材库存，智能推荐菜谱，记录每日饮食",
   "start_url": "/menu-generator/",
   "scope": "/menu-generator/",
