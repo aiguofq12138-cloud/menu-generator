@@ -2239,48 +2239,65 @@ for (const ing of selectedRecipe.ingredients) {
         return total;
     }
 
-    function renderDayDetail() {
-        if (!selectedDate) {
-            document.getElementById('dayDetailTitle').textContent = '选择日期查看详情';
-            document.getElementById('mealSlots').innerHTML = '';
-            return;
-        }
-
-        document.getElementById('dayDetailTitle').textContent = formatDate(selectedDate);
-        const log = appData.mealLog[selectedDate] || { breakfast: null, lunch: null, dinner: null };
-
-        document.getElementById('mealSlots').innerHTML = ['breakfast', 'lunch', 'dinner'].map(meal => {
-            const emoji = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
-            const record = log[meal];
-           if (record) {
-    var calDetail = calcMealCaloriesDetail(record);
-    var totalCal = calDetail.total;
-    var detailText = '';
-    if (calDetail.ingredient > 0) detailText += '食材 ' + calDetail.ingredient + ' kcal';
-    if (calDetail.condiment > 0) detailText += (detailText ? '，' : '') + '调料 ' + calDetail.condiment + ' kcal';
-    if (!detailText) detailText = '无热量数据';
-    return `
-    <div style="margin-bottom:10px;">
-        <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
-        <div class="meal-slot has-meal">
-            <div class="meal-recipe-name">🍽 ${record.recipeName}</div>
-            <div style="font-size:12px;color:var(--gray-600);">🔥 总 ${totalCal} kcal（${detailText}）</div>
-            <div class="meal-recipe-meta">📂 ${record.recipeCategory} · ${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
-            <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
-        </div>
-    </div>`;
-}else {
-                return `
-                <div style="margin-bottom:10px;">
-                    <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
-                    <div class="meal-slot">
-                        <span class="meal-empty" onclick="goAddMeal('${selectedDate}','${meal}')">+ 添加${mealTypeLabel(meal)}</span>
-                    </div>
-                </div>`;
-            }
-        }).join('');
+   function renderDayDetail() {
+    if (!selectedDate) {
+        document.getElementById('dayDetailTitle').textContent = '选择日期查看详情';
+        document.getElementById('mealSlots').innerHTML = '';
+        return;
     }
 
+    document.getElementById('dayDetailTitle').textContent = formatDate(selectedDate);
+    const log = appData.mealLog[selectedDate] || { breakfast: null, lunch: null, dinner: null };
+
+    // 计算当日总热量
+    var dailyTotal = 0;
+    ['breakfast', 'lunch', 'dinner'].forEach(function(meal) {
+        var record = log[meal];
+        if (record) {
+            var cal = calcMealCalories(record); // 使用简单总热量计算
+            dailyTotal += cal;
+        }
+    });
+
+    // 构建餐食插槽
+    var slotsHtml = ['breakfast', 'lunch', 'dinner'].map(function(meal) {
+        const emoji = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
+        const record = log[meal];
+        if (record) {
+            // 计算该餐总热量（用于显示）
+            var totalCal = calcMealCalories(record);
+            return `
+            <div style="margin-bottom:10px;">
+                <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)} 🔥 ${totalCal} kcal</div>
+                <div class="meal-slot has-meal">
+                    <div class="meal-recipe-name">🍽 ${record.recipeName}</div>
+                    <div style="font-size:12px;color:var(--gray-600);">${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
+                    <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
+                </div>
+            </div>`;
+        } else {
+            return `
+            <div style="margin-bottom:10px;">
+                <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
+                <div class="meal-slot">
+                    <span class="meal-empty" onclick="goAddMeal('${selectedDate}','${meal}')">+ 添加${mealTypeLabel(meal)}</span>
+                </div>
+            </div>`;
+        }
+    }).join('');
+
+    // 在标题下方添加当日总热量汇总
+    var totalHtml = '';
+    if (dailyTotal > 0) {
+        totalHtml = `<div style="font-size:13px;color:var(--gray-600);margin-top:-6px;margin-bottom:10px;">📊 当日总热量：${dailyTotal} kcal</div>`;
+    } else {
+        totalHtml = `<div style="font-size:13px;color:var(--gray-400);margin-top:-6px;margin-bottom:10px;">📊 今日暂无饮食记录</div>`;
+    }
+
+    // 将汇总插入到 dayDetailTitle 之后（在 card 中）
+    // 我们可以在 dayDetailTitle 下面追加，但需要修改 DOM 结构：可以插入到 mealSlots 之前。
+    document.getElementById('mealSlots').innerHTML = totalHtml + slotsHtml;
+}
     function goAddMeal(date, meal) {
         confirmDate = date;
         confirmMealType = meal;
