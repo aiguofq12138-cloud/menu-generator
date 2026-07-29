@@ -2256,7 +2256,7 @@ var calInfo = calcRecipeCalories(recipe);
                 <div style="margin-bottom:10px;">
                     <div class="meal-label">${emoji[meal]} ${mealTypeLabel(meal)}</div>
                     <div class="meal-slot has-meal">
-                        <div class="meal-recipe-name">🍽 ${record.recipeName}</div>
+                        <div class="meal-recipe-name">🍽 ${record.recipeName}  (🔥 ${totalCal} kcal)</div>
                         <div class="meal-recipe-meta">📂 ${record.recipeCategory} · ${record.consumedIngredients.map(i=>`${i.name}${i.grams}g`).join('、')}</div>
                         <button class="meal-delete" onclick="deleteMeal('${selectedDate}','${meal}')">✕</button>
                     </div>
