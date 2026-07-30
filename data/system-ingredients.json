@@ -1,7 +1,10 @@
 [
+  // ========== 蛋类 ==========
   { "name": "鸡蛋", "icon": "🥚", "category": "蛋类", "unit": "个", "cal": 144, "carb": 1.1, "prot": 13.3, "fat": 9.5 },
   { "name": "鸭蛋", "icon": "🥚", "category": "蛋类", "unit": "个", "cal": 156, "carb": 1.5, "prot": 12.8, "fat": 11.1 },
   { "name": "鹌鹑蛋", "icon": "", "category": "蛋类", "unit": "个", "cal": 160, "carb": 0.5, "prot": 12.8, "fat": 11.1 },
+
+  // ========== 蔬菜（62种） ==========
   { "name": "番茄", "icon": "🍅", "category": "蔬菜", "unit": "个", "cal": 18, "carb": 3.9, "prot": 0.9, "fat": 0.2 },
   { "name": "黄瓜", "icon": "🥒", "category": "蔬菜", "unit": "根", "cal": 15, "carb": 3.6, "prot": 0.7, "fat": 0.1 },
   { "name": "生菜", "icon": "🥬", "category": "蔬菜", "unit": "g", "cal": 15, "carb": 2.9, "prot": 1.4, "fat": 0.2 },
@@ -63,6 +66,8 @@
   { "name": "平菇", "icon": "🍄", "category": "蔬菜", "unit": "g", "cal": 24, "carb": 4.0, "prot": 2.2, "fat": 0.2 },
   { "name": "茶树菇", "icon": "🍄", "category": "蔬菜", "unit": "g", "cal": 28, "carb": 5.0, "prot": 2.5, "fat": 0.3 },
   { "name": "木耳（干）", "icon": "", "category": "蔬菜", "unit": "g", "cal": 205, "carb": 60.0, "prot": 10.0, "fat": 1.0 },
+
+  // ========== 肉类（不变） ==========
   { "name": "猪瘦肉", "icon": "🥩", "category": "肉类", "unit": "g", "cal": 143, "carb": 0, "prot": 20.3, "fat": 6.2 },
   { "name": "猪五花肉", "icon": "🥩", "category": "肉类", "unit": "g", "cal": 395, "carb": 0, "prot": 13.9, "fat": 37.0 },
   { "name": "猪里脊", "icon": "", "category": "肉类", "unit": "g", "cal": 150, "carb": 0, "prot": 20.5, "fat": 7.0 },
@@ -78,6 +83,8 @@
   { "name": "五花肉（羊肉）", "icon": "", "category": "肉类", "unit": "g", "cal": 280, "carb": 0, "prot": 15.0, "fat": 24.0 },
   { "name": "猪肝", "icon": "", "category": "肉类", "unit": "g", "cal": 129, "carb": 5.0, "prot": 19.3, "fat": 3.5 },
   { "name": "鸡心", "icon": "", "category": "肉类", "unit": "g", "cal": 172, "carb": 0.2, "prot": 15.9, "fat": 11.8 },
+
+  // ========== 主食（不变） ==========
   { "name": "米饭", "icon": "🍚", "category": "主食", "unit": "g", "cal": 116, "carb": 25.9, "prot": 2.6, "fat": 0.3 },
   { "name": "面条（干）", "icon": "🍜", "category": "主食", "unit": "g", "cal": 350, "carb": 75.0, "prot": 11.0, "fat": 1.5 },
   { "name": "馒头", "icon": "", "category": "主食", "unit": "个", "cal": 221, "carb": 46.5, "prot": 7.0, "fat": 1.1 },
@@ -91,12 +98,16 @@
   { "name": "糯米", "icon": "", "category": "主食", "unit": "g", "cal": 350, "carb": 78.0, "prot": 7.0, "fat": 1.0 },
   { "name": "玉米面", "icon": "", "category": "主食", "unit": "g", "cal": 365, "carb": 74.0, "prot": 8.0, "fat": 3.4 },
   { "name": "挂面", "icon": "", "category": "主食", "unit": "g", "cal": 340, "carb": 72.0, "prot": 10.0, "fat": 1.0 },
+
+  // ========== 乳制品（不变） ==========
   { "name": "牛奶", "icon": "🥛", "category": "乳制品", "unit": "ml", "cal": 54, "carb": 3.4, "prot": 3.0, "fat": 3.2 },
   { "name": "酸奶（原味）", "icon": "🥛", "category": "乳制品", "unit": "ml", "cal": 72, "carb": 5.3, "prot": 2.9, "fat": 3.6 },
   { "name": "奶酪（全脂）", "icon": "🧀", "category": "乳制品", "unit": "g", "cal": 330, "carb": 1.3, "prot": 25.0, "fat": 25.0 },
   { "name": "黄油", "icon": "🧈", "category": "乳制品", "unit": "g", "cal": 717, "carb": 0.1, "prot": 0.9, "fat": 81.0 },
   { "name": "奶油（淡）", "icon": "", "category": "乳制品", "unit": "g", "cal": 345, "carb": 2.8, "prot": 2.1, "fat": 36.0 },
   { "name": "炼乳（甜）", "icon": "", "category": "乳制品", "unit": "g", "cal": 330, "carb": 55.0, "prot": 8.0, "fat": 8.0 },
+
+  // ========== 水果（不变） ==========
   { "name": "苹果", "icon": "🍎", "category": "水果", "unit": "个", "cal": 53, "carb": 13.8, "prot": 0.2, "fat": 0.2 },
   { "name": "香蕉", "icon": "🍌", "category": "水果", "unit": "根", "cal": 89, "carb": 22.8, "prot": 1.1, "fat": 0.3 },
   { "name": "橙子", "icon": "🍊", "category": "水果", "unit": "个", "cal": 47, "carb": 11.8, "prot": 0.9, "fat": 0.1 },
@@ -117,6 +128,8 @@
   { "name": "火龙果", "icon": "🐉", "category": "水果", "unit": "个", "cal": 51, "carb": 13.3, "prot": 1.2, "fat": 0.3 },
   { "name": "百香果", "icon": "", "category": "水果", "unit": "个", "cal": 97, "carb": 23.4, "prot": 2.2, "fat": 0.7 },
   { "name": "蓝莓", "icon": "🫐", "category": "水果", "unit": "g", "cal": 57, "carb": 14.5, "prot": 0.7, "fat": 0.3 },
+
+  // ========== 豆制品（不变） ==========
   { "name": "豆腐", "icon": "", "category": "豆制品", "unit": "g", "cal": 81, "carb": 4.2, "prot": 8.1, "fat": 3.7 },
   { "name": "豆腐干", "icon": "", "category": "豆制品", "unit": "g", "cal": 142, "carb": 4.5, "prot": 16.0, "fat": 6.0 },
   { "name": "腐竹", "icon": "", "category": "豆制品", "unit": "g", "cal": 460, "carb": 22.0, "prot": 44.0, "fat": 21.0 },
@@ -126,6 +139,8 @@
   { "name": "红豆", "icon": "", "category": "豆制品", "unit": "g", "cal": 329, "carb": 63.0, "prot": 20.0, "fat": 0.6 },
   { "name": "黑豆", "icon": "", "category": "豆制品", "unit": "g", "cal": 341, "carb": 40.0, "prot": 36.0, "fat": 16.0 },
   { "name": "豆腐皮", "icon": "", "category": "豆制品", "unit": "g", "cal": 410, "carb": 18.0, "prot": 44.0, "fat": 18.0 },
+
+  // ========== 海鲜（已扩充，新增条目以“// 新增”示意，实际无注释） ==========
   { "name": "虾", "icon": "🦐", "category": "海鲜", "unit": "g", "cal": 84, "carb": 0.8, "prot": 18.3, "fat": 0.8 },
   { "name": "蟹", "icon": "🦀", "category": "海鲜", "unit": "g", "cal": 103, "carb": 2.0, "prot": 18.0, "fat": 2.6 },
   { "name": "三文鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 139, "carb": 0, "prot": 20.0, "fat": 6.3 },
@@ -136,6 +151,44 @@
   { "name": "牡蛎", "icon": "🦪", "category": "海鲜", "unit": "g", "cal": 73, "carb": 4.2, "prot": 10.0, "fat": 2.0 },
   { "name": "鱿鱼", "icon": "🦑", "category": "海鲜", "unit": "g", "cal": 75, "carb": 0, "prot": 15.0, "fat": 0.8 },
   { "name": "扇贝", "icon": "🐚", "category": "海鲜", "unit": "g", "cal": 88, "carb": 2.0, "prot": 16.0, "fat": 1.4 },
+
+  // 新增淡水鱼
+  { "name": "草鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 113, "carb": 0, "prot": 16.6, "fat": 5.2 },
+  { "name": "鲫鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 108, "carb": 0, "prot": 17.0, "fat": 4.2 },
+  { "name": "鲤鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 109, "carb": 0, "prot": 17.6, "fat": 4.1 },
+  { "name": "鲢鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 104, "carb": 0, "prot": 17.8, "fat": 3.6 },
+  { "name": "黑鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 85, "carb": 0, "prot": 18.0, "fat": 1.3 },
+  { "name": "鲶鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 147, "carb": 0, "prot": 15.3, "fat": 9.1 },
+  { "name": "黄鳝", "icon": "🐍", "category": "海鲜", "unit": "g", "cal": 89, "carb": 1.5, "prot": 18.0, "fat": 1.4 },
+
+  // 新增海鱼
+  { "name": "鲳鱼（平鱼）", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 140, "carb": 0, "prot": 18.5, "fat": 7.3 },
+  { "name": "大黄鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 97, "carb": 0, "prot": 17.7, "fat": 2.8 },
+  { "name": "小黄鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 99, "carb": 0, "prot": 17.9, "fat": 3.0 },
+  { "name": "金枪鱼（罐头）", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 132, "carb": 0, "prot": 23.0, "fat": 4.9 },
+  { "name": "秋刀鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 161, "carb": 0, "prot": 18.8, "fat": 9.2 },
+  { "name": "多宝鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 95, "carb": 0, "prot": 17.0, "fat": 2.8 },
+  { "name": "石斑鱼", "icon": "🐟", "category": "海鲜", "unit": "g", "cal": 112, "carb": 0, "prot": 18.0, "fat": 4.0 },
+
+  // 新增虾蟹类
+  { "name": "基围虾", "icon": "🦐", "category": "海鲜", "unit": "g", "cal": 95, "carb": 0.8, "prot": 18.5, "fat": 2.0 },
+  { "name": "小龙虾", "icon": "🦞", "category": "海鲜", "unit": "g", "cal": 93, "carb": 0.5, "prot": 16.0, "fat": 2.6 },
+  { "name": "皮皮虾（虾蛄）", "icon": "🦐", "category": "海鲜", "unit": "g", "cal": 90, "carb": 0.5, "prot": 18.0, "fat": 1.5 },
+  { "name": "大闸蟹", "icon": "🦀", "category": "海鲜", "unit": "g", "cal": 103, "carb": 2.0, "prot": 17.5, "fat": 2.8 },
+  { "name": "梭子蟹", "icon": "🦀", "category": "海鲜", "unit": "g", "cal": 95, "carb": 1.8, "prot": 16.0, "fat": 2.5 },
+
+  // 新增贝类及其他
+  { "name": "花蛤", "icon": "🐚", "category": "海鲜", "unit": "g", "cal": 62, "carb": 3.8, "prot": 10.4, "fat": 1.1 },
+  { "name": "文蛤", "icon": "🐚", "category": "海鲜", "unit": "g", "cal": 60, "carb": 3.5, "prot": 10.0, "fat": 1.0 },
+  { "name": "蛏子", "icon": "🐚", "category": "海鲜", "unit": "g", "cal": 70, "carb": 4.0, "prot": 12.0, "fat": 1.2 },
+  { "name": "贻贝（青口）", "icon": "🐚", "category": "海鲜", "unit": "g", "cal": 80, "carb": 3.5, "prot": 12.0, "fat": 2.0 },
+  { "name": "鲍鱼", "icon": "", "category": "海鲜", "unit": "g", "cal": 84, "carb": 2.0, "prot": 12.0, "fat": 0.8 },
+  { "name": "海参", "icon": "", "category": "海鲜", "unit": "g", "cal": 78, "carb": 2.5, "prot": 16.0, "fat": 0.2 },
+  { "name": "章鱼", "icon": "🐙", "category": "海鲜", "unit": "g", "cal": 70, "carb": 1.0, "prot": 15.0, "fat": 0.7 },
+  { "name": "海蜇", "icon": "", "category": "海鲜", "unit": "g", "cal": 33, "carb": 0.5, "prot": 4.0, "fat": 0.3 },
+  { "name": "海螺", "icon": "🐚", "category": "海鲜", "unit": "g", "cal": 95, "carb": 4.0, "prot": 14.0, "fat": 1.5 },
+
+  // ========== 坚果（不变） ==========
   { "name": "核桃", "icon": "🥜", "category": "坚果", "unit": "g", "cal": 654, "carb": 13.7, "prot": 15.2, "fat": 65.2 },
   { "name": "杏仁", "icon": "🥜", "category": "坚果", "unit": "g", "cal": 579, "carb": 21.6, "prot": 21.2, "fat": 49.9 },
   { "name": "花生", "icon": "🥜", "category": "坚果", "unit": "g", "cal": 567, "carb": 16.1, "prot": 25.8, "fat": 49.2 },
