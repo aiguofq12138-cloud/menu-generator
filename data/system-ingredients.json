@@ -91,6 +91,7 @@
   { "name": "糯米", "icon": "", "category": "主食", "unit": "g", "cal": 350, "carb": 78.0, "prot": 7.0, "fat": 1.0 },
   { "name": "玉米面", "icon": "", "category": "主食", "unit": "g", "cal": 365, "carb": 74.0, "prot": 8.0, "fat": 3.4 },
   { "name": "挂面", "icon": "", "category": "主食", "unit": "g", "cal": 340, "carb": 72.0, "prot": 10.0, "fat": 1.0 },
+  { "name": "藜麦", "icon": "🌾", "category": "主食", "unit": "g", "cal": 368, "carb": 64.2, "prot": 14.1, "fat": 6.1 },
   { "name": "牛奶", "icon": "🥛", "category": "乳制品", "unit": "ml", "cal": 54, "carb": 3.4, "prot": 3.0, "fat": 3.2 },
   { "name": "酸奶（原味）", "icon": "🥛", "category": "乳制品", "unit": "ml", "cal": 72, "carb": 5.3, "prot": 2.9, "fat": 3.6 },
   { "name": "奶酪（全脂）", "icon": "🧀", "category": "乳制品", "unit": "g", "cal": 330, "carb": 1.3, "prot": 25.0, "fat": 25.0 },
