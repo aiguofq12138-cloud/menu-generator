@@ -1144,7 +1144,7 @@ function renderIconManage() {
         if (allItems.length === 0) return;
 
         var catKey = 'cat_' + cat;
-        var isOpen = iconAccordionState[catKey] !== false;
+        var isOpen = iconAccordionState[catKey] == true;
         var isSystemCat = builtInCats.hasOwnProperty(cat);
         var emoji = allCats[cat] || '📦';
 
@@ -2421,7 +2421,7 @@ function calcMealCaloriesDetail(meal) {
 
         var customCatNames = Object.keys(cats);
         if (customCatNames.length > 0) {
-            var isOpen = categoryAccordionState['custom'] !== false;
+            var isOpen = categoryAccordionState['custom'] == true;
             html += '<div class="accordion-item"><div class="accordion-header ' + (isOpen ? 'open' : '') + '" onclick="toggleCategoryAccordion(\'custom\')">✨ 自定义分类 <span style="font-size:11px;color:var(--gray-400);font-weight:400;">(' + customCatNames.length + '个)</span><span class="arrow">▼</span></div><div class="accordion-body ' + (isOpen ? 'open' : '') + '">';
             customCatNames.forEach(function(name, idx) {
                 html += '<div class="sub-item" draggable="true" ondragstart="categoryDragStart(event,\'' + name + '\')" ondragover="categoryDragOver(event)" ondrop="categoryDrop(event,\'' + name + '\')" ondragend="categoryDragEnd(event)"><span style="font-size:18px;">' + cats[name] + '</span><span>' + name + '</span><div class="accordion-actions">' + (idx > 0 ? '<button onclick="event.stopPropagation();moveCategoryUp(\'' + name + '\')">▲</button>' : '<button disabled style="opacity:0.3;">▲</button>') + (idx < customCatNames.length - 1 ? '<button onclick="event.stopPropagation();moveCategoryDown(\'' + name + '\')">▼</button>' : '<button disabled style="opacity:0.3;">▼</button>') + '<button onclick="event.stopPropagation();editCategory(\'' + name + '\')" style="color:var(--primary);">✏️</button><button onclick="event.stopPropagation();deleteCategory(\'' + name + '\')" class="danger">×</button></div></div>';
