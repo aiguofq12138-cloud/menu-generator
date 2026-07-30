@@ -1843,6 +1843,7 @@ function renderRecipeBrowse() {
             html += `<div>`;
             html += `<div style="font-size:14px;font-weight:600;color:var(--gray-600);margin-bottom:8px;">✏️ 我的菜谱</div>`;
             customRecipes.forEach((r, idx) => {
+                // 注意：idx 只在 selectMiniRecipe 中可能用到，但该函数通过名称查找，索引不影响，可忽略
                 html += renderMiniRecipe(r, idx, true);   // editable = true
             });
             html += `</div>`;
@@ -1851,7 +1852,6 @@ function renderRecipeBrowse() {
 
     document.getElementById('recipeList').innerHTML = html;
 }
-
         if (all.length === 0) {
             document.getElementById('recipeList').innerHTML = `
                 <div class="empty-state">
@@ -1975,7 +1975,7 @@ function renderRecipeDetail(recipe, showActions) {
 }
 
 
- function renderMiniRecipe(recipe, idx, editable) {
+function renderMiniRecipe(recipe, idx, editable) {
     const invMap = {};
     for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
     const condimentCats = ['调料', '香料'];
@@ -1983,7 +1983,8 @@ function renderRecipeDetail(recipe, showActions) {
     const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
     var calInfo = calcRecipeCalories(recipe);
     var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
-    // 按钮区域：根据 editable 决定是否显示
+    
+    // 根据 editable 决定是否显示操作按钮
     let actionsHtml = '';
     if (editable) {
         actionsHtml = `
@@ -1991,6 +1992,7 @@ function renderRecipeDetail(recipe, showActions) {
             <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
         `;
     }
+
     return `
 <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
     <div style="display:flex;justify-content:space-between;align-items:center;">
