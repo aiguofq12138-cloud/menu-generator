@@ -1852,17 +1852,6 @@ function renderRecipeBrowse() {
 
     document.getElementById('recipeList').innerHTML = html;
 }
-        if (all.length === 0) {
-            document.getElementById('recipeList').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📋</div>
-                    <p>还没有菜谱，点击右上角添加吧~</p>
-                </div>`;
-            return;
-        }
-
-        document.getElementById('recipeList').innerHTML = all.map((r, idx) => renderMiniRecipe(r, idx, false)).join('');
-    }
 
     function enterGenerateMode() {
         const avail = getAvailableIngredients();
