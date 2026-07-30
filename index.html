@@ -1215,7 +1215,8 @@ function deleteIngredient(idx) {
     let categoryAccordionState = {};
     let iconAccordionState = {};
 
-    // ==================== 数据管理 ====================
+// 👇 在这里添加新变量
+let recipeListFilter = 'system'; // 'system' 或 'custom'
    // ==================== 从 JSON 加载基础数据 ====================
 const DATA_BASE_PATH = './data/';
 
@@ -1813,38 +1814,56 @@ function renderRecipeBrowse() {
     document.getElementById('recipeContent').innerHTML = `
         <div class="card" id="recipeBrowseCard">
             <div class="card-title">
-                📋 我的菜谱
+                📋 菜谱
                 <button class="btn btn-sm btn-outline" onclick="openRecipeFormModal()">+ 添加菜谱</button>
+            </div>
+            <!-- 切换标签 -->
+            <div style="display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--gray-200);padding-bottom:8px;">
+                <button class="btn btn-sm ${recipeListFilter === 'system' ? 'btn-primary' : 'btn-secondary'}" 
+                        onclick="switchRecipeList('system')" style="flex:1;">📚 系统菜谱</button>
+                <button class="btn btn-sm ${recipeListFilter === 'custom' ? 'btn-primary' : 'btn-secondary'}" 
+                        onclick="switchRecipeList('custom')" style="flex:1;">✏️ 我的菜谱</button>
             </div>
             <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
             <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 随机生成菜谱</button>
             <div id="recipeList" style="margin-top:12px;"></div>
         </div>`;
 
-    const systemRecipes = RECIPES;          // 全局内置菜谱
+    // 根据当前过滤器渲染对应列表
+    renderRecipeList();
+}
+
+// 切换列表过滤器
+function switchRecipeList(filter) {
+    recipeListFilter = filter;
+    // 清除已展开的详情
+    selectedRecipe = null;
+    renderRecipeBrowse(); // 重新渲染整个浏览界面（或只刷新列表，但为了统一，重绘）
+}
+
+// 实际渲染列表内容（被 renderRecipeBrowse 调用）
+function renderRecipeList() {
+    const systemRecipes = RECIPES;
     const customRecipes = appData.customRecipes || [];
     let html = '';
 
-    if (systemRecipes.length === 0 && customRecipes.length === 0) {
-        html = `<div class="empty-state"><div class="empty-icon">📋</div><p>还没有菜谱，点击右上角添加吧~</p></div>`;
-    } else {
-        // ---- 系统菜谱（只读） ----
-        if (systemRecipes.length > 0) {
-            html += `<div style="margin-bottom:16px;">`;
-            html += `<div style="font-size:14px;font-weight:600;color:var(--gray-600);margin-bottom:8px;">📚 系统菜谱</div>`;
+    if (recipeListFilter === 'system') {
+        if (systemRecipes.length === 0) {
+            html = `<div class="empty-state"><div class="empty-icon">📚</div><p>暂无系统菜谱</p></div>`;
+        } else {
+            html = `<div>`;
             systemRecipes.forEach((r, idx) => {
-                html += renderMiniRecipe(r, idx, false);  // editable = false
+                html += renderMiniRecipe(r, idx, false); // 只读
             });
             html += `</div>`;
         }
-
-        // ---- 自定义菜谱（可编辑删除） ----
-        if (customRecipes.length > 0) {
-            html += `<div>`;
-            html += `<div style="font-size:14px;font-weight:600;color:var(--gray-600);margin-bottom:8px;">✏️ 我的菜谱</div>`;
+    } else { // custom
+        if (customRecipes.length === 0) {
+            html = `<div class="empty-state"><div class="empty-icon">✏️</div><p>还没有自定义菜谱，点击右上角添加吧~</p></div>`;
+        } else {
+            html = `<div>`;
             customRecipes.forEach((r, idx) => {
-                // 注意：idx 只在 selectMiniRecipe 中可能用到，但该函数通过名称查找，索引不影响，可忽略
-                html += renderMiniRecipe(r, idx, true);   // editable = true
+                html += renderMiniRecipe(r, idx, true); // 可编辑
             });
             html += `</div>`;
         }
