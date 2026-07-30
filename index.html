@@ -1808,23 +1808,49 @@ function getIngredientDisplayIcon(ingredientName) {
         return '';
     }
 
-    function renderRecipeBrowse() {
-        recipeViewMode = 'browse';
-        document.getElementById('recipeContent').innerHTML = `
-            <div class="card" id="recipeBrowseCard">
-                <div class="card-title">
-                    📋 我的菜谱
-                    <button class="btn btn-sm btn-outline" onclick="openRecipeFormModal()">+ 添加菜谱</button>
-                </div>
-                <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
-                <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 随机生成菜谱</button>
-                <div id="recipeList" style="margin-top:12px;"></div>
-            </div>`;
+function renderRecipeBrowse() {
+    recipeViewMode = 'browse';
+    document.getElementById('recipeContent').innerHTML = `
+        <div class="card" id="recipeBrowseCard">
+            <div class="card-title">
+                📋 我的菜谱
+                <button class="btn btn-sm btn-outline" onclick="openRecipeFormModal()">+ 添加菜谱</button>
+            </div>
+            <div id="availSummary" style="font-size:12px;color:var(--gray-400);margin-bottom:12px;"></div>
+            <button class="btn btn-primary" onclick="enterGenerateMode()">🎲 随机生成菜谱</button>
+            <div id="recipeList" style="margin-top:12px;"></div>
+        </div>`;
 
-        const all = getAllRecipes();
-// 删掉或注释掉以下两行
-// const avail = getAvailableIngredients();
-// document.getElementById('availSummary').textContent = `可用食材：${avail.map(i => `${i.name}(${i.grams}g)`).join('、') || '无'}`;
+    const systemRecipes = RECIPES;          // 全局内置菜谱
+    const customRecipes = appData.customRecipes || [];
+    let html = '';
+
+    if (systemRecipes.length === 0 && customRecipes.length === 0) {
+        html = `<div class="empty-state"><div class="empty-icon">📋</div><p>还没有菜谱，点击右上角添加吧~</p></div>`;
+    } else {
+        // ---- 系统菜谱（只读） ----
+        if (systemRecipes.length > 0) {
+            html += `<div style="margin-bottom:16px;">`;
+            html += `<div style="font-size:14px;font-weight:600;color:var(--gray-600);margin-bottom:8px;">📚 系统菜谱</div>`;
+            systemRecipes.forEach((r, idx) => {
+                html += renderMiniRecipe(r, idx, false);  // editable = false
+            });
+            html += `</div>`;
+        }
+
+        // ---- 自定义菜谱（可编辑删除） ----
+        if (customRecipes.length > 0) {
+            html += `<div>`;
+            html += `<div style="font-size:14px;font-weight:600;color:var(--gray-600);margin-bottom:8px;">✏️ 我的菜谱</div>`;
+            customRecipes.forEach((r, idx) => {
+                html += renderMiniRecipe(r, idx, true);   // editable = true
+            });
+            html += `</div>`;
+        }
+    }
+
+    document.getElementById('recipeList').innerHTML = html;
+}
 
         if (all.length === 0) {
             document.getElementById('recipeList').innerHTML = `
@@ -1949,7 +1975,7 @@ function renderRecipeDetail(recipe, showActions) {
 }
 
 
-  function renderMiniRecipe(recipe, idx, fullMatch) {
+ function renderMiniRecipe(recipe, idx, editable) {
     const invMap = {};
     for (const [k, v] of Object.entries(appData.inventory)) invMap[k] = v.grams;
     const condimentCats = ['调料', '香料'];
@@ -1957,6 +1983,14 @@ function renderRecipeDetail(recipe, showActions) {
     const matchRate = recipe.matchRate !== undefined ? recipe.matchRate : 0;
     var calInfo = calcRecipeCalories(recipe);
     var calText = calInfo.total > 0 ? calInfo.total + ' kcal' : '--';
+    // 按钮区域：根据 editable 决定是否显示
+    let actionsHtml = '';
+    if (editable) {
+        actionsHtml = `
+            <button class="btn btn-sm" style="background:#e3f2fd;color:#1976d2;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();openRecipeEditModal('${recipe.name}')">编辑</button>
+            <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
+        `;
+    }
     return `
 <div class="recipe-card" onclick="selectMiniRecipe('${recipe.name}', ${idx})" id="mini-${idx}">
     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1964,8 +1998,7 @@ function renderRecipeDetail(recipe, showActions) {
         <div style="display:flex;gap:6px;align-items:center;">
             <span style="font-size:12px;color:var(--gray-600);">🔥 ${calText}</span>
             <span style="font-size:12px;color:var(--primary);font-weight:600;">${matchRate > 0 ? '匹配' + matchRate + '%' : ''}</span>
-            <button class="btn btn-sm" style="background:#e3f2fd;color:#1976d2;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();openRecipeEditModal('${recipe.name}')">编辑</button>
-            <button class="btn btn-sm" style="background:#ffebee;color:#c62828;padding:4px 8px;font-size:11px;" onclick="event.stopPropagation();deleteRecipe('${recipe.name}')">删除</button>
+            ${actionsHtml}
         </div>
     </div>
     <div style="font-size:11px;color:var(--gray-400);">📂 ${recipe.category} · ⏱ ${recipe.time}</div>
