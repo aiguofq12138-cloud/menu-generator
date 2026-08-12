@@ -943,7 +943,7 @@
                 `<table><thead><tr><th>分类</th><th>图标</th><th>操作</th></tr></thead><tbody>`;
             pageData.forEach(([name, emoji]) => {
                 html +=
-                    `<tr><td>${name}</td><td>${emoji||'📦'}</td><td class="actions"><button class="btn btn-danger btn-sm" onclick="deleteCategory('${name}')">删除</button></td></tr>`;
+                    `<tr><td>${name}</td><td>${emoji||'📦'}</td><td class="actions"> <button class="btn btn-secondary btn-sm" onclick="editCategory('${name}')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteCategory('${name}')">删除</button></td></tr>`;
             });
             html += '</tbody></table>';
             container.innerHTML = html;
@@ -1129,6 +1129,57 @@
             // 初始化 datalist
             updateDatalist();
         };
+
+        let editingCategoryName = null;
+
+function editCategory(name) {
+    editingCategoryName = name;
+    const emoji = categories[name] || '📦';
+    document.getElementById('editCategoryName').value = name;
+    document.getElementById('editCategoryEmoji').value = emoji;
+    document.getElementById('categoryEditModal').classList.add('show');
+}
+
+function closeCategoryEditModal() {
+    document.getElementById('categoryEditModal').classList.remove('show');
+    editingCategoryName = null;
+}
+
+function saveCategoryEdit() {
+    const newName = document.getElementById('editCategoryName').value.trim();
+    const newEmoji = document.getElementById('editCategoryEmoji').value.trim() || '📦';
+    if (!newName) { alert('分类名称不能为空'); return; }
+    if (newName !== editingCategoryName && categories[newName]) {
+        alert('分类名称已存在，请使用其他名称');
+        return;
+    }
+    if (newName !== editingCategoryName) {
+        delete categories[editingCategoryName];
+    }
+    categories[newName] = newEmoji;
+    closeCategoryEditModal();
+    renderCategories();
+    populateCategorySelect(newName);
+    showStatus('categoriesStatus', '✅ 分类已更新', 'success');
+}
+
+// 点击遮罩关闭模态框
+document.getElementById('categoryEditModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCategoryEditModal();
+});
     </script>
+<!-- 分类编辑模态框 -->
+<div class="modal-overlay" id="categoryEditModal">
+    <div class="modal">
+        <h2>✏️ 编辑分类</h2>
+        <div class="form-group"><label>分类名称</label><input type="text" id="editCategoryName"></div>
+        <div class="form-group"><label>图标（1-2个字符）</label><input type="text" id="editCategoryEmoji" placeholder="如：🥩" maxlength="2"></div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeCategoryEditModal()">取消</button>
+            <button class="btn btn-primary" onclick="saveCategoryEdit()">保存</button>
+        </div>
+    </div>
+</div>
+    
 </body>
 </html>
