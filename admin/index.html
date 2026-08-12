@@ -3,495 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" sizes="192x192" href="/menu-generator/icon-192.png">
-<link rel="apple-touch-icon" href="/menu-generator/icon-192.png">
-<!-- 如果有 SVG 或 32x32 也可添加 -->
-    <title>吃啥后台</title>
+    <title>运营后台 · 左侧菜单</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f1f5f9;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== 左侧菜单 ===== */
-        .sidebar {
-            width: 220px;
-            background: #0f172a;
-            color: #cbd5e1;
-            padding: 20px 0;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-        }
-        .sidebar .brand {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            padding: 0 20px 24px 20px;
-            border-bottom: 1px solid #1e293b;
-            margin-bottom: 12px;
-        }
-        .sidebar .menu-item {
-            padding: 12px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            font-size: 14px;
-            color: #94a3b8;
-            transition: 0.15s;
-            border-left: 3px solid transparent;
-        }
-        .sidebar .menu-item:hover {
-            background: #1e293b;
-            color: #e2e8f0;
-        }
-        .sidebar .menu-item.active {
-            background: #1e293b;
-            color: white;
-            border-left-color: #3b82f6;
-        }
-        .sidebar .menu-item .icon {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-        }
-
-        /* ===== 右侧内容 ===== */
-        .main-content {
-            flex: 1;
-            padding: 24px 32px;
-            overflow-y: auto;
-            min-width: 0;
-            max-height: 100vh;
-        }
-        .main-content h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #0f172a;
-            position: sticky;
-            top: 0;
-            background: #f1f5f9;
-            z-index: 5;
-            padding: 4px 0 12px 0;
-        }
-
-        /* ===== 卡片 ===== */
-        .card {
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-        }
-        .card .card-body {
-            padding: 0 20px 20px 20px;
-        }
-
-        /* ===== 固定操作栏 (sticky) ===== */
-        .toolbar {
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-            padding: 12px 20px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-        }
-        .toolbar .left {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-        }
-        .toolbar .right {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px;
-        }
-        .toolbar input,
-        .toolbar select {
-            padding: 6px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-        }
-        .toolbar input {
-            flex: 1;
-            min-width: 140px;
-        }
-
-        /* ===== 按钮 ===== */
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-        .btn-success {
-            background: #16a34a;
-            color: white;
-        }
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #1f2937;
-        }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 13px;
-        }
-        .btn-xs {
-            padding: 2px 8px;
-            font-size: 12px;
-        }
-        .btn:hover {
-            opacity: 0.85;
-        }
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .status {
-            margin-top: 8px;
-            font-size: 14px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            display: none;
-        }
-        .status.success {
-            background: #dcfce7;
-            color: #166534;
-            display: block;
-        }
-        .status.error {
-            background: #fee2e2;
-            color: #991b1b;
-            display: block;
-        }
-        .status.loading {
-            background: #fef9c3;
-            color: #854d0e;
-            display: block;
-        }
-        .status.info {
-            background: #dbeafe;
-            color: #1e40af;
-            display: block;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        th {
-            text-align: left;
-            padding: 10px 8px;
-            background: #f1f5f9;
-            border-bottom: 2px solid #d1d5db;
-            position: sticky;
-            top: 0;
-        }
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #e5e7eb;
-            vertical-align: top;
-        }
-        .actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .table-wrap {
-            max-height: 540px;
-            overflow-y: auto;
-        }
-
-        /* ===== 分页控件 ===== */
-        .pagination-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 8px 4px 8px;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 8px;
-            font-size: 14px;
-            color: #475569;
-        }
-        .pagination-wrap .info {
-            font-size: 13px;
-        }
-        .pagination-wrap .pages {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-        .pagination-wrap .pages button {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 6px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            color: #1f2937;
-            transition: 0.15s;
-        }
-        .pagination-wrap .pages button:hover:not(:disabled) {
-            background: #e5e7eb;
-        }
-        .pagination-wrap .pages button.active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-        .pagination-wrap .pages button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .pagination-wrap .pages .ellipsis {
-            padding: 0 4px;
-            color: #9ca3af;
-        }
-
-        /* ===== 模态框 ===== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.show {
-            display: flex;
-        }
-        .modal {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            max-width: 640px;
-            width: 92%;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal h2 {
-            margin-bottom: 16px;
-        }
-        .form-group {
-            margin-bottom: 12px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: 500;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .form-group textarea {
-            min-height: 60px;
-            font-family: inherit;
-        }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 16px;
-        }
-
-        /* ===== 食材行 ===== */
-        .ing-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        .ing-row select {
-            flex: 2;
-            min-width: 100px;
-            padding: 6px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-        .ing-row input {
-            flex: 1;
-            min-width: 60px;
-            padding: 6px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 13px;
-            width: 80px;
-        }
-        .ing-row .btn {
-            flex-shrink: 0;
-        }
-        .add-ing-btn {
-            margin-top: 4px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* ===== 配置页面 ===== */
-        .config-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-items: flex-end;
-        }
-        .config-row .field {
-            flex: 1;
-            min-width: 150px;
-        }
-        .config-row .field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 4px;
-        }
-        .config-row .field input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .config-row .field input:focus {
-            border-color: #3b82f6;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-        .config-status-box {
-            margin-top: 16px;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        .config-status-box .label {
-            font-size: 12px;
-            color: #64748b;
-        }
-        .config-status-box .value {
-            font-family: monospace;
-            font-size: 13px;
-            word-break: break-all;
-        }
-        .config-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .tip-box {
-            margin-top: 16px;
-            padding: 12px;
-            background: #fef9c3;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #854d0e;
-        }
-
-        /* ===== 响应式 ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
+        .sidebar { width: 220px; background: #0f172a; color: #cbd5e1; padding: 20px 0; flex-shrink: 0; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+        .sidebar .brand { font-size: 20px; font-weight: 700; color: white; padding: 0 20px 24px 20px; border-bottom: 1px solid #1e293b; margin-bottom: 12px; }
+        .sidebar .menu-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 14px; color: #94a3b8; transition: 0.15s; border-left: 3px solid transparent; }
+        .sidebar .menu-item:hover { background: #1e293b; color: #e2e8f0; }
+        .sidebar .menu-item.active { background: #1e293b; color: white; border-left-color: #3b82f6; }
+        .sidebar .menu-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .main-content { flex: 1; padding: 24px 32px; overflow-y: auto; min-width: 0; max-height: 100vh; }
+        .main-content h1 { font-size: 24px; margin-bottom: 20px; color: #0f172a; position: sticky; top: 0; background: #f1f5f9; z-index: 5; padding: 4px 0 12px 0; }
+        .card { background: white; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+        .card .card-body { padding: 0 20px 20px 20px; }
+        .toolbar { position: sticky; top: 0; background: white; z-index: 10; padding: 12px 20px; border-bottom: 1px solid #e5e7eb; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .toolbar .left { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1; }
+        .toolbar .right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .toolbar input, .toolbar select { padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; background: white; }
+        .toolbar input { flex: 1; min-width: 140px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px; white-space: nowrap; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #e5e7eb; color: #1f2937; }
+        .btn-sm { padding: 4px 10px; font-size: 13px; }
+        .btn:hover { opacity: 0.85; }
+        .status { margin-top: 8px; font-size: 14px; padding: 6px 12px; border-radius: 6px; display: none; }
+        .status.success { background: #dcfce7; color: #166534; display: block; }
+        .status.error { background: #fee2e2; color: #991b1b; display: block; }
+        .status.loading { background: #fef9c3; color: #854d0e; display: block; }
+        .status.info { background: #dbeafe; color: #1e40af; display: block; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 10px 8px; background: #f1f5f9; border-bottom: 2px solid #d1d5db; position: sticky; top: 0; }
+        td { padding: 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .table-wrap { max-height: 540px; overflow-y: auto; }
+        .pagination-wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 12px 8px 4px 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; font-size: 14px; color: #475569; }
+        .pagination-wrap .pages { display: flex; gap: 4px; align-items: center; }
+        .pagination-wrap .pages button { min-width: 32px; height: 32px; padding: 0 6px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 500; color: #1f2937; transition: 0.15s; }
+        .pagination-wrap .pages button.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .pagination-wrap .pages button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; padding: 24px; border-radius: 16px; max-width: 700px; width: 92%; max-height: 85vh; overflow-y: auto; }
+        .modal h2 { margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-group textarea { min-height: 60px; font-family: inherit; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+        .ing-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .ing-row input.ing-name { flex: 2; min-width: 100px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+        .ing-row input.ing-grams { flex: 1; min-width: 60px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; width: 80px; }
+        .ing-row .btn { flex-shrink: 0; }
+        .add-ing-btn { margin-top: 4px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .config-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+        .config-row .field { flex: 1; min-width: 150px; }
+        .config-row .field label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        .config-row .field input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .config-status-box { margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .config-status-box .label { font-size: 12px; color: #64748b; }
+        .tip-box { margin-top: 16px; padding: 12px; background: #fef9c3; border-radius: 8px; font-size: 13px; color: #854d0e; }
+        .json-toggle { cursor: pointer; color: #2563eb; font-weight: 600; font-size: 14px; user-select: none; }
+        .json-toggle:hover { text-decoration: underline; }
+        .json-area { margin-top: 8px; display: none; }
+        .json-area.open { display: block; }
+        .json-area textarea { width: 100%; font-family: monospace; font-size: 13px; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px; min-height: 120px; }
+        .json-actions { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
         @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-                padding: 12px 0;
-            }
-            .sidebar .brand {
-                font-size: 14px;
-                padding: 0 12px 16px 12px;
-                text-align: center;
-            }
-            .sidebar .menu-item {
-                padding: 12px;
-                justify-content: center;
-            }
-            .sidebar .menu-item span:not(.icon) {
-                display: none;
-            }
-            .main-content {
-                padding: 16px;
-            }
-            .config-row .field {
-                min-width: 120px;
-            }
-            .toolbar {
-                padding: 10px 14px;
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .toolbar .left,
-            .toolbar .right {
-                flex-wrap: wrap;
-            }
-            .toolbar input {
-                min-width: 100px;
-            }
-            .pagination-wrap {
-                flex-direction: column;
-                gap: 8px;
-                align-items: stretch;
-                text-align: center;
-            }
-            .pagination-wrap .pages {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
+            .sidebar { width: 60px; padding: 12px 0; }
+            .sidebar .brand { font-size: 14px; padding: 0 12px 16px 12px; text-align: center; }
+            .sidebar .menu-item { padding: 12px; justify-content: center; }
+            .sidebar .menu-item span:not(.icon) { display: none; }
+            .main-content { padding: 16px; }
+            .toolbar { padding: 10px 14px; flex-direction: column; align-items: stretch; }
+            .pagination-wrap { flex-direction: column; gap: 8px; align-items: stretch; text-align: center; }
+            .pagination-wrap .pages { justify-content: center; flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== 左侧菜单 ===== -->
     <aside class="sidebar">
         <div class="brand">⚙️ 运营后台</div>
         <nav>
@@ -502,16 +97,13 @@
             <div class="menu-item" data-tab="other"><span class="icon">🔧</span><span>其他数据</span></div>
             <div class="menu-item" data-tab="config"><span class="icon">⚙️</span><span>GitHub 配置</span></div>
         </nav>
-        <div style="margin-top:auto;padding:16px 20px;border-top:1px solid #1e293b;font-size:12px;color:#64748b;">
-            v2.0 · 每页10条
-        </div>
+        <div style="margin-top:auto;padding:16px 20px;border-top:1px solid #1e293b;font-size:12px;color:#64748b;">v2.0 · 每页10条</div>
     </aside>
 
-    <!-- ===== 右侧主内容 ===== -->
     <main class="main-content">
         <h1 id="pageTitle">📝 菜谱管理</h1>
 
-        <!-- ===== 菜谱管理 ===== -->
+        <!-- 菜谱管理 -->
         <div id="tab-recipes" class="tab-content active">
             <div class="card">
                 <div class="toolbar">
@@ -527,15 +119,13 @@
                 </div>
                 <div class="card-body">
                     <div id="recipesStatus" class="status"></div>
-                    <div class="table-wrap" id="recipeTableContainer">
-                        <p style="color:#6b7280;">点击“加载”查看数据</p>
-                    </div>
+                    <div class="table-wrap" id="recipeTableContainer"><p style="color:#6b7280;">点击“加载”查看数据</p></div>
                     <div id="recipePagination" class="pagination-wrap"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 食材管理 ===== -->
+        <!-- 食材管理 -->
         <div id="tab-ingredients" class="tab-content">
             <div class="card">
                 <div class="toolbar">
@@ -551,15 +141,13 @@
                 </div>
                 <div class="card-body">
                     <div id="ingredientsStatus" class="status"></div>
-                    <div class="table-wrap" id="ingredientTableContainer">
-                        <p style="color:#6b7280;">点击“加载”查看数据</p>
-                    </div>
+                    <div class="table-wrap" id="ingredientTableContainer"><p style="color:#6b7280;">点击“加载”查看数据</p></div>
                     <div id="ingredientPagination" class="pagination-wrap"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 分类管理 ===== -->
+        <!-- 分类管理 -->
         <div id="tab-categories" class="tab-content">
             <div class="card">
                 <div class="toolbar">
@@ -575,21 +163,17 @@
                 </div>
                 <div class="card-body">
                     <div id="categoriesStatus" class="status"></div>
-                    <div class="table-wrap" id="categoryList">
-                        <p style="color:#6b7280;">点击“加载”查看</p>
-                    </div>
+                    <div class="table-wrap" id="categoryList"><p style="color:#6b7280;">点击“加载”查看</p></div>
                     <div id="categoryPagination" class="pagination-wrap"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 营养数据 ===== -->
+        <!-- 营养数据 -->
         <div id="tab-nutrition" class="tab-content">
             <div class="card">
                 <div class="toolbar">
-                    <div class="left">
-                        <input type="text" id="nutriSearch" placeholder="搜索食材..." oninput="filterNutrition()">
-                    </div>
+                    <div class="left"><input type="text" id="nutriSearch" placeholder="搜索食材..." oninput="filterNutrition()"></div>
                     <div class="right">
                         <button class="btn btn-success" onclick="saveNutrition()">💾 保存</button>
                         <button class="btn btn-secondary" onclick="loadNutrition()">🔄 加载</button>
@@ -597,21 +181,17 @@
                 </div>
                 <div class="card-body">
                     <div id="nutritionStatus" class="status"></div>
-                    <div class="table-wrap" id="nutritionTableContainer">
-                        <p style="color:#6b7280;">点击“加载”查看</p>
-                    </div>
+                    <div class="table-wrap" id="nutritionTableContainer"><p style="color:#6b7280;">点击“加载”查看</p></div>
                     <div id="nutritionPagination" class="pagination-wrap"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 其他数据 ===== -->
+        <!-- 其他数据 -->
         <div id="tab-other" class="tab-content">
             <div class="card">
                 <div class="toolbar">
-                    <div class="left">
-                        <button class="btn btn-secondary" onclick="loadOtherData()">📥 检查所有文件</button>
-                    </div>
+                    <div class="left"><button class="btn btn-secondary" onclick="loadOtherData()">📥 检查所有文件</button></div>
                     <div class="right"></div>
                 </div>
                 <div class="card-body">
@@ -629,13 +209,11 @@
             </div>
         </div>
 
-        <!-- ===== 🔐 GitHub 配置（独立页面） ===== -->
+        <!-- GitHub 配置 -->
         <div id="tab-config" class="tab-content">
             <div class="card">
                 <div class="toolbar">
-                    <div class="left">
-                        <strong style="font-size:15px;">🔐 GitHub 配置</strong>
-                    </div>
+                    <div class="left"><strong style="font-size:15px;">🔐 GitHub 配置</strong></div>
                     <div class="right">
                         <button class="btn btn-primary" onclick="saveConfig()">💾 保存配置</button>
                         <button class="btn btn-secondary" onclick="loadConfig()">📂 加载配置</button>
@@ -648,30 +226,16 @@
                         Token 需要 <code style="background:#e5e7eb;padding:1px 6px;border-radius:4px;">repo</code> 权限。
                     </p>
                     <div class="config-row">
-                        <div class="field">
-                            <label>Owner（用户名）</label>
-                            <input type="text" id="owner" placeholder="你的GitHub用户名">
-                        </div>
-                        <div class="field">
-                            <label>Repo（仓库名）</label>
-                            <input type="text" id="repo" placeholder="你的仓库名">
-                        </div>
-                        <div class="field">
-                            <label>Token（classic）</label>
-                            <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx">
-                        </div>
+                        <div class="field"><label>Owner（用户名）</label><input type="text" id="owner" placeholder="你的GitHub用户名"></div>
+                        <div class="field"><label>Repo（仓库名）</label><input type="text" id="repo" placeholder="你的仓库名"></div>
+                        <div class="field"><label>Token（classic）</label><input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx"></div>
                     </div>
                     <div id="configStatus" class="status"></div>
                     <div class="config-status-box">
                         <div class="label">📌 当前配置状态</div>
-                        <div id="configInfo" style="margin-top:6px;font-size:13px;color:#475569;">
-                            尚未配置
-                        </div>
+                        <div id="configInfo" style="margin-top:6px;font-size:13px;color:#475569;">尚未配置</div>
                     </div>
-                    <div class="tip-box">
-                        💡 <strong>提示：</strong>配置保存在浏览器本地（localStorage），不会上传到任何服务器。
-                        如需切换账号或仓库，重新配置即可。
-                    </div>
+                    <div class="tip-box">💡 <strong>提示：</strong>配置保存在浏览器本地（localStorage），不会上传到任何服务器。</div>
                     <div style="margin-top:16px;">
                         <button class="btn btn-secondary" onclick="testConnection()">🔄 测试 GitHub 连接</button>
                         <span id="testResult" style="font-size:14px;color:#64748b;margin-left:12px;"></span>
@@ -682,26 +246,37 @@
         </div>
     </main>
 
-    <!-- ===== 模态框：菜谱 ===== -->
+    <!-- ===== 菜谱模态框（已改造：食材输入+下拉建议，增加JSON导入导出） ===== -->
     <div class="modal-overlay" id="recipeModal">
         <div class="modal">
             <h2 id="recipeModalTitle">新增菜谱</h2>
+            <!-- 基础表单 -->
             <div class="form-group"><label>菜谱名称</label><input type="text" id="editRecipeName"></div>
             <div class="form-group"><label>分类</label><input type="text" id="editRecipeCat" placeholder="如：家常菜"></div>
-            <div class="form-group"><label>难度</label>
-                <select id="editRecipeDiff"><option value="简单">简单</option><option value="中等" selected>中等</option><option value="困难">困难</option></select>
-            </div>
+            <div class="form-group"><label>难度</label><select id="editRecipeDiff"><option value="简单">简单</option><option value="中等" selected>中等</option><option value="困难">困难</option></select></div>
             <div class="form-group"><label>烹饪时间</label><input type="text" id="editRecipeTime" placeholder="如：10分钟"></div>
             <div class="form-group">
-                <label>所需食材（从食材库选择）</label>
-                <div id="editRecipeIngredientsContainer">
-                    <!-- 动态行由 js 生成 -->
-                </div>
+                <label>所需食材（输入名称，自动匹配下拉）</label>
+                <!-- datalist 用于提供下拉建议 -->
+                <datalist id="ingredientDatalist"></datalist>
+                <div id="editRecipeIngredientsContainer"></div>
                 <button class="btn btn-secondary btn-sm add-ing-btn" onclick="addIngredientRow()">+ 添加食材</button>
             </div>
-            <div class="form-group"><label>步骤（每行一步）</label>
-                <textarea id="editRecipeSteps" rows="5" placeholder="1. 炒鸡蛋&#10;2. 加入青椒"></textarea>
+            <div class="form-group"><label>步骤（每行一步）</label><textarea id="editRecipeSteps" rows="5"></textarea></div>
+
+            <!-- JSON 导入/导出区域 -->
+            <div style="margin-top:16px; border-top:1px solid #e5e7eb; padding-top:12px;">
+                <span class="json-toggle" onclick="toggleJsonArea()">📋 JSON 导入/导出 (点击展开)</span>
+                <div id="jsonArea" class="json-area">
+                    <textarea id="recipeJsonInput" placeholder="粘贴 JSON 格式的菜谱数据..."></textarea>
+                    <div class="json-actions">
+                        <button class="btn btn-primary btn-sm" onclick="importRecipeJSON()">📥 导入并填充</button>
+                        <button class="btn btn-secondary btn-sm" onclick="exportRecipeJSON()">📤 导出当前为 JSON</button>
+                        <button class="btn btn-secondary btn-sm" onclick="clearJsonInput()">🗑️ 清空</button>
+                    </div>
+                </div>
             </div>
+
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeRecipeModal()">取消</button>
                 <button class="btn btn-primary" onclick="saveRecipeModal()">保存</button>
@@ -709,12 +284,15 @@
         </div>
     </div>
 
-    <!-- ===== 模态框：食材 ===== -->
+    <!-- 食材模态框 -->
     <div class="modal-overlay" id="ingredientModal">
         <div class="modal">
             <h2 id="ingredientModalTitle">新增食材</h2>
             <div class="form-group"><label>食材名称</label><input type="text" id="editIngName"></div>
-            <div class="form-group"><label>分类</label><input type="text" id="editIngCat" placeholder="如：蔬菜"></div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="editIngCat"><option value="">请选择分类（先加载分类）</option></select>
+            </div>
             <div class="form-group"><label>单位</label><input type="text" id="editIngUnit" value="g"></div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeIngredientModal()">取消</button>
@@ -726,25 +304,15 @@
     <script>
         // ============ 全局状态 ============
         let CONFIG = { owner: '', repo: '', token: '' };
-        let recipes = [],
-            recipesSha = null;
-        let ingredients = [],
-            ingredientsSha = null;
-        let categories = {},
-            categorySha = null;
-        let nutrition = {},
-            nutritionSha = null;
-        let editRecipeIdx = -1,
-            editIngIdx = -1;
-
-        // ============ 分页状态 (每页10条) ============
+        let recipes = [], recipesSha = null;
+        let ingredients = [], ingredientsSha = null;
+        let categories = {}, categorySha = null;
+        let nutrition = {}, nutritionSha = null;
+        let editRecipeIdx = -1, editIngIdx = -1;
         const PAGE_SIZE = 10;
-        let recipePage = 1;
-        let ingPage = 1;
-        let catPage = 1;
-        let nutPage = 1;
+        let recipePage = 1, ingPage = 1, catPage = 1, nutPage = 1;
 
-        // ============ 左侧菜单切换 ============
+        // ============ 菜单切换 ============
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function() {
                 document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
@@ -790,9 +358,11 @@
         function saveConfig() {
             CONFIG.owner = document.getElementById('owner').value.trim();
             CONFIG.repo = document.getElementById('repo').value.trim();
-            CONFIG.token = document.getElementById('token').value.trim();
+            let token = document.getElementById('token').value.trim();
+            token = token.replace(/[^A-Za-z0-9_\-]/g, '');
+            CONFIG.token = token;
             if (!CONFIG.owner || !CONFIG.repo || !CONFIG.token) {
-                showStatus('configStatus', '❌ 请完整填写 Owner、Repo 和 Token', 'error');
+                showStatus('configStatus', '❌ 请完整填写配置', 'error');
                 return;
             }
             localStorage.setItem('admin_github_config', JSON.stringify(CONFIG));
@@ -816,14 +386,12 @@
             const cfg = getConfigSilent();
             if (cfg && cfg.owner && cfg.repo) {
                 el.innerHTML =
-                    `
-                            <div style="display:flex;flex-wrap:wrap;gap:16px;">
-                                <span>👤 <strong>Owner:</strong> ${cfg.owner}</span>
-                                <span>📦 <strong>Repo:</strong> ${cfg.repo}</span>
-                                <span>🔑 <strong>Token:</strong> ${cfg.token ? '已设置 (' + cfg.token.slice(0,8) + '••••••)' : '未设置'}</span>
-                                <span style="color:#16a34a;">✅ 配置有效</span>
-                            </div>
-                        `;
+                    `<div style="display:flex;flex-wrap:wrap;gap:16px;">
+                        <span>👤 <strong>Owner:</strong> ${cfg.owner}</span>
+                        <span>📦 <strong>Repo:</strong> ${cfg.repo}</span>
+                        <span>🔑 <strong>Token:</strong> ${cfg.token ? '已设置 (' + cfg.token.slice(0,8) + '••••••)' : '未设置'}</span>
+                        <span style="color:#16a34a;">✅ 配置有效</span>
+                    </div>`;
             } else {
                 el.innerHTML = '<span style="color:#dc2626;">⚠️ 配置不完整，请填写所有字段并保存</span>';
             }
@@ -832,7 +400,8 @@
         function getConfigSilent() {
             const o = document.getElementById('owner').value.trim();
             const r = document.getElementById('repo').value.trim();
-            const t = document.getElementById('token').value.trim();
+            let t = document.getElementById('token').value.trim();
+            t = t.replace(/[^A-Za-z0-9_\-]/g, '');
             if (o && r && t) return { owner: o, repo: r, token: t };
             return null;
         }
@@ -846,7 +415,6 @@
             return cfg;
         }
 
-        // ============ 连接测试 ============
         async function testConnection() {
             const cfg = getConfig();
             if (!cfg) return;
@@ -860,19 +428,16 @@
                     headers: { 'Authorization': `token ${cfg.token}`, 'Accept': 'application/vnd.github.v3+json' }
                 });
                 if (res.status === 200) {
-                    showStatus('testStatus', '✅ 连接成功！可以正常读取 data/recipes.json', 'success');
+                    showStatus('testStatus', '✅ 连接成功！', 'success');
                     result.textContent = '🎉 仓库可访问';
                 } else if (res.status === 404) {
-                    showStatus('testStatus', '⚠️ 连接成功，但 data/recipes.json 不存在（新建即可）', 'info');
+                    showStatus('testStatus', '⚠️ 连接成功，文件待创建', 'info');
                     result.textContent = '📂 仓库可访问，文件待创建';
-                } else if (res.status === 401) {
-                    showStatus('testStatus', '❌ Token 无效或已过期，请重新生成', 'error');
-                    result.textContent = '🔑 Token 认证失败';
-                } else if (res.status === 403) {
-                    showStatus('testStatus', '❌ 权限不足，请检查 Token 是否勾选了 repo 权限', 'error');
-                    result.textContent = '🚫 权限不足';
+                } else if (res.status === 401 || res.status === 403) {
+                    showStatus('testStatus', '❌ Token 无效或权限不足', 'error');
+                    result.textContent = '🔑 认证失败';
                 } else {
-                    showStatus('testStatus', `⚠️ 响应状态码 ${res.status}，请检查配置`, 'error');
+                    showStatus('testStatus', `⚠️ 状态码 ${res.status}`, 'error');
                     result.textContent = `HTTP ${res.status}`;
                 }
             } catch (e) {
@@ -881,7 +446,7 @@
             }
         }
 
-        // ============ GitHub API（安全 UTF-8） ============
+        // ============ GitHub API ============
         async function readGitHubFile(path) {
             const cfg = getConfig();
             if (!cfg) throw new Error('配置无效');
@@ -942,60 +507,43 @@
 
         function safeArray(data) { return Array.isArray(data) ? data : []; }
 
-        // ============ 分页渲染辅助 ============
         function renderPagination(containerId, total, currentPage, pageSize, onPageChange) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            if (total === 0) {
-                container.innerHTML = `<span class="info">共 0 条</span>`;
-                return;
-            }
+            if (total === 0) { container.innerHTML = `<span class="info">共 0 条</span>`; return; }
             const totalPages = Math.ceil(total / pageSize);
-            if (totalPages <= 1) {
-                container.innerHTML = `<span class="info">共 ${total} 条</span>`;
-                return;
-            }
-
+            if (totalPages <= 1) { container.innerHTML = `<span class="info">共 ${total} 条</span>`; return; }
             let html = `<span class="info">共 ${total} 条，第 ${currentPage}/${totalPages} 页</span><div class="pages">`;
             html +=
                 `<button onclick="changePage(${currentPage - 1}, '${containerId}', ${total}, '${onPageChange}')" ${currentPage <= 1 ? 'disabled' : ''}>上一页</button>`;
-
-            // 页码逻辑：显示当前页前后各2页
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 2);
-
             if (startPage > 1) {
                 html += `<button onclick="changePage(1, '${containerId}', ${total}, '${onPageChange}')">1</button>`;
                 if (startPage > 2) html += `<span class="ellipsis">…</span>`;
             }
-
             for (let i = startPage; i <= endPage; i++) {
                 html +=
                     `<button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i}, '${containerId}', ${total}, '${onPageChange}')">${i}</button>`;
             }
-
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) html += `<span class="ellipsis">…</span>`;
                 html +=
                     `<button onclick="changePage(${totalPages}, '${containerId}', ${total}, '${onPageChange}')">${totalPages}</button>`;
             }
-
             html +=
                 `<button onclick="changePage(${currentPage + 1}, '${containerId}', ${total}, '${onPageChange}')" ${currentPage >= totalPages ? 'disabled' : ''}>下一页</button>`;
             html += `</div>`;
             container.innerHTML = html;
         }
 
-        // 全局分页跳转函数
         function changePage(page, containerId, total, callbackName) {
             const totalPages = Math.ceil(total / PAGE_SIZE);
             if (page < 1 || page > totalPages) return;
-            // 根据 containerId 更新对应的 page 变量
             if (containerId === 'recipePagination') recipePage = page;
             else if (containerId === 'ingredientPagination') ingPage = page;
             else if (containerId === 'categoryPagination') catPage = page;
             else if (containerId === 'nutritionPagination') nutPage = page;
-            // 调用对应的渲染函数
             if (callbackName === 'renderRecipes') renderRecipes();
             else if (callbackName === 'renderIngredients') renderIngredients();
             else if (callbackName === 'renderCategories') renderCategories();
@@ -1008,8 +556,7 @@
             showStatus('recipesStatus', '⏳ 加载中...', 'loading');
             try {
                 const r = await readGitHubFile('data/recipes.json');
-                if (!r) { recipes = [];
-                    recipesSha = null;
+                if (!r) { recipes = []; recipesSha = null;
                     showStatus('recipesStatus', '⚠️ 文件不存在', 'error'); } else { recipes = safeArray(r.content);
                     recipesSha = r.sha;
                     showStatus('recipesStatus', `✅ 共 ${recipes.length} 条`, 'success'); }
@@ -1027,18 +574,13 @@
             sel.innerHTML = '<option value="">全部分类</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join(
             '');
             sel.value = cur;
-
             const filtered = recipes.filter(r => r.name.toLowerCase().includes(search) && (!catFilter || r.category ===
                 catFilter));
             const total = filtered.length;
             const start = (recipePage - 1) * PAGE_SIZE;
             const pageData = filtered.slice(start, start + PAGE_SIZE);
-
-            if (!pageData.length) {
-                container.innerHTML = '<p style="color:#6b7280;">无匹配</p>';
-                renderPagination('recipePagination', total, recipePage, PAGE_SIZE, 'renderRecipes');
-                return;
-            }
+            if (!pageData.length) { container.innerHTML = '<p style="color:#6b7280;">无匹配</p>';
+                renderPagination('recipePagination', total, recipePage, PAGE_SIZE, 'renderRecipes'); return; }
             let html =
                 `<table><thead><tr><th>名称</th><th>分类</th><th>难度</th><th>时间</th><th>食材</th><th>步骤</th><th>操作</th></tr></thead><tbody>`;
             pageData.forEach(r => {
@@ -1056,31 +598,28 @@
         function filterRecipes() { recipePage = 1;
             renderRecipes(); }
 
-        // ===== 菜谱模态框 - 食材下拉选择 =====
-        function populateIngredientSelects() {
-            const selects = document.querySelectorAll('#editRecipeIngredientsContainer .ing-name-select');
-            const options = ingredients.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
-            selects.forEach(sel => {
-                const current = sel.value;
-                sel.innerHTML = `<option value="">选择食材...</option>${options}`;
-                if (current) sel.value = current;
-            });
+        // ===== 菜谱食材行：改用 input + datalist =====
+        function updateDatalist() {
+            const datalist = document.getElementById('ingredientDatalist');
+            if (!datalist) return;
+            // 去重
+            const names = [...new Set(ingredients.map(i => i.name).filter(Boolean))];
+            datalist.innerHTML = names.map(n => `<option value="${n}">`).join('');
         }
 
         function addIngredientRow(name, grams) {
             const container = document.getElementById('editRecipeIngredientsContainer');
-            const options = ingredients.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
             const row = document.createElement('div');
             row.className = 'ing-row';
             row.innerHTML = `
-                        <select class="ing-name-select">${options}</select>
+                        <input type="text" class="ing-name" list="ingredientDatalist" placeholder="输入食材名称" value="${name || ''}" autocomplete="off">
                         <input type="number" class="ing-grams" placeholder="克数" value="${grams || 100}" min="1">
                         <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
                     `;
-            if (name) row.querySelector('.ing-name-select').value = name;
             container.appendChild(row);
         }
 
+        // 打开/编辑菜谱时初始化食材行
         function openRecipeModal() {
             editRecipeIdx = -1;
             document.getElementById('recipeModalTitle').textContent = '新增菜谱';
@@ -1089,16 +628,19 @@
             document.getElementById('editRecipeDiff').value = '中等';
             document.getElementById('editRecipeTime').value = '';
             document.getElementById('editRecipeSteps').value = '';
+            document.getElementById('recipeJsonInput').value = '';
+            document.getElementById('jsonArea').classList.remove('open');
             const container = document.getElementById('editRecipeIngredientsContainer');
             container.innerHTML = '';
+            // 如果食材列表为空，先加载
             if (ingredients.length === 0) {
                 loadIngredients().then(() => {
                     addIngredientRow('', 100);
-                    populateIngredientSelects();
+                    updateDatalist();
                 });
             } else {
                 addIngredientRow('', 100);
-                populateIngredientSelects();
+                updateDatalist();
             }
             document.getElementById('recipeModal').classList.add('show');
         }
@@ -1112,18 +654,20 @@
             document.getElementById('editRecipeDiff').value = r.difficulty || '中等';
             document.getElementById('editRecipeTime').value = r.time || '';
             document.getElementById('editRecipeSteps').value = (r.steps || []).join('\n');
+            document.getElementById('recipeJsonInput').value = '';
+            document.getElementById('jsonArea').classList.remove('open');
             const container = document.getElementById('editRecipeIngredientsContainer');
             container.innerHTML = '';
             if (ingredients.length === 0) {
                 loadIngredients().then(() => {
                     (r.ingredients || []).forEach(ing => addIngredientRow(ing.name, ing.grams));
                     if ((r.ingredients || []).length === 0) addIngredientRow('', 100);
-                    populateIngredientSelects();
+                    updateDatalist();
                 });
             } else {
                 (r.ingredients || []).forEach(ing => addIngredientRow(ing.name, ing.grams));
                 if ((r.ingredients || []).length === 0) addIngredientRow('', 100);
-                populateIngredientSelects();
+                updateDatalist();
             }
             document.getElementById('recipeModal').classList.add('show');
         }
@@ -1138,9 +682,9 @@
             const rows = document.querySelectorAll('#editRecipeIngredientsContainer .ing-row');
             const ingredientsList = [];
             rows.forEach(row => {
-                const sel = row.querySelector('.ing-name-select');
+                const nameInput = row.querySelector('.ing-name');
                 const gramsInput = row.querySelector('.ing-grams');
-                const ingName = sel ? sel.value.trim() : '';
+                const ingName = nameInput ? nameInput.value.trim() : '';
                 const grams = parseFloat(gramsInput ? gramsInput.value : 0) || 0;
                 if (ingName && grams > 0) {
                     ingredientsList.push({ name: ingName, grams: grams });
@@ -1179,7 +723,94 @@
             } catch (e) { showStatus('recipesStatus', '❌ ' + e.message, 'error'); }
         }
 
+        // ===== JSON 导入/导出 =====
+        function toggleJsonArea() {
+            const area = document.getElementById('jsonArea');
+            area.classList.toggle('open');
+        }
+
+        function importRecipeJSON() {
+            const raw = document.getElementById('recipeJsonInput').value.trim();
+            if (!raw) { alert('请先输入 JSON 数据'); return; }
+            try {
+                const data = JSON.parse(raw);
+                // 填充基础字段
+                if (data.name) document.getElementById('editRecipeName').value = data.name;
+                if (data.category) document.getElementById('editRecipeCat').value = data.category;
+                if (data.difficulty) document.getElementById('editRecipeDiff').value = data.difficulty;
+                if (data.time) document.getElementById('editRecipeTime').value = data.time;
+                if (data.steps && Array.isArray(data.steps)) {
+                    document.getElementById('editRecipeSteps').value = data.steps.join('\n');
+                }
+                // 填充食材
+                const container = document.getElementById('editRecipeIngredientsContainer');
+                container.innerHTML = '';
+                if (data.ingredients && Array.isArray(data.ingredients)) {
+                    data.ingredients.forEach(ing => {
+                        if (ing.name && ing.grams) {
+                            addIngredientRow(ing.name, ing.grams);
+                        }
+                    });
+                }
+                if (container.children.length === 0) addIngredientRow('', 100);
+                updateDatalist();
+                showStatus('recipesStatus', '✅ JSON 导入成功', 'success');
+                // 清空输入区
+                document.getElementById('recipeJsonInput').value = '';
+                document.getElementById('jsonArea').classList.remove('open');
+            } catch (e) {
+                alert('JSON 解析失败：' + e.message);
+            }
+        }
+
+        function exportRecipeJSON() {
+            const name = document.getElementById('editRecipeName').value.trim();
+            const category = document.getElementById('editRecipeCat').value.trim();
+            const difficulty = document.getElementById('editRecipeDiff').value;
+            const time = document.getElementById('editRecipeTime').value.trim();
+            const steps = document.getElementById('editRecipeSteps').value.split('\n').filter(s => s.trim());
+            const rows = document.querySelectorAll('#editRecipeIngredientsContainer .ing-row');
+            const ingredientsList = [];
+            rows.forEach(row => {
+                const nameInput = row.querySelector('.ing-name');
+                const gramsInput = row.querySelector('.ing-grams');
+                const ingName = nameInput ? nameInput.value.trim() : '';
+                const grams = parseFloat(gramsInput ? gramsInput.value : 0) || 0;
+                if (ingName && grams > 0) {
+                    ingredientsList.push({ name: ingName, grams: grams });
+                }
+            });
+            const recipe = { name, category, difficulty, time, ingredients: ingredientsList, steps };
+            document.getElementById('recipeJsonInput').value = JSON.stringify(recipe, null, 2);
+            document.getElementById('jsonArea').classList.add('open');
+            showStatus('recipesStatus', '📤 JSON 已导出到下方文本框', 'info');
+        }
+
+        function clearJsonInput() {
+            document.getElementById('recipeJsonInput').value = '';
+        }
+
         // ============ 食材 CRUD ============
+        function populateCategorySelect(selected) {
+            const select = document.getElementById('editIngCat');
+            if (!select) return;
+            const catNames = Object.keys(categories).sort((a, b) => a.localeCompare(b));
+            let html = '';
+            if (catNames.length === 0) {
+                html = '<option value="">请先加载分类数据</option>';
+            } else {
+                html = '<option value="">请选择分类</option>';
+                catNames.forEach(name => {
+                    const emoji = categories[name] || '';
+                    html += `<option value="${name}" ${selected === name ? 'selected' : ''}>${emoji} ${name}</option>`;
+                });
+            }
+            select.innerHTML = html;
+            if (selected && !select.value) {
+                if (catNames.length > 0) select.value = catNames[0];
+            }
+        }
+
         async function loadIngredients() {
             ingPage = 1;
             showStatus('ingredientsStatus', '⏳ 加载中...', 'loading');
@@ -1191,7 +822,7 @@
                     ingredientsSha = r.sha;
                     showStatus('ingredientsStatus', `✅ 共 ${ingredients.length} 条`, 'success'); }
                 renderIngredients();
-                populateIngredientSelects();
+                updateDatalist(); // 更新菜谱模态框中的datalist
             } catch (e) { showStatus('ingredientsStatus', '❌ ' + e.message, 'error'); }
         }
 
@@ -1205,18 +836,13 @@
             sel.innerHTML = '<option value="">全部分类</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join(
             '');
             sel.value = cur;
-
             const filtered = ingredients.filter(i => i.name.toLowerCase().includes(search) && (!catFilter || i.category ===
                 catFilter));
             const total = filtered.length;
             const start = (ingPage - 1) * PAGE_SIZE;
             const pageData = filtered.slice(start, start + PAGE_SIZE);
-
-            if (!pageData.length) {
-                container.innerHTML = '<p style="color:#6b7280;">无匹配</p>';
-                renderPagination('ingredientPagination', total, ingPage, PAGE_SIZE, 'renderIngredients');
-                return;
-            }
+            if (!pageData.length) { container.innerHTML = '<p style="color:#6b7280;">无匹配</p>';
+                renderPagination('ingredientPagination', total, ingPage, PAGE_SIZE, 'renderIngredients'); return; }
             let html =
                 `<table><thead><tr><th>名称</th><th>分类</th><th>单位</th><th>操作</th></tr></thead><tbody>`;
             pageData.forEach(i => {
@@ -1237,8 +863,8 @@
             editIngIdx = -1;
             document.getElementById('ingredientModalTitle').textContent = '新增食材';
             document.getElementById('editIngName').value = '';
-            document.getElementById('editIngCat').value = '';
             document.getElementById('editIngUnit').value = 'g';
+            populateCategorySelect('');
             document.getElementById('ingredientModal').classList.add('show');
         }
 
@@ -1251,24 +877,23 @@
             const i = ingredients[idx];
             document.getElementById('ingredientModalTitle').textContent = '编辑食材';
             document.getElementById('editIngName').value = i.name || '';
-            document.getElementById('editIngCat').value = i.category || '';
             document.getElementById('editIngUnit').value = i.unit || 'g';
+            populateCategorySelect(i.category || '');
             document.getElementById('ingredientModal').classList.add('show');
         }
 
         function saveIngredientModal() {
             const name = document.getElementById('editIngName').value.trim();
             if (!name) { alert('请输入食材名称'); return; }
-            const item = {
-                name: name,
-                category: document.getElementById('editIngCat').value.trim(),
-                unit: document.getElementById('editIngUnit').value.trim() || 'g'
-            };
+            const category = document.getElementById('editIngCat').value;
+            if (!category) { alert('请选择分类'); return; }
+            const unit = document.getElementById('editIngUnit').value.trim() || 'g';
+            const item = { name, category, unit };
             if (editIngIdx === -1) ingredients.push(item);
             else ingredients[editIngIdx] = item;
             closeIngredientModal();
             renderIngredients();
-            populateIngredientSelects();
+            updateDatalist();
             showStatus('ingredientsStatus', '📝 已更新', '');
         }
 
@@ -1276,7 +901,7 @@
             if (!confirm('确定删除？')) return;
             ingredients.splice(idx, 1);
             renderIngredients();
-            populateIngredientSelects();
+            updateDatalist();
             showStatus('ingredientsStatus', '🗑️ 已删除', '');
         }
 
@@ -1290,7 +915,7 @@
             } catch (e) { showStatus('ingredientsStatus', '❌ ' + e.message, 'error'); }
         }
 
-        // ============ 分类管理 ============
+        // ============ 分类管理 CRUD ============
         async function loadCategories() {
             catPage = 1;
             showStatus('categoriesStatus', '⏳ 加载中...', 'loading');
@@ -1302,6 +927,7 @@
                     categorySha = r.sha;
                     showStatus('categoriesStatus', `✅ 共 ${Object.keys(categories).length} 个`, 'success'); }
                 renderCategories();
+                populateCategorySelect(document.getElementById('editIngCat')?.value || '');
             } catch (e) { showStatus('categoriesStatus', '❌ ' + e.message, 'error'); }
         }
 
@@ -1311,12 +937,8 @@
             const total = list.length;
             const start = (catPage - 1) * PAGE_SIZE;
             const pageData = list.slice(start, start + PAGE_SIZE);
-
-            if (!pageData.length) {
-                container.innerHTML = '<p style="color:#6b7280;">无分类</p>';
-                renderPagination('categoryPagination', total, catPage, PAGE_SIZE, 'renderCategories');
-                return;
-            }
+            if (!pageData.length) { container.innerHTML = '<p style="color:#6b7280;">无分类</p>';
+                renderPagination('categoryPagination', total, catPage, PAGE_SIZE, 'renderCategories'); return; }
             let html =
                 `<table><thead><tr><th>分类</th><th>图标</th><th>操作</th></tr></thead><tbody>`;
             pageData.forEach(([name, emoji]) => {
@@ -1336,10 +958,10 @@
             categories[name] = emoji;
             document.getElementById('newCatName').value = '';
             document.getElementById('newCatEmoji').value = '';
-            // 添加后跳转到最后一页
             const total = Object.keys(categories).length;
             catPage = Math.ceil(total / PAGE_SIZE);
             renderCategories();
+            populateCategorySelect(name);
             showStatus('categoriesStatus', '📝 已添加', '');
         }
 
@@ -1347,6 +969,7 @@
             if (!confirm('确定删除？')) return;
             delete categories[name];
             renderCategories();
+            populateCategorySelect('');
             showStatus('categoriesStatus', '🗑️ 已删除', '');
         }
 
@@ -1382,12 +1005,8 @@
             const total = entries.length;
             const start = (nutPage - 1) * PAGE_SIZE;
             const pageData = entries.slice(start, start + PAGE_SIZE);
-
-            if (!pageData.length) {
-                container.innerHTML = '<p style="color:#6b7280;">无数据</p>';
-                renderPagination('nutritionPagination', total, nutPage, PAGE_SIZE, 'renderNutrition');
-                return;
-            }
+            if (!pageData.length) { container.innerHTML = '<p style="color:#6b7280;">无数据</p>';
+                renderPagination('nutritionPagination', total, nutPage, PAGE_SIZE, 'renderNutrition'); return; }
             let html =
                 `<table><thead><tr><th>食材</th><th>热量</th><th>碳水</th><th>蛋白质</th><th>脂肪</th><th>操作</th></tr></thead><tbody>`;
             pageData.forEach(([name, data]) => {
@@ -1474,6 +1093,9 @@
             loadConfig();
             loadRecipes();
             loadIngredients();
+            loadCategories();
+            // 初始化 datalist
+            updateDatalist();
         };
     </script>
 </body>
