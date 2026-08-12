@@ -985,18 +985,50 @@
 
         // ============ 营养数据 ============
         async function loadNutrition() {
-            nutPage = 1;
-            showStatus('nutritionStatus', '⏳ 加载中...', 'loading');
-            try {
-                const r = await readGitHubFile('data/nutrition-table.json');
-                if (!r) { nutrition = {};
-                    nutritionSha = null;
-                    showStatus('nutritionStatus', '⚠️ 文件不存在', 'error'); } else { nutrition = r.content;
-                    nutritionSha = r.sha;
-                    showStatus('nutritionStatus', `✅ 共 ${Object.keys(nutrition).length} 条`, 'success'); }
-                renderNutrition();
-            } catch (e) { showStatus('nutritionStatus', '❌ ' + e.message, 'error'); }
+    nutPage = 1;
+    showStatus('nutritionStatus', '⏳ 加载中...', 'loading');
+    try {
+        const cfg = getConfig();
+        const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/data/system-ingredients.json`;
+        const res = await fetch(url, {
+            headers: { 'Authorization': `token ${cfg.token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        const data = await res.json();
+
+        const binary = atob(data.content);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const content = new TextDecoder('utf-8').decode(bytes);
+        const parsed = JSON.parse(content);
+
+        // 解析为 nutrition 对象
+        const newNutrition = {};
+        if (Array.isArray(parsed)) {
+            parsed.forEach(item => {
+                const name = item.name;
+                if (name) {
+                    newNutrition[name] = {
+                        cal: item.cal || 0,
+                        carb: item.carb || 0,
+                        prot: item.prot || 0,
+                        fat: item.fat || 0
+                    };
+                }
+            });
+        } else {
+            Object.assign(newNutrition, parsed);
         }
+        Object.assign(nutrition, newNutrition);
+        // 保存 sha 以便后续更新
+        nutritionSha = data.sha;
+
+        showStatus('nutritionStatus', `✅ 共 ${Object.keys(nutrition).length} 条`, 'success');
+        renderNutrition();
+    } catch (e) {
+        console.error('加载失败:', e);
+        showStatus('nutritionStatus', '❌ ' + e.message, 'error');
+    }
+}
 
         function renderNutrition() {
             const container = document.getElementById('nutritionTableContainer');
