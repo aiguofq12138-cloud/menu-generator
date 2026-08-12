@@ -3,450 +3,676 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>运营后台 - 基础数据管理</title>
+    <title>运营后台 · 结构化数据管理</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; padding: 20px; max-width: 900px; margin: auto; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; padding: 20px; max-width: 1200px; margin: auto; }
         h1 { font-size: 24px; margin-bottom: 20px; }
         .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 4px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
-        .btn { padding: 8px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: #2563eb; color: white; }
         .btn-success { background: #16a34a; color: white; }
         .btn-danger { background: #dc2626; color: white; }
         .btn-secondary { background: #e5e7eb; color: #1f2937; }
-        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .status { margin-top: 8px; font-size: 14px; padding: 6px 12px; border-radius: 6px; }
-        .status.success { background: #dcfce7; color: #166534; }
-        .status.error { background: #fee2e2; color: #991b1b; }
-        .json-preview { background: #f3f4f6; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 300px; overflow: auto; white-space: pre-wrap; word-break: break-all; margin-top: 8px; }
+        .btn-sm { padding: 4px 10px; font-size: 13px; }
+        .btn:hover { opacity: 0.85; }
+        .status { margin-top: 8px; font-size: 14px; padding: 6px 12px; border-radius: 6px; display: none; }
+        .status.success { background: #dcfce7; color: #166534; display: block; }
+        .status.error { background: #fee2e2; color: #991b1b; display: block; }
+        .status.loading { background: #fef9c3; color: #854d0e; display: block; }
+
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 10px 8px; background: #f1f5f9; border-bottom: 2px solid #d1d5db; }
+        td { padding: 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tag { background: #e5e7eb; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+
+        /* 模态框 */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; padding: 24px; border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal h2 { margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-group textarea { min-height: 60px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+        /* 导航标签 */
+        .tabs { display: flex; gap: 4px; border-bottom: 2px solid #d1d5db; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 8px 16px; cursor: pointer; border-radius: 8px 8px 0 0; font-weight: 600; color: #6b7280; background: transparent; border: none; }
+        .tab.active { background: white; color: #2563eb; border-bottom: 2px solid #2563eb; }
+        .tab:hover { background: #e5e7eb; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* 搜索栏 */
+        .search-bar { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+        .search-bar input { flex: 1; min-width: 150px; padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; }
+        .search-bar select { padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; }
+
+        .json-preview { background: #f3f4f6; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 200px; overflow: auto; white-space: pre-wrap; }
         hr { margin: 20px 0; border: 0; border-top: 1px solid #e5e7eb; }
     </style>
 </head>
 <body>
 
-    <h1>⚙️ 运营后台 · 基础数据管理</h1>
+<h1>⚙️ 运营后台 · 结构化数据管理</h1>
 
-    <!-- 配置区域 -->
-    <div class="card">
-        <div class="card-title">🔐 GitHub 配置</div>
-        <div class="flex" style="flex-wrap:wrap; gap:10px;">
-            <div style="flex:1;min-width:150px;">
-                <label>Owner（用户名）</label>
-                <input type="text" id="owner" value="" placeholder="你的GitHub用户名">
-            </div>
-            <div style="flex:1;min-width:150px;">
-                <label>Repo（仓库名）</label>
-                <input type="text" id="repo" value="" placeholder="你的仓库名">
-            </div>
-            <div style="flex:1;min-width:200px;">
-                <label>Token（classic）</label>
-                <input type="password" id="token" placeholder="ghp_xxxxxxxx" style="width:100%;">
-            </div>
-            <div style="display:flex;align-items:flex-end;gap:8px;">
-                <button class="btn btn-secondary" onclick="saveConfig()">保存配置</button>
-                <button class="btn btn-secondary" onclick="loadConfig()">加载配置</button>
-            </div>
-        </div>
-        <div id="configStatus" class="status" style="display:none;"></div>
-        <div style="margin-top:8px;font-size:12px;color:#6b7280;">
-            ⚠️ Token 需要 <code>repo</code> 或 <code>public_repo</code> 权限，配置保存在浏览器本地。
+<!-- GitHub 配置 -->
+<div class="card">
+    <div class="card-title">🔐 GitHub 配置</div>
+    <div class="flex" style="flex-wrap:wrap; gap:10px;">
+        <div style="flex:1;min-width:120px;"><label>Owner</label><input type="text" id="owner" placeholder="用户名"></div>
+        <div style="flex:1;min-width:120px;"><label>Repo</label><input type="text" id="repo" placeholder="仓库名"></div>
+        <div style="flex:1;min-width:160px;"><label>Token</label><input type="password" id="token" placeholder="ghp_xxx"></div>
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+            <button class="btn btn-secondary" onclick="saveConfig()">保存配置</button>
+            <button class="btn btn-secondary" onclick="loadConfig()">加载配置</button>
         </div>
     </div>
+    <div id="configStatus" class="status"></div>
+</div>
 
-    <!-- 管理菜谱 -->
+<!-- 导航 Tabs -->
+<div class="tabs">
+    <button class="tab active" data-tab="recipes">📝 菜谱管理</button>
+    <button class="tab" data-tab="ingredients">🥬 食材管理</button>
+    <button class="tab" data-tab="categories">📂 分类管理</button>
+    <button class="tab" data-tab="nutrition">🍎 营养数据</button>
+    <button class="tab" data-tab="other">🔧 其他数据</button>
+</div>
+
+<!-- 菜谱管理 -->
+<div id="tab-recipes" class="tab-content active">
     <div class="card">
-        <div class="card-title">📝 管理系统菜谱（recipes.json）</div>
-        <div class="flex" style="margin-bottom:10px;">
-            <button class="btn btn-primary" onclick="loadRecipes()">📥 加载当前菜谱</button>
-            <button class="btn btn-success" onclick="saveRecipes()">💾 保存菜谱</button>
+        <div class="card-title">
+            <span>📝 菜谱列表</span>
+            <button class="btn btn-primary" onclick="openRecipeModal()">+ 新增菜谱</button>
         </div>
-        <div id="recipesStatus" class="status" style="display:none;"></div>
-
-        <div class="form-group">
-            <label>新增菜谱（一行一个）</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <input type="text" id="newRecipeName" placeholder="菜谱名称" style="flex:2;min-width:120px;">
-                <input type="text" id="newRecipeCat" placeholder="分类" style="flex:1;min-width:80px;">
-                <input type="text" id="newRecipeTime" placeholder="时间" style="flex:1;min-width:80px;">
-                <button class="btn btn-primary" onclick="addRecipe()">➕ 添加</button>
-            </div>
+        <div class="search-bar">
+            <input type="text" id="recipeSearch" placeholder="搜索菜谱名称..." oninput="filterRecipes()">
+            <select id="recipeCategoryFilter" onchange="filterRecipes()"><option value="">全部分类</option></select>
+            <button class="btn btn-success" onclick="saveRecipes()">💾 保存到 GitHub</button>
+            <button class="btn btn-secondary" onclick="loadRecipes()">🔄 重新加载</button>
         </div>
+        <div id="recipesStatus" class="status"></div>
+        <div id="recipeTableContainer"><p style="color:#6b7280;">请点击“加载”或“重新加载”</p></div>
+    </div>
+</div>
 
-        <div id="recipeListContainer">
-            <p style="color:#6b7280;font-size:14px;">点击“加载当前菜谱”查看列表</p>
+<!-- 食材管理 -->
+<div id="tab-ingredients" class="tab-content">
+    <div class="card">
+        <div class="card-title">
+            <span>🥬 食材列表</span>
+            <button class="btn btn-primary" onclick="openIngredientModal()">+ 新增食材</button>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="ingSearch" placeholder="搜索食材名称..." oninput="filterIngredients()">
+            <select id="ingCategoryFilter" onchange="filterIngredients()"><option value="">全部分类</option></select>
+            <button class="btn btn-success" onclick="saveIngredients()">💾 保存到 GitHub</button>
+            <button class="btn btn-secondary" onclick="loadIngredients()">🔄 重新加载</button>
+        </div>
+        <div id="ingredientsStatus" class="status"></div>
+        <div id="ingredientTableContainer"><p style="color:#6b7280;">请点击“加载”或“重新加载”</p></div>
+    </div>
+</div>
+
+<!-- 分类管理 -->
+<div id="tab-categories" class="tab-content">
+    <div class="card">
+        <div class="card-title">📂 分类管理（内置 + 自定义）</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+            <input type="text" id="newCatName" placeholder="分类名称">
+            <input type="text" id="newCatEmoji" placeholder="图标(如🥩)" style="width:80px;">
+            <button class="btn btn-primary" onclick="addCategory()">添加自定义分类</button>
+            <button class="btn btn-secondary" onclick="loadCategories()">加载分类</button>
+            <button class="btn btn-success" onclick="saveCategories()">保存分类</button>
+        </div>
+        <div id="categoriesStatus" class="status"></div>
+        <div id="categoryList"><p style="color:#6b7280;">点击“加载分类”查看</p></div>
+    </div>
+</div>
+
+<!-- 营养数据（热量表） -->
+<div id="tab-nutrition" class="tab-content">
+    <div class="card">
+        <div class="card-title">🍎 营养数据（每100g）</div>
+        <div class="search-bar">
+            <input type="text" id="nutriSearch" placeholder="搜索食材..." oninput="filterNutrition()">
+            <button class="btn btn-secondary" onclick="loadNutrition()">加载营养表</button>
+            <button class="btn btn-success" onclick="saveNutrition()">保存营养表</button>
+        </div>
+        <div id="nutritionStatus" class="status"></div>
+        <div id="nutritionTableContainer"><p style="color:#6b7280;">点击“加载营养表”查看</p></div>
+    </div>
+</div>
+
+<!-- 其他数据（预览） -->
+<div id="tab-other" class="tab-content">
+    <div class="card">
+        <div class="card-title">🔧 其他基础数据文件</div>
+        <button class="btn btn-secondary" onclick="loadOtherData()">加载所有文件状态</button>
+        <div id="otherDataContainer" style="margin-top:8px; font-size:13px;"></div>
+        <hr>
+        <div><strong>手动编辑 JSON（高级）</strong></div>
+        <div style="display:flex; gap:8px; margin:8px 0; flex-wrap:wrap;">
+            <input type="text" id="otherFilePath" placeholder="文件路径 (如 data/calorie-table.json)" style="flex:2; min-width:200px;">
+            <button class="btn btn-secondary" onclick="loadOtherFile()">加载</button>
+            <button class="btn btn-success" onclick="saveOtherFile()">保存</button>
+        </div>
+        <textarea id="otherFileContent" rows="10" style="width:100%; font-family:monospace; font-size:13px; border:1px solid #d1d5db; border-radius:8px; padding:8px;"></textarea>
+        <div id="otherFileStatus" class="status"></div>
+    </div>
+</div>
+
+<!-- ===== 模态框：菜谱编辑 ===== -->
+<div class="modal-overlay" id="recipeModal">
+    <div class="modal">
+        <h2 id="recipeModalTitle">新增菜谱</h2>
+        <div class="form-group"><label>菜谱名称</label><input type="text" id="editRecipeName" placeholder="如：青椒鸡蛋酱拌魔芋面"></div>
+        <div class="form-group"><label>分类</label><input type="text" id="editRecipeCat" placeholder="如：家常菜"></div>
+        <div class="form-group"><label>难度</label>
+            <select id="editRecipeDiff"><option value="简单">简单</option><option value="中等">中等</option><option value="困难">困难</option></select>
+        </div>
+        <div class="form-group"><label>烹饪时间</label><input type="text" id="editRecipeTime" placeholder="如：10分钟"></div>
+        <div class="form-group"><label>食材（每行一个：名称,克数）</label>
+            <textarea id="editRecipeIngredients" rows="4" placeholder="青椒,100&#10;鸡蛋,2&#10;魔芋面,200"></textarea>
+        </div>
+        <div class="form-group"><label>步骤（每行一步）</label>
+            <textarea id="editRecipeSteps" rows="5" placeholder="1. 炒鸡蛋&#10;2. 加入青椒&#10;3. 拌面"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeRecipeModal()">取消</button>
+            <button class="btn btn-primary" onclick="saveRecipeModal()">保存</button>
         </div>
     </div>
+</div>
 
-    <!-- 管理食材 -->
-    <div class="card">
-        <div class="card-title">🥬 管理系统食材（system-ingredients.json）</div>
-        <div class="flex" style="margin-bottom:10px;">
-            <button class="btn btn-primary" onclick="loadIngredients()">📥 加载当前食材</button>
-            <button class="btn btn-success" onclick="saveIngredients()">💾 保存食材</button>
-        </div>
-        <div id="ingredientsStatus" class="status" style="display:none;"></div>
-
-        <div class="form-group">
-            <label>新增食材</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <input type="text" id="newIngName" placeholder="食材名称" style="flex:2;min-width:120px;">
-                <input type="text" id="newIngCat" placeholder="分类" style="flex:1;min-width:80px;">
-                <input type="text" id="newIngUnit" placeholder="单位" value="g" style="flex:1;min-width:60px;">
-                <button class="btn btn-primary" onclick="addIngredient()">➕ 添加</button>
-            </div>
-        </div>
-
-        <div id="ingredientListContainer">
-            <p style="color:#6b7280;font-size:14px;">点击“加载当前食材”查看列表</p>
+<!-- ===== 模态框：食材编辑 ===== -->
+<div class="modal-overlay" id="ingredientModal">
+    <div class="modal">
+        <h2 id="ingredientModalTitle">新增食材</h2>
+        <div class="form-group"><label>食材名称</label><input type="text" id="editIngName"></div>
+        <div class="form-group"><label>分类</label><input type="text" id="editIngCat" placeholder="如：蔬菜"></div>
+        <div class="form-group"><label>单位</label><input type="text" id="editIngUnit" value="g"></div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeIngredientModal()">取消</button>
+            <button class="btn btn-primary" onclick="saveIngredientModal()">保存</button>
         </div>
     </div>
+</div>
 
-    <!-- 其他数据（可选） -->
-    <div class="card">
-        <div class="card-title">🔧 其他数据文件</div>
-        <div class="flex">
-            <button class="btn btn-secondary" onclick="loadOtherData()">加载所有数据</button>
-        </div>
-        <div id="otherDataContainer" style="margin-top:8px;font-size:13px;"></div>
-    </div>
+<script>
+// ============ 全局状态 ============
+let CONFIG = { owner: '', repo: '', token: '' };
+let recipes = [], recipesSha = null;
+let ingredients = [], ingredientsSha = null;
+let categories = {}, categorySha = null;
+let nutrition = {}, nutritionSha = null;
 
-    <script>
-        // ============ 配置 ============
-        let CONFIG = {
-            owner: '',
-            repo: '',
-            token: ''
-        };
+// 当前编辑索引（-1表示新增）
+let editRecipeIdx = -1, editIngIdx = -1;
 
-        // 加载本地配置
-        function loadConfig() {
-            const saved = localStorage.getItem('admin_github_config');
-            if (saved) {
-                try {
-                    const cfg = JSON.parse(saved);
-                    document.getElementById('owner').value = cfg.owner || '';
-                    document.getElementById('repo').value = cfg.repo || '';
-                    document.getElementById('token').value = cfg.token || '';
-                    CONFIG = cfg;
-                    showStatus('configStatus', '配置已加载 ✅', 'success');
-                } catch(e) { /* ignore */ }
-            }
-        }
-
-        function saveConfig() {
-            CONFIG.owner = document.getElementById('owner').value.trim();
-            CONFIG.repo = document.getElementById('repo').value.trim();
-            CONFIG.token = document.getElementById('token').value.trim();
-            if (!CONFIG.owner || !CONFIG.repo || !CONFIG.token) {
-                alert('请填写完整信息');
-                return;
-            }
-            localStorage.setItem('admin_github_config', JSON.stringify(CONFIG));
-            showStatus('configStatus', '配置已保存 ✅', 'success');
-        }
-
-        function getConfig() {
-            // 优先从输入框获取最新值
-            CONFIG.owner = document.getElementById('owner').value.trim();
-            CONFIG.repo = document.getElementById('repo').value.trim();
-            CONFIG.token = document.getElementById('token').value.trim();
-            if (!CONFIG.owner || !CONFIG.repo || !CONFIG.token) {
-                alert('请先配置 GitHub 信息');
-                return null;
-            }
-            return CONFIG;
-        }
-
-        // ============ GitHub API 操作 ============
-        async function readGitHubFile(path) {
-            const cfg = getConfig();
-            if (!cfg) throw new Error('配置无效');
-            const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
-            const res = await fetch(url, {
-                headers: {
-                    'Authorization': `token ${cfg.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            if (!res.ok) {
-                if (res.status === 404) return null; // 文件不存在
-                throw new Error(`读取失败 (${res.status}): ${res.statusText}`);
-            }
-            const data = await res.json();
-            const binary = atob(data.content);
-const bytes = new Uint8Array(binary.length);
-for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
+// ============ 配置管理 ============
+function loadConfig() {
+    const saved = localStorage.getItem('admin_github_config');
+    if (saved) {
+        try {
+            const cfg = JSON.parse(saved);
+            document.getElementById('owner').value = cfg.owner || '';
+            document.getElementById('repo').value = cfg.repo || '';
+            document.getElementById('token').value = cfg.token || '';
+            CONFIG = cfg;
+            showStatus('configStatus', '配置已加载 ✅', 'success');
+        } catch(e) { /* ignore */ }
+    }
 }
-const content = new TextDecoder('utf-8').decode(bytes);
-return { content: JSON.parse(content), sha: data.sha };
-        }
-
-        async function writeGitHubFile(path, jsonData, sha) {
-            const cfg = getConfig();
-            if (!cfg) throw new Error('配置无效');
-            const jsonString = JSON.stringify(jsonData, null, 2);
-const utf8Bytes = new TextEncoder().encode(jsonString);
-let binary = '';
-for (let i = 0; i < utf8Bytes.length; i++) {
-    binary += String.fromCharCode(utf8Bytes[i]);
+function saveConfig() {
+    CONFIG.owner = document.getElementById('owner').value.trim();
+    CONFIG.repo = document.getElementById('repo').value.trim();
+    CONFIG.token = document.getElementById('token').value.trim();
+    if (!CONFIG.owner || !CONFIG.repo || !CONFIG.token) {
+        alert('请完整填写配置');
+        return;
+    }
+    localStorage.setItem('admin_github_config', JSON.stringify(CONFIG));
+    showStatus('configStatus', '配置已保存 ✅', 'success');
 }
-const content = btoa(binary);
-            const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
-            const res = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${cfg.token}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/vnd.github.v3+json'
-                },
-                body: JSON.stringify({
-                    message: `运营后台更新: ${path}`,
-                    content: content,
-                    sha: sha
-                })
-            });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(`写入失败 (${res.status}): ${err.message || res.statusText}`);
-            }
-            return res.json();
-        }
+function getConfig() {
+    CONFIG.owner = document.getElementById('owner').value.trim();
+    CONFIG.repo = document.getElementById('repo').value.trim();
+    CONFIG.token = document.getElementById('token').value.trim();
+    if (!CONFIG.owner || !CONFIG.repo || !CONFIG.token) {
+        alert('请先配置 GitHub');
+        return null;
+    }
+    return CONFIG;
+}
 
-        // ============ 菜谱管理 ============
-        let currentRecipes = [];
-        let currentRecipesSha = null;
+// ============ GitHub API（安全 UTF-8） ============
+async function readGitHubFile(path) {
+    const cfg = getConfig();
+    if (!cfg) throw new Error('配置无效');
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+    const res = await fetch(url, {
+        headers: { 'Authorization': `token ${cfg.token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) {
+        if (res.status === 404) return null;
+        throw new Error(`读取失败 (${res.status}): ${res.statusText}`);
+    }
+    const data = await res.json();
+    const binary = atob(data.content);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const content = new TextDecoder('utf-8').decode(bytes);
+    return { content: JSON.parse(content), sha: data.sha };
+}
+async function writeGitHubFile(path, jsonData, sha) {
+    const cfg = getConfig();
+    if (!cfg) throw new Error('配置无效');
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    const utf8Bytes = new TextEncoder().encode(jsonString);
+    let binary = '';
+    for (let i = 0; i < utf8Bytes.length; i++) binary += String.fromCharCode(utf8Bytes[i]);
+    const content = btoa(binary);
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+    const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${cfg.token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify({
+            message: `运营后台更新: ${path}`,
+            content: content,
+            sha: sha
+        })
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(`写入失败 (${res.status}): ${err.message || res.statusText}`);
+    }
+    return res.json();
+}
 
-        async function loadRecipes() {
-            const status = document.getElementById('recipesStatus');
-            status.style.display = 'block';
-            status.className = 'status';
-            status.textContent = '⏳ 加载中...';
-            try {
-                const result = await readGitHubFile('data/recipes.json');
-                if (!result) {
-                    currentRecipes = [];
-                    currentRecipesSha = null;
-                    status.textContent = '⚠️ 文件不存在，将新建';
-                    status.className = 'status error';
-                } else {
-                    currentRecipes = result.content;
-                    currentRecipesSha = result.sha;
-                    status.textContent = `✅ 加载成功，共 ${currentRecipes.length} 个菜谱`;
-                    status.className = 'status success';
-                }
-                renderRecipeList();
-            } catch (err) {
-                status.textContent = `❌ 加载失败: ${err.message}`;
-                status.className = 'status error';
-            }
-        }
+// ============ 工具函数 ============
+function showStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'status ' + (type || '');
+    if (type) el.style.display = 'block';
+    else el.style.display = 'none';
+}
+function safeParseArray(data) { return Array.isArray(data) ? data : []; }
 
-        function renderRecipeList() {
-            const container = document.getElementById('recipeListContainer');
-            if (!currentRecipes || currentRecipes.length === 0) {
-                container.innerHTML = '<p style="color:#6b7280;">暂无菜谱</p>';
-                return;
-            }
-            let html = '<ul style="list-style:none;padding:0;">';
-            currentRecipes.forEach((r, idx) => {
-                html += `<li style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e5e7eb;">
-                    <span><strong>${r.name}</strong> (${r.category}) ${r.time}</span>
-                    <button class="btn btn-danger btn-sm" onclick="deleteRecipe(${idx})">删除</button>
-                </li>`;
-            });
-            html += '</ul>';
-            container.innerHTML = html;
-        }
+// ============ Tab 切换 ============
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        // 自动加载对应数据
+        const tabName = this.dataset.tab;
+        if (tabName === 'recipes') loadRecipes();
+        else if (tabName === 'ingredients') loadIngredients();
+        else if (tabName === 'categories') loadCategories();
+        else if (tabName === 'nutrition') loadNutrition();
+    });
+});
 
-        function addRecipe() {
-            const name = document.getElementById('newRecipeName').value.trim();
-            const category = document.getElementById('newRecipeCat').value.trim();
-            const time = document.getElementById('newRecipeTime').value.trim();
-            if (!name || !category || !time) {
-                alert('请完整填写菜谱信息');
-                return;
-            }
-            if (!currentRecipes) currentRecipes = [];
-            currentRecipes.push({
-                name: name,
-                category: category,
-                difficulty: '中等',
-                time: time,
-                ingredients: [{ name: '示例食材', grams: 100 }],
-                steps: ['步骤1', '步骤2']
-            });
-            renderRecipeList();
-            document.getElementById('newRecipeName').value = '';
-            document.getElementById('newRecipeCat').value = '';
-            document.getElementById('newRecipeTime').value = '';
-            document.getElementById('recipesStatus').textContent = '📝 已添加，点击“保存菜谱”提交到 GitHub';
-            document.getElementById('recipesStatus').className = 'status';
-        }
+// ============ 菜谱管理 ============
+async function loadRecipes() {
+    const status = document.getElementById('recipesStatus');
+    showStatus('recipesStatus', '⏳ 加载中...', 'loading');
+    try {
+        const result = await readGitHubFile('data/recipes.json');
+        if (!result) { recipes = []; recipesSha = null; showStatus('recipesStatus', '⚠️ 文件不存在，将新建', 'error'); }
+        else { recipes = safeParseArray(result.content); recipesSha = result.sha; showStatus('recipesStatus', `✅ 加载成功，共 ${recipes.length} 条`, 'success'); }
+        renderRecipes();
+    } catch (e) { showStatus('recipesStatus', '❌ ' + e.message, 'error'); }
+}
+function renderRecipes() {
+    const container = document.getElementById('recipeTableContainer');
+    const search = document.getElementById('recipeSearch').value.toLowerCase();
+    const catFilter = document.getElementById('recipeCategoryFilter').value;
+    // 更新分类下拉
+    const cats = [...new Set(recipes.map(r => r.category).filter(Boolean))];
+    const filterSelect = document.getElementById('recipeCategoryFilter');
+    const currentVal = filterSelect.value;
+    filterSelect.innerHTML = '<option value="">全部分类</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    filterSelect.value = currentVal;
 
-        function deleteRecipe(idx) {
-            if (!confirm('确定删除这个菜谱吗？')) return;
-            currentRecipes.splice(idx, 1);
-            renderRecipeList();
-            document.getElementById('recipesStatus').textContent = '🗑️ 已删除，点击“保存菜谱”提交更改';
-            document.getElementById('recipesStatus').className = 'status';
-        }
+    let filtered = recipes.filter(r => {
+        const matchName = r.name.toLowerCase().includes(search);
+        const matchCat = !catFilter || r.category === catFilter;
+        return matchName && matchCat;
+    });
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="color:#6b7280;">暂无匹配的菜谱</p>';
+        return;
+    }
+    let html = `<table><thead><tr><th>名称</th><th>分类</th><th>难度</th><th>时间</th><th>食材</th><th>步骤数</th><th style="width:150px;">操作</th></tr></thead><tbody>`;
+    filtered.forEach((r, idx) => {
+        const origIdx = recipes.indexOf(r);
+        const ingredientsList = (r.ingredients || []).map(i => `${i.name} ${i.grams}g`).join(', ');
+        const stepsCount = (r.steps || []).length;
+        html += `<tr>
+            <td><strong>${r.name}</strong></td>
+            <td>${r.category || ''}</td>
+            <td>${r.difficulty || ''}</td>
+            <td>${r.time || ''}</td>
+            <td style="font-size:13px;">${ingredientsList}</td>
+            <td>${stepsCount}</td>
+            <td class="actions">
+                <button class="btn btn-secondary btn-sm" onclick="editRecipe(${origIdx})">编辑</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteRecipe(${origIdx})">删除</button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+function filterRecipes() { renderRecipes(); }
 
-        async function saveRecipes() {
-            const status = document.getElementById('recipesStatus');
-            status.style.display = 'block';
-            status.className = 'status';
-            status.textContent = '⏳ 保存中...';
-            try {
-                if (!currentRecipes) currentRecipes = [];
-                // 如果文件原本不存在，sha 为 null，PUT 时自动创建
-                const result = await writeGitHubFile('data/recipes.json', currentRecipes, currentRecipesSha);
-                // 更新 sha
-                currentRecipesSha = result.content.sha;
-                status.textContent = '✅ 保存成功！GitHub Pages 将在 1-2 分钟后更新';
-                status.className = 'status success';
-            } catch (err) {
-                status.textContent = `❌ 保存失败: ${err.message}`;
-                status.className = 'status error';
-            }
-        }
+function openRecipeModal() { editRecipeIdx = -1; document.getElementById('recipeModalTitle').textContent = '新增菜谱'; clearRecipeForm(); document.getElementById('recipeModal').classList.add('show'); }
+function closeRecipeModal() { document.getElementById('recipeModal').classList.remove('show'); }
+function clearRecipeForm() {
+    document.getElementById('editRecipeName').value = '';
+    document.getElementById('editRecipeCat').value = '';
+    document.getElementById('editRecipeDiff').value = '中等';
+    document.getElementById('editRecipeTime').value = '';
+    document.getElementById('editRecipeIngredients').value = '';
+    document.getElementById('editRecipeSteps').value = '';
+}
+function editRecipe(idx) {
+    editRecipeIdx = idx;
+    const r = recipes[idx];
+    document.getElementById('recipeModalTitle').textContent = '编辑菜谱';
+    document.getElementById('editRecipeName').value = r.name || '';
+    document.getElementById('editRecipeCat').value = r.category || '';
+    document.getElementById('editRecipeDiff').value = r.difficulty || '中等';
+    document.getElementById('editRecipeTime').value = r.time || '';
+    const ingStr = (r.ingredients || []).map(i => `${i.name},${i.grams}`).join('\n');
+    document.getElementById('editRecipeIngredients').value = ingStr;
+    document.getElementById('editRecipeSteps').value = (r.steps || []).join('\n');
+    document.getElementById('recipeModal').classList.add('show');
+}
+function saveRecipeModal() {
+    const name = document.getElementById('editRecipeName').value.trim();
+    if (!name) { alert('请输入菜谱名称'); return; }
+    const category = document.getElementById('editRecipeCat').value.trim();
+    const difficulty = document.getElementById('editRecipeDiff').value;
+    const time = document.getElementById('editRecipeTime').value.trim();
+    const ingText = document.getElementById('editRecipeIngredients').value;
+    const stepsText = document.getElementById('editRecipeSteps').value;
+    // 解析食材
+    const ingredients = ingText.split('\n').filter(line => line.trim()).map(line => {
+        const parts = line.split(',').map(s => s.trim());
+        const name = parts[0];
+        const grams = parseFloat(parts[1]) || 0;
+        return { name, grams };
+    });
+    const steps = stepsText.split('\n').filter(s => s.trim());
+    const recipe = { name, category, difficulty, time, ingredients, steps };
+    if (editRecipeIdx === -1) {
+        recipes.push(recipe);
+    } else {
+        recipes[editRecipeIdx] = recipe;
+    }
+    closeRecipeModal();
+    renderRecipes();
+    showStatus('recipesStatus', '📝 已更新，点击“保存到 GitHub”提交', '');
+}
+function deleteRecipe(idx) {
+    if (!confirm('确定删除「' + recipes[idx].name + '」吗？')) return;
+    recipes.splice(idx, 1);
+    renderRecipes();
+    showStatus('recipesStatus', '🗑️ 已删除，点击“保存到 GitHub”提交', '');
+}
+async function saveRecipes() {
+    const status = document.getElementById('recipesStatus');
+    showStatus('recipesStatus', '⏳ 保存中...', 'loading');
+    try {
+        const result = await writeGitHubFile('data/recipes.json', recipes, recipesSha);
+        recipesSha = result.content.sha;
+        showStatus('recipesStatus', '✅ 保存成功！GitHub Pages 将更新', 'success');
+    } catch (e) { showStatus('recipesStatus', '❌ ' + e.message, 'error'); }
+}
 
-        // ============ 食材管理 ============
-        let currentIngredients = [];
-        let currentIngredientsSha = null;
+// ============ 食材管理 ============
+async function loadIngredients() {
+    showStatus('ingredientsStatus', '⏳ 加载中...', 'loading');
+    try {
+        const result = await readGitHubFile('data/system-ingredients.json');
+        if (!result) { ingredients = []; ingredientsSha = null; showStatus('ingredientsStatus', '⚠️ 文件不存在', 'error'); }
+        else { ingredients = safeParseArray(result.content); ingredientsSha = result.sha; showStatus('ingredientsStatus', `✅ 加载成功，共 ${ingredients.length} 条`, 'success'); }
+        renderIngredients();
+    } catch (e) { showStatus('ingredientsStatus', '❌ ' + e.message, 'error'); }
+}
+function renderIngredients() {
+    const container = document.getElementById('ingredientTableContainer');
+    const search = document.getElementById('ingSearch').value.toLowerCase();
+    const catFilter = document.getElementById('ingCategoryFilter').value;
+    // 更新分类下拉
+    const cats = [...new Set(ingredients.map(i => i.category).filter(Boolean))];
+    const filterSelect = document.getElementById('ingCategoryFilter');
+    const currentVal = filterSelect.value;
+    filterSelect.innerHTML = '<option value="">全部分类</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    filterSelect.value = currentVal;
 
-        async function loadIngredients() {
-            const status = document.getElementById('ingredientsStatus');
-            status.style.display = 'block';
-            status.className = 'status';
-            status.textContent = '⏳ 加载中...';
-            try {
-                const result = await readGitHubFile('data/system-ingredients.json');
-                if (!result) {
-                    currentIngredients = [];
-                    currentIngredientsSha = null;
-                    status.textContent = '⚠️ 文件不存在，将新建';
-                    status.className = 'status error';
-                } else {
-                    currentIngredients = result.content;
-                    currentIngredientsSha = result.sha;
-                    status.textContent = `✅ 加载成功，共 ${currentIngredients.length} 个食材`;
-                    status.className = 'status success';
-                }
-                renderIngredientList();
-            } catch (err) {
-                status.textContent = `❌ 加载失败: ${err.message}`;
-                status.className = 'status error';
-            }
-        }
+    let filtered = ingredients.filter(i => {
+        const matchName = i.name.toLowerCase().includes(search);
+        const matchCat = !catFilter || i.category === catFilter;
+        return matchName && matchCat;
+    });
+    if (filtered.length === 0) { container.innerHTML = '<p style="color:#6b7280;">暂无食材</p>'; return; }
+    let html = `<table><thead><tr><th>名称</th><th>分类</th><th>单位</th><th style="width:150px;">操作</th></tr></thead><tbody>`;
+    filtered.forEach((i, idx) => {
+        const origIdx = ingredients.indexOf(i);
+        html += `<tr>
+            <td><strong>${i.name}</strong></td>
+            <td>${i.category || ''}</td>
+            <td>${i.unit || 'g'}</td>
+            <td class="actions">
+                <button class="btn btn-secondary btn-sm" onclick="editIngredient(${origIdx})">编辑</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteIngredient(${origIdx})">删除</button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+function filterIngredients() { renderIngredients(); }
+function openIngredientModal() { editIngIdx = -1; document.getElementById('ingredientModalTitle').textContent = '新增食材'; document.getElementById('editIngName').value = ''; document.getElementById('editIngCat').value = ''; document.getElementById('editIngUnit').value = 'g'; document.getElementById('ingredientModal').classList.add('show'); }
+function closeIngredientModal() { document.getElementById('ingredientModal').classList.remove('show'); }
+function editIngredient(idx) {
+    editIngIdx = idx;
+    const i = ingredients[idx];
+    document.getElementById('ingredientModalTitle').textContent = '编辑食材';
+    document.getElementById('editIngName').value = i.name || '';
+    document.getElementById('editIngCat').value = i.category || '';
+    document.getElementById('editIngUnit').value = i.unit || 'g';
+    document.getElementById('ingredientModal').classList.add('show');
+}
+function saveIngredientModal() {
+    const name = document.getElementById('editIngName').value.trim();
+    if (!name) { alert('请输入食材名称'); return; }
+    const category = document.getElementById('editIngCat').value.trim();
+    const unit = document.getElementById('editIngUnit').value.trim() || 'g';
+    const item = { name, category, unit };
+    if (editIngIdx === -1) ingredients.push(item);
+    else ingredients[editIngIdx] = item;
+    closeIngredientModal();
+    renderIngredients();
+    showStatus('ingredientsStatus', '📝 已更新，点击“保存到 GitHub”提交', '');
+}
+function deleteIngredient(idx) {
+    if (!confirm('确定删除「' + ingredients[idx].name + '」吗？')) return;
+    ingredients.splice(idx, 1);
+    renderIngredients();
+    showStatus('ingredientsStatus', '🗑️ 已删除', '');
+}
+async function saveIngredients() {
+    showStatus('ingredientsStatus', '⏳ 保存中...', 'loading');
+    try {
+        const result = await writeGitHubFile('data/system-ingredients.json', ingredients, ingredientsSha);
+        ingredientsSha = result.content.sha;
+        showStatus('ingredientsStatus', '✅ 保存成功！', 'success');
+    } catch (e) { showStatus('ingredientsStatus', '❌ ' + e.message, 'error'); }
+}
 
-        function renderIngredientList() {
-            const container = document.getElementById('ingredientListContainer');
-            if (!currentIngredients || currentIngredients.length === 0) {
-                container.innerHTML = '<p style="color:#6b7280;">暂无食材</p>';
-                return;
-            }
-            let html = '<ul style="list-style:none;padding:0;">';
-            currentIngredients.forEach((item, idx) => {
-                html += `<li style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e5e7eb;">
-                    <span><strong>${item.name}</strong> (${item.category}) 单位: ${item.unit}</span>
-                    <button class="btn btn-danger btn-sm" onclick="deleteIngredient(${idx})">删除</button>
-                </li>`;
-            });
-            html += '</ul>';
-            container.innerHTML = html;
-        }
+// ============ 分类管理 ============
+async function loadCategories() {
+    showStatus('categoriesStatus', '⏳ 加载中...', 'loading');
+    try {
+        const result = await readGitHubFile('data/categories.json');
+        if (!result) { categories = {}; categorySha = null; showStatus('categoriesStatus', '⚠️ 文件不存在', 'error'); }
+        else { categories = result.content; categorySha = result.sha; showStatus('categoriesStatus', `✅ 加载成功，共 ${Object.keys(categories).length} 个分类`, 'success'); }
+        renderCategories();
+    } catch (e) { showStatus('categoriesStatus', '❌ ' + e.message, 'error'); }
+}
+function renderCategories() {
+    const container = document.getElementById('categoryList');
+    const list = Object.entries(categories).sort((a,b) => a[0].localeCompare(b[0]));
+    if (list.length === 0) { container.innerHTML = '<p style="color:#6b7280;">暂无分类</p>'; return; }
+    let html = `<table><thead><tr><th>分类名</th><th>图标</th><th style="width:150px;">操作</th></tr></thead><tbody>`;
+    list.forEach(([name, emoji]) => {
+        html += `<tr><td>${name}</td><td>${emoji || '📦'}</td>
+            <td class="actions"><button class="btn btn-danger btn-sm" onclick="deleteCategory('${name}')">删除</button></td></tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+function addCategory() {
+    const name = document.getElementById('newCatName').value.trim();
+    const emoji = document.getElementById('newCatEmoji').value.trim() || '📦';
+    if (!name) { alert('请输入分类名称'); return; }
+    if (categories[name]) { alert('分类已存在'); return; }
+    categories[name] = emoji;
+    document.getElementById('newCatName').value = '';
+    document.getElementById('newCatEmoji').value = '';
+    renderCategories();
+    showStatus('categoriesStatus', '📝 已添加，点击“保存分类”提交', '');
+}
+function deleteCategory(name) {
+    if (!confirm('确定删除分类「' + name + '」吗？')) return;
+    delete categories[name];
+    renderCategories();
+    showStatus('categoriesStatus', '🗑️ 已删除', '');
+}
+async function saveCategories() {
+    showStatus('categoriesStatus', '⏳ 保存中...', 'loading');
+    try {
+        const result = await writeGitHubFile('data/categories.json', categories, categorySha);
+        categorySha = result.content.sha;
+        showStatus('categoriesStatus', '✅ 保存成功！', 'success');
+    } catch (e) { showStatus('categoriesStatus', '❌ ' + e.message, 'error'); }
+}
 
-        function addIngredient() {
-            const name = document.getElementById('newIngName').value.trim();
-            const category = document.getElementById('newIngCat').value.trim();
-            const unit = document.getElementById('newIngUnit').value.trim() || 'g';
-            if (!name || !category) {
-                alert('请完整填写食材信息');
-                return;
-            }
-            if (!currentIngredients) currentIngredients = [];
-            // 简单去重
-            if (currentIngredients.some(i => i.name === name)) {
-                alert('该食材已存在，请勿重复添加');
-                return;
-            }
-            currentIngredients.push({ name, category, unit });
-            renderIngredientList();
-            document.getElementById('newIngName').value = '';
-            document.getElementById('newIngCat').value = '';
-            document.getElementById('newIngUnit').value = 'g';
-            document.getElementById('ingredientsStatus').textContent = '📝 已添加，点击“保存食材”提交到 GitHub';
-            document.getElementById('ingredientsStatus').className = 'status';
-        }
+// ============ 营养数据管理 ============
+async function loadNutrition() {
+    showStatus('nutritionStatus', '⏳ 加载中...', 'loading');
+    try {
+        const result = await readGitHubFile('data/nutrition-table.json');
+        if (!result) { nutrition = {}; nutritionSha = null; showStatus('nutritionStatus', '⚠️ 文件不存在', 'error'); }
+        else { nutrition = result.content; nutritionSha = result.sha; showStatus('nutritionStatus', `✅ 加载成功，共 ${Object.keys(nutrition).length} 条`, 'success'); }
+        renderNutrition();
+    } catch (e) { showStatus('nutritionStatus', '❌ ' + e.message, 'error'); }
+}
+function renderNutrition() {
+    const container = document.getElementById('nutritionTableContainer');
+    const search = document.getElementById('nutriSearch').value.toLowerCase();
+    const entries = Object.entries(nutrition).filter(([k]) => k.toLowerCase().includes(search));
+    if (entries.length === 0) { container.innerHTML = '<p style="color:#6b7280;">暂无数据</p>'; return; }
+    let html = `<table><thead><tr><th>食材</th><th>热量(kcal)</th><th>碳水(g)</th><th>蛋白质(g)</th><th>脂肪(g)</th><th style="width:150px;">操作</th></tr></thead><tbody>`;
+    entries.forEach(([name, data]) => {
+        html += `<tr>
+            <td><strong>${name}</strong></td>
+            <td>${data.cal || 0}</td>
+            <td>${data.carb || 0}</td>
+            <td>${data.prot || 0}</td>
+            <td>${data.fat || 0}</td>
+            <td class="actions"><button class="btn btn-danger btn-sm" onclick="deleteNutrition('${name}')">删除</button></td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+function filterNutrition() { renderNutrition(); }
+function deleteNutrition(name) {
+    if (!confirm('确定删除「' + name + '」的营养数据吗？')) return;
+    delete nutrition[name];
+    renderNutrition();
+    showStatus('nutritionStatus', '🗑️ 已删除，点击“保存营养表”提交', '');
+}
+async function saveNutrition() {
+    showStatus('nutritionStatus', '⏳ 保存中...', 'loading');
+    try {
+        const result = await writeGitHubFile('data/nutrition-table.json', nutrition, nutritionSha);
+        nutritionSha = result.content.sha;
+        showStatus('nutritionStatus', '✅ 保存成功！', 'success');
+    } catch (e) { showStatus('nutritionStatus', '❌ ' + e.message, 'error'); }
+}
 
-        function deleteIngredient(idx) {
-            if (!confirm('确定删除这个食材吗？')) return;
-            currentIngredients.splice(idx, 1);
-            renderIngredientList();
-            document.getElementById('ingredientsStatus').textContent = '🗑️ 已删除，点击“保存食材”提交更改';
-            document.getElementById('ingredientsStatus').className = 'status';
-        }
+// ============ 其他数据文件 ============
+async function loadOtherData() {
+    const container = document.getElementById('otherDataContainer');
+    container.innerHTML = '⏳ 加载中...';
+    const files = ['categories.json', 'calorie-table.json', 'nutrition-table.json', 'category-defaults.json', 'ingredient-units.json'];
+    let html = '';
+    for (const f of files) {
+        try {
+            const result = await readGitHubFile(`data/${f}`);
+            html += `<div><strong>${f}</strong> ${result ? '✅ 存在' : '❌ 不存在'}</div>`;
+        } catch(e) { html += `<div><strong>${f}</strong> ❌ 读取失败</div>`; }
+    }
+    container.innerHTML = html || '无数据';
+}
+async function loadOtherFile() {
+    const path = document.getElementById('otherFilePath').value.trim();
+    if (!path) { alert('请输入文件路径'); return; }
+    showStatus('otherFileStatus', '⏳ 加载中...', 'loading');
+    try {
+        const result = await readGitHubFile(path);
+        if (!result) { document.getElementById('otherFileContent').value = ''; showStatus('otherFileStatus', '⚠️ 文件不存在', 'error'); }
+        else { document.getElementById('otherFileContent').value = JSON.stringify(result.content, null, 2); showStatus('otherFileStatus', '✅ 加载成功', 'success'); }
+    } catch(e) { showStatus('otherFileStatus', '❌ ' + e.message, 'error'); }
+}
+async function saveOtherFile() {
+    const path = document.getElementById('otherFilePath').value.trim();
+    if (!path) { alert('请输入文件路径'); return; }
+    const content = document.getElementById('otherFileContent').value;
+    let jsonData;
+    try { jsonData = JSON.parse(content); } catch(e) { alert('JSON 格式错误'); return; }
+    showStatus('otherFileStatus', '⏳ 保存中...', 'loading');
+    try {
+        // 需要先获取 sha（若文件存在）
+        let sha = null;
+        try {
+            const existing = await readGitHubFile(path);
+            if (existing) sha = existing.sha;
+        } catch(e) { /* 忽略，新建 */ }
+        const result = await writeGitHubFile(path, jsonData, sha);
+        showStatus('otherFileStatus', '✅ 保存成功！', 'success');
+    } catch(e) { showStatus('otherFileStatus', '❌ ' + e.message, 'error'); }
+}
 
-        async function saveIngredients() {
-            const status = document.getElementById('ingredientsStatus');
-            status.style.display = 'block';
-            status.className = 'status';
-            status.textContent = '⏳ 保存中...';
-            try {
-                if (!currentIngredients) currentIngredients = [];
-                const result = await writeGitHubFile('data/system-ingredients.json', currentIngredients, currentIngredientsSha);
-                currentIngredientsSha = result.content.sha;
-                status.textContent = '✅ 保存成功！GitHub Pages 将在 1-2 分钟后更新';
-                status.className = 'status success';
-            } catch (err) {
-                status.textContent = `❌ 保存失败: ${err.message}`;
-                status.className = 'status error';
-            }
-        }
-
-        // ============ 其他数据预览 ============
-        async function loadOtherData() {
-            const container = document.getElementById('otherDataContainer');
-            container.innerHTML = '⏳ 加载中...';
-            try {
-                const files = ['categories.json', 'calorie-table.json', 'nutrition-table.json', 'category-defaults.json', 'ingredient-units.json'];
-                let html = '';
-                for (const f of files) {
-                    const result = await readGitHubFile(`data/${f}`);
-                    if (result) {
-                        html += `<div><strong>${f}</strong> (存在)</div>`;
-                    } else {
-                        html += `<div><strong>${f}</strong> <span style="color:#dc2626;">不存在</span></div>`;
-                    }
-                }
-                container.innerHTML = html || '无其他数据';
-            } catch (err) {
-                container.innerHTML = `❌ ${err.message}`;
-            }
-        }
-
-        // ============ 工具 ============
-        function showStatus(id, msg, type) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.textContent = msg;
-                el.className = `status ${type}`;
-                el.style.display = 'block';
-            }
-        }
-
-        // 页面加载时自动加载配置
-        window.onload = function() {
-            loadConfig();
-            // 自动加载菜谱和食材
-            loadRecipes();
-            loadIngredients();
-        };
-    </script>
+// ============ 初始化 ============
+window.onload = function() {
+    loadConfig();
+    // 默认加载菜谱和食材
+    loadRecipes();
+    loadIngredients();
+};
+</script>
 </body>
 </html>
