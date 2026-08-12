@@ -3974,5 +3974,28 @@
     "steps": [
       "无"
     ]
+  },
+  {
+    "name": "毛豆烧鸡",
+    "category": "家常菜",
+    "difficulty": "中等",
+    "time": "30分钟",
+    "ingredients": [
+      {
+        "name": "毛豆",
+        "grams": 200
+      },
+      {
+        "name": "鸡腿肉",
+        "grams": 700
+      },
+      {
+        "name": "螺丝椒",
+        "grams": 100
+      }
+    ],
+    "steps": [
+      "无"
+    ]
   }
 ]
