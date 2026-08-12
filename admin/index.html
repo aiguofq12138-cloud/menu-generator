@@ -177,14 +177,25 @@
                 throw new Error(`读取失败 (${res.status}): ${res.statusText}`);
             }
             const data = await res.json();
-            const content = atob(data.content);
-            return { content: JSON.parse(content), sha: data.sha };
+            const binary = atob(data.content);
+const bytes = new Uint8Array(binary.length);
+for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+}
+const content = new TextDecoder('utf-8').decode(bytes);
+return { content: JSON.parse(content), sha: data.sha };
         }
 
         async function writeGitHubFile(path, jsonData, sha) {
             const cfg = getConfig();
             if (!cfg) throw new Error('配置无效');
-            const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
+            const jsonString = JSON.stringify(jsonData, null, 2);
+const utf8Bytes = new TextEncoder().encode(jsonString);
+let binary = '';
+for (let i = 0; i < utf8Bytes.length; i++) {
+    binary += String.fromCharCode(utf8Bytes[i]);
+}
+const content = btoa(binary);
             const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
             const res = await fetch(url, {
                 method: 'PUT',
