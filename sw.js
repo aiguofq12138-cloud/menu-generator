@@ -96,7 +96,16 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(event.request));
     return;
   }
-
+// data/ 目录下的 JSON 文件：强制走网络，永远不缓存（确保数据实时更新）
+if (path.includes('/data/') && path.endsWith('.json')) {
+    event.respondWith(
+        fetch(event.request, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        })
+    );
+    return;
+}
   // 其他文件：网络优先，失败回退缓存
   event.respondWith(
     fetch(event.request)
